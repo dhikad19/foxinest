@@ -1,7 +1,7 @@
-import Section from "../components/Section";
+import Section from "../components/Section/Completed";
 // import Sidebar from "../components/Sidebar";
 import Topbar from "../components/Topbar";
-const Home = () => {
+const Completed = () => {
   return (
     <div style={{ display: "flex", width: "100%" }}>
       {/* <Sidebar /> */}
@@ -13,4 +13,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Completed;

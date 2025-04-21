@@ -8,6 +8,7 @@ const Topbar = () => {
         position: "sticky",
         backgroundColor: "orange",
         justifyContent: "space-between",
+        zIndex: "999",
         padding: "10px",
       }}
     >

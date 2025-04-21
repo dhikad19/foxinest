@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { loadFromStorage, saveToStorage } from "../../utils/storage";
-import TaskList from "../../components/Task/List";
-import EditModal from "../../components/Modal/Edit";
-import SearchBar from "../../components/Search";
-import CompletedTaskList from "../../components/Task/Completed"; // Import CompletedTaskList
-import Snackbar from "../../components/Snackbar"; // Import Snackbar component
+import { loadFromStorage, saveToStorage } from "../../../utils/storage";
+import TaskList from "../../../components/Task/List";
+import EditModal from "../../../components/Modal/Edit";
+import SearchBar from "../../../components/Search";
+import CompletedTaskList from "../../../components/Task/Completed"; // Import CompletedTaskList
+import Snackbar from "../../../components/Snackbar"; // Import Snackbar component
 
-const Section = () => {
+const Home = () => {
   const [tasks, setTasks] = useState([]);
   const [sections, setSections] = useState([]);
   const [editTask, setEditTask] = useState(null);
@@ -150,12 +150,12 @@ const Section = () => {
 
   return (
     <div style={{ padding: "1rem", maxWidth: "700px", margin: "0 auto" }}>
-      <h1>📋 To-Do List with Sections</h1>
+      {/* <h1>📋 To-Do List with Sections</h1> */}
 
-      <SearchBar query={searchQuery} setQuery={setSearchQuery} />
+      {/* <SearchBar query={searchQuery} setQuery={setSearchQuery} /> */}
 
       {/* Add Section */}
-      <form
+      {/* <form
         onSubmit={(e) => {
           e.preventDefault();
           const name = e.target.section.value.trim();
@@ -168,10 +168,10 @@ const Section = () => {
       >
         <input name="section" placeholder="New section name" />
         <button type="submit">➕ Add Section</button>
-      </form>
+      </form> */}
 
       {/* Non-Completed Tasks */}
-      <TaskList
+      {/* <TaskList
         tasksByCategory={sections.reduce((acc, section) => {
           acc[section] = incompleteTasks.filter(
             (task) => task.category === section
@@ -180,7 +180,6 @@ const Section = () => {
         }, {})}
         onDelete={handleDeleteTask}
         onEdit={(task) => setEditTask(task)}
-        onEditSection={handleEditSection}
         onAdd={handleAddTask}
         onDeleteSection={handleDeleteSection}
         onReorderTasks={handleReorderTasks}
@@ -189,14 +188,14 @@ const Section = () => {
         setEditingSection={setEditingSection}
         newSectionName={newSectionName}
         setNewSectionName={setNewSectionName}
-      />
+      /> */}
 
       {/* Completed Tasks (History) */}
-      {/* <CompletedTaskList
+      <CompletedTaskList
         completedTasks={completedTasks}
         onClearHistory={handleClearHistory}
         onDeleteCompletedTask={handleDeleteCompletedTask}
-      /> */}
+      />
 
       {editTask && (
         <EditModal
@@ -212,4 +211,4 @@ const Section = () => {
   );
 };
 
-export default Section;
+export default Home;

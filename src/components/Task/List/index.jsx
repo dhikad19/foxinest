@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   DndContext,
   closestCenter,
@@ -14,6 +14,52 @@ import {
 import TaskItem from "../Item";
 import TaskForm from "../Form";
 
+// Tiptap imports
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+
+// ✏️ Live inline editor that instantly updates section name
+
+const LiveSectionEditor = ({ initialContent, onChange }) => {
+  const [currentText, setCurrentText] = useState(initialContent);
+
+  const editor = useEditor({
+    extensions: [StarterKit],
+    content: initialContent,
+    editorProps: {
+      attributes: {
+        class: "inline-editor",
+        style:
+          "border: none; outline: none; font-size: 1.25rem; font-weight: bold;",
+      },
+      handleDOMEvents: {
+        blur: () => {
+          const trimmed = currentText.trim();
+          if (trimmed !== initialContent && trimmed !== "") {
+            onChange(trimmed);
+          }
+        },
+      },
+    },
+    onUpdate: ({ editor }) => {
+      const text = editor.getText();
+      setCurrentText(text);
+    },
+  });
+
+  // Keep in sync with external changes
+  useEffect(() => {
+    if (editor && initialContent !== editor.getText().trim()) {
+      editor.commands.setContent(initialContent);
+      setCurrentText(initialContent);
+    }
+  }, [initialContent]);
+
+  if (!editor) return null;
+
+  return <EditorContent editor={editor} />;
+};
+
 const TaskList = ({
   tasksByCategory,
   onDelete,
@@ -26,7 +72,7 @@ const TaskList = ({
   newSectionName,
   setNewSectionName,
   onReorderTasks,
-  onComplete, // New prop for handling task completion
+  onComplete,
 }) => {
   const [openForms, setOpenForms] = useState({});
   const sensors = useSensors(useSensor(PointerSensor));
@@ -71,8 +117,6 @@ const TaskList = ({
             key={category}
             style={{
               marginBottom: "2rem",
-              border: "1px solid #eee",
-              padding: 16,
               borderRadius: 8,
             }}
           >
@@ -83,45 +127,18 @@ const TaskList = ({
                 alignItems: "center",
               }}
             >
-              {editingSection === category ? (
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    onEditSection(category, newSectionName);
-                  }}
-                  style={{ display: "flex", gap: 8 }}
-                >
-                  <input
-                    value={newSectionName}
-                    onChange={(e) => setNewSectionName(e.target.value)}
-                    autoFocus
-                  />
-                  <button type="submit">✅</button>
-                  <button type="button" onClick={() => setEditingSection(null)}>
-                    ❌
-                  </button>
-                </form>
-              ) : (
-                <>
-                  <h3>{category}</h3>
-                  <div style={{ display: "flex", gap: 8 }}>
-                    <button
-                      onClick={() => {
-                        setEditingSection(category);
-                        setNewSectionName(category);
-                      }}
-                    >
-                      ✏️
-                    </button>
-                    <button onClick={() => toggleForm(category)}>
-                      {openForms[category] ? "– Cancel" : "➕ Add Task"}
-                    </button>
-                    <button onClick={() => onDeleteSection(category)}>
-                      🗑️
-                    </button>
-                  </div>
-                </>
-              )}
+              <LiveSectionEditor
+                initialContent={category}
+                onChange={(newName) => {
+                  onEditSection(category, newName);
+                }}
+              />
+              <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={() => toggleForm(category)}>
+                  {openForms[category] ? "– Cancel" : "➕ Add Task"}
+                </button>
+                <button onClick={() => onDeleteSection(category)}>🗑️</button>
+              </div>
             </div>
 
             <SortableContext
@@ -134,7 +151,7 @@ const TaskList = ({
                   task={task}
                   onDelete={onDelete}
                   onEdit={onEdit}
-                  onComplete={onComplete} // Pass onComplete handler here
+                  onComplete={onComplete}
                 />
               ))}
             </SortableContext>
