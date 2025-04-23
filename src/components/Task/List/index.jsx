@@ -1,11 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react"; // Import useEffect here
 import {
   DndContext,
   closestCenter,
   PointerSensor,
   useSensor,
+  DragOverlay,
   useSensors,
 } from "@dnd-kit/core";
+import { Divider } from "@mui/material";
+import {
+  restrictToVerticalAxis,
+  restrictToHorizontalAxis,
+} from "@dnd-kit/modifiers";
 import {
   SortableContext,
   verticalListSortingStrategy,
@@ -18,8 +24,10 @@ import TaskForm from "../Form";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 
-// ✏️ Live inline editor that instantly updates section name
+// React-icons for the arrow
+import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 
+// ✏️ Live inline editor that instantly updates section name
 const LiveSectionEditor = ({ initialContent, onChange }) => {
   const [currentText, setCurrentText] = useState(initialContent);
 
@@ -30,7 +38,7 @@ const LiveSectionEditor = ({ initialContent, onChange }) => {
       attributes: {
         class: "inline-editor",
         style:
-          "border: none; outline: none; font-size: 1.25rem; font-weight: bold;",
+          "border: none; outline: none; font-size: 15px; font-weight: bold;",
       },
       handleDOMEvents: {
         blur: () => {
@@ -75,6 +83,8 @@ const TaskList = ({
   onComplete,
 }) => {
   const [openForms, setOpenForms] = useState({});
+  const [expandedSections, setExpandedSections] = useState({});
+  const [activeTask, setActiveTask] = useState(null);
   const sensors = useSensors(useSensor(PointerSensor));
 
   const toggleForm = (category) => {
@@ -82,6 +92,22 @@ const TaskList = ({
       ...prev,
       [category]: !prev[category],
     }));
+  };
+
+  const toggleExpand = (category) => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [category]: !prev[category],
+    }));
+  };
+
+  const handleDragStart = (event) => {
+    const { active } = event;
+    const allTasks = Object.values(tasksByCategory).flat();
+    const task = allTasks.find((t) => t.id === active.id);
+    if (task) {
+      setActiveTask(task);
+    }
   };
 
   const handleDragEnd = (event) => {
@@ -105,8 +131,23 @@ const TaskList = ({
     }
   };
 
+  useEffect(() => {
+    if (tasksByCategory && Object.keys(tasksByCategory).length > 0) {
+      setExpandedSections((prev) => {
+        const updated = { ...prev };
+        for (const key of Object.keys(tasksByCategory)) {
+          if (updated[key] === undefined) {
+            updated[key] = true; // default to expanded
+          }
+        }
+        return updated;
+      });
+    }
+  }, [tasksByCategory]);
+
   return (
     <DndContext
+      modifiers={[restrictToVerticalAxis]}
       sensors={sensors}
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}
@@ -116,56 +157,125 @@ const TaskList = ({
           <div
             key={category}
             style={{
-              marginBottom: "2rem",
+              marginBottom: "1rem",
               borderRadius: 8,
+              padding: 4,
             }}
           >
+            {/* Section Header with Expand/Collapse Button */}
             <div
               style={{
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
+                userSelect: "none",
+                marginBottom: 10,
               }}
             >
-              <LiveSectionEditor
-                initialContent={category}
-                onChange={(newName) => {
-                  onEditSection(category, newName);
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
                 }}
-              />
+              >
+                <div
+                  onClick={() => toggleExpand(category)}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    marginLeft: -30,
+                  }}
+                >
+                  {/* Toggle Arrow Icon */}
+                  {expandedSections[category] ? (
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        cursor: "pointer",
+                        marginRight: 8,
+                        borderRadius: 4,
+                        height: 22,
+                        width: 22,
+                        backgroundColor: "#fafafa",
+                      }}
+                    >
+                      <FaChevronDown size={10} color="grey" />
+                    </div>
+                  ) : (
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        cursor: "pointer",
+                        marginRight: 8,
+                        borderRadius: 4,
+                        height: 22,
+                        width: 22,
+                        backgroundColor: "#fafafa",
+                      }}
+                    >
+                      <FaChevronRight size={10} color="grey" />
+                    </div>
+                  )}
+                </div>
+                <LiveSectionEditor
+                  initialContent={category}
+                  onChange={(newName) => {
+                    onEditSection(category, newName);
+                  }}
+                />
+              </div>
               <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={() => onDeleteSection(category)}>
+                  Delete
+                </button>
+              </div>
+            </div>
+            <Divider></Divider>
+            <div
+              style={{
+                overflow: "hidden",
+                paddingLeft: 4,
+                paddingRight: 4,
+                maxHeight: expandedSections[category] ? "100%" : "0",
+              }}
+            >
+              <SortableContext
+                items={tasks.map((t) => t.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                {tasks.map((task) => (
+                  <TaskItem
+                    key={task.id}
+                    task={task}
+                    onDelete={onDelete}
+                    onEdit={onEdit}
+                    onComplete={onComplete}
+                  />
+                ))}
+              </SortableContext>
+
+              {!openForms[category] && (
                 <button onClick={() => toggleForm(category)}>
                   {openForms[category] ? "– Cancel" : "➕ Add Task"}
                 </button>
-                <button onClick={() => onDeleteSection(category)}>🗑️</button>
-              </div>
-            </div>
+              )}
 
-            <SortableContext
-              items={tasks.map((t) => t.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              {tasks.map((task) => (
-                <TaskItem
-                  key={task.id}
-                  task={task}
-                  onDelete={onDelete}
-                  onEdit={onEdit}
-                  onComplete={onComplete}
+              {openForms[category] && (
+                <TaskForm
+                  onAdd={(task) => {
+                    onAdd(task);
+                    toggleForm(category);
+                  }}
+                  defaultCategory={category}
+                  onCancel={() => toggleForm(category)}
                 />
-              ))}
-            </SortableContext>
-
-            {openForms[category] && (
-              <TaskForm
-                onAdd={(task) => {
-                  onAdd(task);
-                  toggleForm(category);
-                }}
-                defaultCategory={category}
-                onCancel={() => toggleForm(category)}
-              />
-            )}
+              )}
+            </div>
           </div>
         ))}
       </div>

@@ -1,49 +1,34 @@
 import React, { useEffect, useState } from "react";
+import { Snackbar, Button } from "@mui/material";
 
-const Snackbar = ({ onUndo }) => {
-  const [visible, setVisible] = useState(true);
+const CustomSnackbar = ({ onUndo }) => {
+  const [open, setOpen] = useState(true);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setVisible(false);
+      setOpen(false);
     }, 7000); // 7 seconds
 
-    return () => clearTimeout(timer); // Cleanup on unmount
+    return () => clearTimeout(timer);
   }, []);
 
-  if (!visible) return null;
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   return (
-    <div style={snackbarStyles}>
-      <span>Task completed!</span>
-      <button onClick={onUndo} style={undoButtonStyles}>
-        Undo
-      </button>
-    </div>
+    <Snackbar
+      open={open}
+      onClose={handleClose}
+      message="Task completed!"
+      action={
+        <Button color="secondary" size="small" onClick={onUndo}>
+          Undo
+        </Button>
+      }
+      anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+    />
   );
 };
 
-const snackbarStyles = {
-  position: "fixed",
-  bottom: "20px",
-  left: "50%",
-  transform: "translateX(-50%)",
-  backgroundColor: "#4CAF50",
-  color: "white",
-  padding: "10px 20px",
-  borderRadius: "5px",
-  display: "flex",
-  alignItems: "center",
-  gap: "10px",
-};
-
-const undoButtonStyles = {
-  backgroundColor: "#f44336",
-  color: "white",
-  border: "none",
-  padding: "5px 10px",
-  borderRadius: "3px",
-  cursor: "pointer",
-};
-
-export default Snackbar;
+export default CustomSnackbar;

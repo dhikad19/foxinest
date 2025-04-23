@@ -28,7 +28,7 @@ const Sidebar = ({ isMobile, isOpen, onClose }) => {
           position: "fixed",
           width: "50vw",
           top: 0,
-          left: isOpen ? 0 : "-370px",
+          left: isOpen ? 0 : "-600px",
         }
       : {
           position: "sticky",

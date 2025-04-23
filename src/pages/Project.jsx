@@ -1,8 +1,8 @@
 // pages/Home.jsx
 import Section from "../components/Section";
 
-const About = () => {
+const Project = () => {
   return <Section />;
 };
 
-export default About;
+export default Project;

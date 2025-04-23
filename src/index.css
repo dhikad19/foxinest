@@ -11,6 +11,11 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+div p {
+  margin: 0;
+}
+
 .sidebar-link {
   display: block;
   padding: 10px 15px;
@@ -57,4 +62,14 @@ code {
 
 .ProseMirror:focus {
   outline: none;
+}
+
+.MuiBox-root {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+}
+
+.active-link {
+  background-color: #ff7800; /* Highlight color */
+  color: white;
 }

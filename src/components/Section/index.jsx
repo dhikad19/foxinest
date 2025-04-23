@@ -3,8 +3,9 @@ import { loadFromStorage, saveToStorage } from "../../utils/storage";
 import TaskList from "../../components/Task/List";
 import EditModal from "../../components/Modal/Edit";
 import SearchBar from "../../components/Search";
-import CompletedTaskList from "../../components/Task/Completed"; // Import CompletedTaskList
 import Snackbar from "../../components/Snackbar"; // Import Snackbar component
+
+import { Button, TextField, Divider } from "@mui/material";
 
 const Section = () => {
   const [tasks, setTasks] = useState([]);
@@ -148,27 +149,111 @@ const Section = () => {
     }
   };
 
+  const [inputValue, setInputValue] = useState("");
+  const [showForm, setShowForm] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const name = inputValue.trim();
+    if (name && !sections.includes(name)) {
+      handleAddSection(name);
+      setInputValue("");
+    }
+  };
+
   return (
-    <div style={{ padding: "1rem", maxWidth: "700px", margin: "0 auto" }}>
+    <div
+      style={{
+        paddingLeft: "45px",
+        paddingRight: "45px",
+        maxWidth: "700px",
+        margin: "0 auto",
+        overflow: "visible" /* 👈 allows dragged item to be seen outside */,
+        position: "relative",
+      }}
+    >
       <h1>📋 To-Do List with Sections</h1>
 
       <SearchBar query={searchQuery} setQuery={setSearchQuery} />
 
-      {/* Add Section */}
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          const name = e.target.section.value.trim();
-          if (name && !sections.includes(name)) {
-            handleAddSection(name);
-            e.target.reset();
-          }
-        }}
-        style={{ marginBottom: 20, display: "flex", gap: 8 }}
-      >
-        <input name="section" placeholder="New section name" />
-        <button type="submit">➕ Add Section</button>
-      </form>
+      {!showForm ? (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            cursor: "pointer",
+            userSelect: "none",
+            marginBottom: 16,
+            padding: 4,
+            marginTop: 16,
+          }}
+          onClick={() => setShowForm(true)}
+        >
+          <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
+          <span
+            style={{ fontWeight: "bold", color: "#ff7800", fontSize: "15px" }}
+          >
+            Add Section
+          </span>
+          <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
+        </div>
+      ) : (
+        <form
+          onSubmit={handleSubmit}
+          style={{ gap: 8, marginTop: 10, marginBottom: 30, padding: 4 }}
+        >
+          <TextField
+            fullWidth
+            id="section"
+            name="section"
+            size="small"
+            placeholder="New section name"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+          />
+          <div style={{ marginTop: "8px" }}>
+            <Button
+              type="submit"
+              variant="contained"
+              sx={{
+                backgroundColor: "#ff7800",
+                "&:hover": { backgroundColor: "#ff871f" },
+              }}
+              disableElevation
+              size="small"
+              style={{
+                textTransform: "capitalize",
+                fontWeight: "bold",
+                fontSize: "12px",
+                marginRight: "6px",
+              }}
+              disabled={!inputValue.trim()}
+            >
+              Add Section
+            </Button>
+            <Button
+              variant="text"
+              size="small"
+              sx={{
+                color: "#000000",
+                "&:hover": { backgroundColor: "#f0f0f0" },
+              }}
+              style={{
+                textTransform: "capitalize",
+                fontWeight: "bold",
+                fontSize: "12px",
+              }}
+              onClick={() => {
+                setShowForm(false);
+                setInputValue("");
+              }}
+            >
+              Cancel
+            </Button>
+          </div>
+        </form>
+      )}
 
       {/* Non-Completed Tasks */}
       <TaskList
