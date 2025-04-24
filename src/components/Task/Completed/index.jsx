@@ -1,5 +1,5 @@
 import React from "react";
-import TaskItem from "./Item";
+import CompletedTaskItem from "./Item"; // Adjust path if needed
 
 const CompletedTaskList = ({
   completedTasks,
@@ -7,19 +7,38 @@ const CompletedTaskList = ({
   onClearHistory,
 }) => {
   return (
-    <div>
+    <div style={{ marginTop: 30 }}>
       <h2>Completed Tasks (History)</h2>
-      <button onClick={onClearHistory}>Clear History</button>
+
+      <button
+        onClick={onClearHistory}
+        style={{
+          background: "#e53935",
+          color: "white",
+          border: "none",
+          padding: "6px 12px",
+          borderRadius: "4px",
+          marginBottom: 10,
+          cursor: "pointer",
+        }}
+      >
+        Clear History
+      </button>
+
       <div>
-        {completedTasks.map((task) => (
-          <TaskItem
-            key={task.id}
-            task={task}
-            onDelete={onDeleteCompletedTask} // Only delete for completed tasks
-            onEdit={() => {}}
-            onComplete={() => {}}
-          />
-        ))}
+        {completedTasks.length === 0 ? (
+          <p style={{ fontStyle: "italic", color: "#777" }}>
+            No completed tasks yet.
+          </p>
+        ) : (
+          completedTasks.map((task) => (
+            <CompletedTaskItem
+              key={task.id}
+              task={task}
+              onDelete={onDeleteCompletedTask}
+            />
+          ))
+        )}
       </div>
     </div>
   );

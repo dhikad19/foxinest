@@ -3,6 +3,23 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Divider, Checkbox } from "@mui/material";
 
+// Styles
+const containerStyle = (isDragging, transform, transition) => ({
+  transform: CSS.Transform.toString(transform),
+  transition,
+  background: "#fff",
+  marginBottom: 10,
+  borderRadius: 4,
+  display: "flex",
+  flexDirection: "column",
+  gap: 8,
+  cursor: "grab",
+  boxShadow: isDragging ? "0 2px 6px rgba(0, 0, 0, 0.1)" : "none",
+  touchAction: "none",
+  zIndex: isDragging ? 9999 : "auto",
+  position: isDragging ? "relative" : "static",
+});
+
 const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
   const {
     attributes,
@@ -14,25 +31,13 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
     isDragging,
   } = useSortable({ id: task.id });
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    background: "#fff",
-    marginBottom: 10,
-    borderRadius: 4,
-    display: "flex",
-    flexDirection: "column",
-    gap: 8,
-    cursor: "grab",
-    boxShadow: isDragging ? "0 2px 6px rgba(0, 0, 0, 0.1)" : "none",
-    touchAction: "none",
-    zIndex: isDragging ? 9999 : "auto",
-    position: isDragging ? "relative" : "static",
-  };
-
   return (
-    <div ref={setNodeRef} style={style}>
+    <div
+      ref={setNodeRef}
+      style={containerStyle(isDragging, transform, transition)}
+    >
       <div style={{ display: "flex", justifyContent: "space-between" }}>
+        {/* Task Details */}
         <div
           style={{ flex: 1, display: "flex", height: "100%", marginTop: 10 }}
         >
@@ -43,10 +48,8 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
               style={{ marginLeft: -2 }}
               size="small"
               sx={{
-                "&.Mui-checked": {
-                  color: "#ff7800", // checked color
-                },
-                p: 0, // optional: removes extra padding
+                "&.Mui-checked": { color: "#ff7800" },
+                p: 0,
               }}
             />
           </div>
@@ -64,9 +67,15 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
             </p>
           </div>
         </div>
+
+        {/* Action Buttons */}
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <button onClick={() => onEdit(task)}>✏️</button>
-          <button onClick={() => onDelete(task.id)}>🗑️</button>
+          <button onClick={() => onEdit(task)} aria-label="Edit task">
+            ✏️
+          </button>
+          <button onClick={() => onDelete(task.id)} aria-label="Delete task">
+            🗑️
+          </button>
           <div
             ref={setActivatorNodeRef}
             {...attributes}
@@ -79,11 +88,13 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
               borderRadius: 4,
               fontSize: 18,
             }}
+            aria-label="Drag task"
           >
             ⠿
           </div>
         </div>
       </div>
+
       {!isDragging && <Divider />}
     </div>
   );

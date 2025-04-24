@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Snackbar, Button } from "@mui/material";
 
-const CustomSnackbar = ({ onUndo }) => {
+const CustomSnackbar = ({ message, onUndo }) => {
   const [open, setOpen] = useState(true);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setOpen(false);
-    }, 7000); // 7 seconds
+    }, 5000); // Snackbar will automatically close after 5 seconds
 
     return () => clearTimeout(timer);
   }, []);
@@ -20,7 +20,7 @@ const CustomSnackbar = ({ onUndo }) => {
     <Snackbar
       open={open}
       onClose={handleClose}
-      message="Task completed!"
+      message={message}
       action={
         <Button color="secondary" size="small" onClick={onUndo}>
           Undo
