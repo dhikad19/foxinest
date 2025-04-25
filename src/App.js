@@ -5,7 +5,7 @@ import About from "./pages/About";
 import Completed from "./pages/Completed";
 import Layout from "./components/Layout";
 import Project from "./pages/Project";
-import ProjectDetail from "./pages/ProjectDetail"; // Dynamic Project Page
+import ProjectDetail from "./pages/ProjectDetail";
 
 const App = () => {
   return (

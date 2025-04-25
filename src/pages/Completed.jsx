@@ -1,16 +1,14 @@
-import Section from "../components/Section/Completed";
-// import Sidebar from "../components/Sidebar";
-import Topbar from "../components/Topbar";
-const Completed = () => {
+import React from "react";
+import CompletedSection from "../components/Task/CompletedSection";
+import Section from "../components/Task/Completed";
+
+const CompletedPage = () => {
   return (
-    <div style={{ display: "flex", width: "100%" }}>
-      {/* <Sidebar /> */}
-      <div style={{ width: "100%" }}>
-        <Topbar />
-        <Section />
-      </div>
-    </div>
+    <>
+      {/* <Section /> */}
+      <CompletedSection />
+    </>
   );
 };
 
-export default Completed;
+export default CompletedPage;

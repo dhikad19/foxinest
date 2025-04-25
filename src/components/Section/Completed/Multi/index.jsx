@@ -1,10 +1,8 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Box, Typography, TextField, Button, Paper } from "@mui/material";
-import TaskForm from "../components/Task/Form";
-import TaskItem from "../components/Task/Item";
-import CompletedTaskList from "../components/Task/Completed"; // ✅ Import this
-import CustomSnackbar from "../components/Snackbar";
+import CompletedTaskList from "../../../../components/Task/Completed"; // ✅ Import this
+import CustomSnackbar from "../../../../components/Snackbar";
 
 import {
   DndContext,
@@ -148,72 +146,11 @@ const ProjectDetail = () => {
         Project: {projectId}
       </Typography>
 
-      <Box display="flex" mb={3}>
-        <TextField
-          label="Add Section"
-          value={newSection}
-          onChange={(e) => setNewSection(e.target.value)}
-          size="small"
-          sx={{ mr: 2 }}
-        />
-        <Button variant="contained" onClick={addSection}>
-          Add Section
-        </Button>
-      </Box>
-
-      {data.sections.map((section) => (
-        <Paper key={section} sx={{ p: 2, mb: 3 }}>
-          <Typography variant="h6">{section}</Typography>
-
-          <DndContext
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-            sensors={sensors}
-          >
-            <SortableContext
-              items={tasksByCategory[section].map((t) => t.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              {tasksByCategory[section]?.map((task) => (
-                <TaskItem
-                  key={task.id}
-                  task={task}
-                  onDelete={deleteTask}
-                  onComplete={completeTask}
-                  onEdit={() => {}}
-                />
-              ))}
-            </SortableContext>
-          </DndContext>
-
-          {openFormSection === section ? (
-            <TaskForm
-              defaultCategory={section}
-              onAdd={(task) => {
-                addTask(task);
-                setOpenFormSection(null);
-              }}
-              onCancel={() => setOpenFormSection(null)}
-            />
-          ) : (
-            <Button
-              onClick={() => setOpenFormSection(section)}
-              sx={{ mt: 2, fontSize: "12px" }}
-              size="small"
-              variant="outlined"
-            >
-              + Add Task
-            </Button>
-          )}
-        </Paper>
-      ))}
-
-      {/* ✅ Completed Tasks Section */}
-      {/* <CompletedTaskList
+      <CompletedTaskList
         completedTasks={data.tasks.filter((task) => task.completed)}
         onDeleteCompletedTask={handleDeleteCompletedTask}
         onClearHistory={handleClearCompletedTasks}
-      /> */}
+      />
 
       {showSnackbar && (
         <CustomSnackbar message="Task completed!" onUndo={handleUndo} />

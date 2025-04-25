@@ -2,7 +2,7 @@ import React from "react";
 import CompletedTaskItem from "./Item"; // Adjust path if needed
 
 const CompletedTaskList = ({
-  completedTasks,
+  completedTasks = [], // ✅ default fallback
   onDeleteCompletedTask,
   onClearHistory,
 }) => {

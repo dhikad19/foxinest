@@ -6,7 +6,7 @@ import SearchBar from "../../../components/Search";
 import CompletedTaskList from "../../../components/Task/Completed"; // Import CompletedTaskList
 import Snackbar from "../../../components/Snackbar"; // Import Snackbar component
 
-const Home = () => {
+const CompletedSection = () => {
   const [tasks, setTasks] = useState([]);
   const [sections, setSections] = useState([]);
   const [editTask, setEditTask] = useState(null);
@@ -150,47 +150,6 @@ const Home = () => {
 
   return (
     <div style={{ padding: "1rem", maxWidth: "700px", margin: "0 auto" }}>
-      {/* <h1>📋 To-Do List with Sections</h1> */}
-
-      {/* <SearchBar query={searchQuery} setQuery={setSearchQuery} /> */}
-
-      {/* Add Section */}
-      {/* <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          const name = e.target.section.value.trim();
-          if (name && !sections.includes(name)) {
-            handleAddSection(name);
-            e.target.reset();
-          }
-        }}
-        style={{ marginBottom: 20, display: "flex", gap: 8 }}
-      >
-        <input name="section" placeholder="New section name" />
-        <button type="submit">➕ Add Section</button>
-      </form> */}
-
-      {/* Non-Completed Tasks */}
-      {/* <TaskList
-        tasksByCategory={sections.reduce((acc, section) => {
-          acc[section] = incompleteTasks.filter(
-            (task) => task.category === section
-          );
-          return acc;
-        }, {})}
-        onDelete={handleDeleteTask}
-        onEdit={(task) => setEditTask(task)}
-        onAdd={handleAddTask}
-        onDeleteSection={handleDeleteSection}
-        onReorderTasks={handleReorderTasks}
-        onComplete={handleCompleteTask}
-        editingSection={editingSection}
-        setEditingSection={setEditingSection}
-        newSectionName={newSectionName}
-        setNewSectionName={setNewSectionName}
-      /> */}
-
-      {/* Completed Tasks (History) */}
       <CompletedTaskList
         completedTasks={completedTasks}
         onClearHistory={handleClearHistory}
@@ -211,4 +170,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default CompletedSection;
