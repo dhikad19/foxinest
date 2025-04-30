@@ -10,8 +10,8 @@ import {
 
 const CompletedSection = () => {
   const [completedTasks, setCompletedTasks] = useState([]);
-  const [searchQuery, setSearchQuery] = useState(""); // state for search query
-  const [sortOption, setSortOption] = useState("newest"); // default sort
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortOption, setSortOption] = useState("newest");
 
   // Function to handle sorting
   const sortTasks = (tasks) => {

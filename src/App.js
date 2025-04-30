@@ -8,40 +8,103 @@ import Layout from "./components/Layout";
 import Project from "./pages/Project";
 import ProjectDetail from "./pages/ProjectDetail";
 import WelcomePage from "./pages/Welcome";
+import { CircularProgress, Box, Typography } from "@mui/material";
 
 const App = () => {
-  const [isLoading, setIsLoading] = useState(true); // Loading state to wait until the check is done
-  const [userData, setUserData] = useState(null); // Store user data
-  const [isRedirected, setIsRedirected] = useState(false); // Track if the redirect has happened
+  const [isLoading, setIsLoading] = useState(true);
+  const [userData, setUserData] = useState(null);
 
   useEffect(() => {
     const storedData = localStorage.getItem("userData");
 
     if (!storedData) {
-      setUserData(null); // No user data, so they need to fill the form
+      setUserData(null);
     } else {
-      setUserData(JSON.parse(storedData)); // Set user data from localStorage
+      setUserData(JSON.parse(storedData));
     }
 
-    setIsLoading(false); // After the check, stop loading
+    setIsLoading(false);
   }, []);
 
+  const handleUserSubmit = (data) => {
+    localStorage.setItem("userData", JSON.stringify(data));
+    setUserData(data); // <-- update state here
+  };
+
   if (isLoading) {
-    return <div>Loading...</div>; // Display a loading message until we know what to render
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+        }}
+      >
+        <CircularProgress sx={{ color: "#ff7800" }} />
+        <Typography variant="subtitle1" sx={{ marginTop: 2 }}>
+          Please wait
+        </Typography>
+      </Box>
+    );
   }
 
-  // If there's no user data, show WelcomePage; otherwise, show HomePage
   return (
     <Router>
       <Routes>
-        <Route path="/welcome" element={<WelcomePage />} />{" "}
-        {/* Route to WelcomePage */}
-        <Route path="/" element={userData ? <Layout /> : <WelcomePage />}>
-          <Route index element={userData ? <Home /> : <WelcomePage />} />
-          <Route path="about" element={<About />} />
-          <Route path="completed" element={<Completed />} />
-          <Route path="project" element={<Project />} />
-          <Route path="project/:projectId" element={<ProjectDetail />} />
+        <Route
+          path="/welcome"
+          element={<WelcomePage onSubmit={handleUserSubmit} />}
+        />
+        <Route
+          path="/"
+          element={
+            userData ? <Layout /> : <WelcomePage onSubmit={handleUserSubmit} />
+          }
+        >
+          <Route
+            index
+            element={
+              userData ? <Home /> : <WelcomePage onSubmit={handleUserSubmit} />
+            }
+          />
+          <Route
+            path="about"
+            element={
+              userData ? <About /> : <WelcomePage onSubmit={handleUserSubmit} />
+            }
+          />
+          <Route
+            path="completed"
+            element={
+              userData ? (
+                <Completed />
+              ) : (
+                <WelcomePage onSubmit={handleUserSubmit} />
+              )
+            }
+          />
+          <Route
+            path="project"
+            element={
+              userData ? (
+                <Project />
+              ) : (
+                <WelcomePage onSubmit={handleUserSubmit} />
+              )
+            }
+          />
+          <Route
+            path="project/:projectId"
+            element={
+              userData ? (
+                <ProjectDetail />
+              ) : (
+                <WelcomePage onSubmit={handleUserSubmit} />
+              )
+            }
+          />
         </Route>
       </Routes>
     </Router>

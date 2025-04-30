@@ -5,6 +5,7 @@ import TaskForm from "../components/Task/Form";
 import TaskItem from "../components/Task/Item";
 import CompletedTaskList from "../components/Task/Completed"; // ✅ Import this
 import CustomSnackbar from "../components/Snackbar";
+import EditModal from "../components/Modal/Edit"; // ✅ Import EditModal
 
 import {
   DndContext,
@@ -21,6 +22,7 @@ import {
 
 const ProjectDetail = () => {
   const { projectId } = useParams();
+  const [editTask, setEditTask] = useState(null);
   const [data, setData] = useState(() => {
     const stored = localStorage.getItem("projects_data");
     if (stored) {
@@ -142,6 +144,22 @@ const ProjectDetail = () => {
     return acc;
   }, {});
 
+  // Handle editing a task
+  const handleEditTask = (task) => {
+    setEditTask(task);
+  };
+
+  // Handle saving the edited task
+  const handleSaveEdit = (editedTask) => {
+    setData((prev) => ({
+      ...prev,
+      tasks: prev.tasks.map((task) =>
+        task.id === editedTask.id ? editedTask : task
+      ),
+    }));
+    setEditTask(null); // Close the edit modal
+  };
+
   return (
     <Box p={3}>
       <Typography variant="h4" mb={2}>
@@ -180,7 +198,7 @@ const ProjectDetail = () => {
                   task={task}
                   onDelete={deleteTask}
                   onComplete={completeTask}
-                  onEdit={() => {}}
+                  onEdit={() => handleEditTask(task)} // Open Edit Modal
                 />
               ))}
             </SortableContext>
@@ -208,12 +226,14 @@ const ProjectDetail = () => {
         </Paper>
       ))}
 
-      {/* ✅ Completed Tasks Section */}
-      {/* <CompletedTaskList
-        completedTasks={data.tasks.filter((task) => task.completed)}
-        onDeleteCompletedTask={handleDeleteCompletedTask}
-        onClearHistory={handleClearCompletedTasks}
-      /> */}
+      {/* Edit Modal */}
+      {editTask && (
+        <EditModal
+          task={editTask}
+          onSave={handleSaveEdit}
+          onClose={() => setEditTask(null)}
+        />
+      )}
 
       {showSnackbar && (
         <CustomSnackbar message="Task completed!" onUndo={handleUndo} />

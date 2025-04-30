@@ -1,14 +1,11 @@
-// src/pages/WelcomePage.jsx
 import React, { useState } from "react";
 import { TextField, Button, Typography, Container } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
-const WelcomePage = () => {
+const WelcomePage = ({ onSubmit }) => {
   const [formData, setFormData] = useState({
-    username: "",
     firstName: "",
     lastName: "",
-    email: "",
   });
 
   const navigate = useNavigate();
@@ -18,10 +15,16 @@ const WelcomePage = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   localStorage.setItem("userData", JSON.stringify(formData));
+  //   navigate("/");
+  // };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    localStorage.setItem("userData", JSON.stringify(formData)); // Save data to localStorage
-    navigate("/"); // Redirect to home page after form submission
+    onSubmit(formData); // <-- panggil handler dari App
+    navigate("/"); // navigasi setelah submit
   };
 
   return (
@@ -30,14 +33,6 @@ const WelcomePage = () => {
         Welcome! Please fill out the form to continue.
       </Typography>
       <form onSubmit={handleSubmit}>
-        <TextField
-          label="Username"
-          name="username"
-          value={formData.username}
-          onChange={handleChange}
-          fullWidth
-          margin="normal"
-        />
         <TextField
           label="First Name"
           name="firstName"
@@ -54,15 +49,13 @@ const WelcomePage = () => {
           fullWidth
           margin="normal"
         />
-        <TextField
-          label="Email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
           fullWidth
-          margin="normal"
-        />
-        <Button type="submit" variant="contained" color="primary" fullWidth>
+          disabled={!formData.firstName.trim()}
+        >
           Submit
         </Button>
       </form>

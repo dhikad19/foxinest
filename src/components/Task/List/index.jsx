@@ -1,17 +1,13 @@
-import React, { useState, useEffect } from "react"; // Import useEffect here
+import React, { useState, useEffect } from "react";
 import {
   DndContext,
   closestCenter,
   PointerSensor,
   useSensor,
-  DragOverlay,
   useSensors,
 } from "@dnd-kit/core";
-import { Divider } from "@mui/material";
-import {
-  restrictToVerticalAxis,
-  restrictToHorizontalAxis,
-} from "@dnd-kit/modifiers";
+import { Divider, Popover, Button, Stack, Box } from "@mui/material";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import {
   SortableContext,
   verticalListSortingStrategy,
@@ -20,14 +16,20 @@ import {
 import TaskItem from "../Item";
 import TaskForm from "../Form";
 
-// Tiptap imports
+// Tiptap
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 
-// React-icons for the arrow
+// Icons
 import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 
-// ✏️ Live inline editor that instantly updates section name
+// Date Picker
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
+import dayjs from "dayjs";
+
+// 📝 Section name inline editor
 const LiveSectionEditor = ({ initialContent, onChange }) => {
   const [currentText, setCurrentText] = useState(initialContent);
 
@@ -55,7 +57,6 @@ const LiveSectionEditor = ({ initialContent, onChange }) => {
     },
   });
 
-  // Keep in sync with external changes
   useEffect(() => {
     if (editor && initialContent !== editor.getText().trim()) {
       editor.commands.setContent(initialContent);
@@ -64,7 +65,6 @@ const LiveSectionEditor = ({ initialContent, onChange }) => {
   }, [initialContent]);
 
   if (!editor) return null;
-
   return <EditorContent editor={editor} />;
 };
 
@@ -85,7 +85,23 @@ const TaskList = ({
   const [openForms, setOpenForms] = useState({});
   const [expandedSections, setExpandedSections] = useState({});
   const [activeTask, setActiveTask] = useState(null);
+  const [showOverdue, setShowOverdue] = useState(true);
   const sensors = useSensors(useSensor(PointerSensor));
+
+  // 📅 Date picker state
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const today = dayjs();
+  const tomorrow = dayjs().add(1, "day");
+
+  const handleOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   const toggleForm = (category) => {
     setOpenForms((prev) => ({
@@ -137,13 +153,51 @@ const TaskList = ({
         const updated = { ...prev };
         for (const key of Object.keys(tasksByCategory)) {
           if (updated[key] === undefined) {
-            updated[key] = true; // default to expanded
+            updated[key] = true;
           }
         }
         return updated;
       });
     }
   }, [tasksByCategory]);
+
+  // 🔍 Overdue tasks filter
+  const overdueTasks = [];
+  const todayStr = today.format("YYYY-MM-DD");
+
+  const filteredTasksByCategory = Object.fromEntries(
+    Object.entries(tasksByCategory).map(([category, tasks]) => {
+      const validTasks = tasks.filter((task) => {
+        const isOverdue = task.dueDate && task.dueDate < todayStr;
+        if (isOverdue) {
+          overdueTasks.push(task);
+        }
+        return !isOverdue;
+      });
+      return [category, validTasks];
+    })
+  );
+
+  const handleDateChange = (newDate) => {
+    if (!newDate) return;
+    const formattedDate = newDate.format("YYYY-MM-DD");
+    setSelectedDate(newDate);
+    handleClose();
+
+    // Update all overdue tasks with new date
+    const updatedTasks = overdueTasks.map((task) => ({
+      ...task,
+      dueDate: formattedDate,
+    }));
+
+    // Keep non-overdue tasks
+    const remainingTasks = Object.values(tasksByCategory)
+      .flat()
+      .filter((task) => !(task.dueDate && task.dueDate < todayStr));
+
+    // Call external updater
+    onReorderTasks([...remainingTasks, ...updatedTasks]);
+  };
 
   return (
     <DndContext
@@ -153,89 +207,156 @@ const TaskList = ({
       onDragEnd={handleDragEnd}
     >
       <div>
-        {Object.entries(tasksByCategory).map(([category, tasks]) => (
-          <div
-            key={category}
-            style={{
-              marginBottom: "1rem",
-              borderRadius: 8,
-              padding: 4,
-            }}
-          >
-            {/* Section Header with Expand/Collapse Button */}
+        {/* 🔴 Overdue Section */}
+        {overdueTasks.length > 0 && (
+          <div style={{ marginBottom: "1rem", borderRadius: 8, padding: 4 }}>
             <div
               style={{
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                userSelect: "none",
                 marginBottom: 10,
               }}
             >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <div
+                  onClick={() => setShowOverdue((prev) => !prev)}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                    marginRight: 8,
+                    borderRadius: 4,
+                    height: 22,
+                    width: 22,
+                    marginLeft: "-30px",
+                    backgroundColor: "#fafafa",
+                  }}
+                >
+                  {showOverdue ? (
+                    <FaChevronDown size={10} color="grey" />
+                  ) : (
+                    <FaChevronRight size={10} color="grey" />
+                  )}
+                </div>
+                <strong style={{ fontSize: 15 }}>Overdue</strong>
+              </div>
+
+              {/* 📅 Date Picker Button */}
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <div
+                  onClick={handleOpen}
+                  style={{
+                    marginLeft: "auto",
+                    cursor: "pointer",
+                    padding: "4px 10px",
+                    borderRadius: 4,
+                    backgroundColor: "#f5f5f5",
+                    fontSize: 13,
+                  }}
+                >
+                  {selectedDate
+                    ? selectedDate.format("MMM D, YYYY")
+                    : "Select Date 📅"}
+                </div>
+
+                <Popover
+                  open={open}
+                  anchorEl={anchorEl}
+                  onClose={handleClose}
+                  anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "left",
+                  }}
+                >
+                  <Box p={1}>
+                    <Stack direction="row" spacing={1} padding={2}>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => handleDateChange(today)}
+                      >
+                        Today
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => handleDateChange(tomorrow)}
+                      >
+                        Tomorrow
+                      </Button>
+                    </Stack>
+                    <DateCalendar
+                      disablePast
+                      value={selectedDate}
+                      onChange={handleDateChange}
+                    />
+                  </Box>
+                </Popover>
+              </LocalizationProvider>
+            </div>
+            <Divider />
+            {showOverdue && (
+              <div style={{ padding: 4 }}>
+                {overdueTasks.map((task) => (
+                  <TaskItem
+                    key={task.id}
+                    task={task}
+                    onDelete={onDelete}
+                    onEdit={onEdit}
+                    onComplete={onComplete}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ✅ Regular Sections */}
+        {Object.entries(filteredTasksByCategory).map(([category, tasks]) => (
+          <div
+            key={category}
+            style={{ marginBottom: "1rem", borderRadius: 8, padding: 4 }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 10,
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center" }}>
                 <div
                   onClick={() => toggleExpand(category)}
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    gap: 8,
-                    marginLeft: -30,
+                    justifyContent: "center",
+                    cursor: "pointer",
+                    marginRight: 8,
+                    borderRadius: 4,
+                    height: 22,
+                    width: 22,
+                    marginLeft: "-30px",
+                    backgroundColor: "#fafafa",
                   }}
                 >
-                  {/* Toggle Arrow Icon */}
                   {expandedSections[category] ? (
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        cursor: "pointer",
-                        marginRight: 8,
-                        borderRadius: 4,
-                        height: 22,
-                        width: 22,
-                        backgroundColor: "#fafafa",
-                      }}
-                    >
-                      <FaChevronDown size={10} color="grey" />
-                    </div>
+                    <FaChevronDown size={10} color="grey" />
                   ) : (
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        cursor: "pointer",
-                        marginRight: 8,
-                        borderRadius: 4,
-                        height: 22,
-                        width: 22,
-                        backgroundColor: "#fafafa",
-                      }}
-                    >
-                      <FaChevronRight size={10} color="grey" />
-                    </div>
+                    <FaChevronRight size={10} color="grey" />
                   )}
                 </div>
                 <LiveSectionEditor
                   initialContent={category}
-                  onChange={(newName) => {
-                    onEditSection(category, newName);
-                  }}
+                  onChange={(newName) => onEditSection(category, newName)}
                 />
               </div>
-              <div style={{ display: "flex", gap: 8 }}>
-                <button onClick={() => onDeleteSection(category)}>
-                  Delete
-                </button>
-              </div>
+              <button onClick={() => onDeleteSection(category)}>Delete</button>
             </div>
-            <Divider></Divider>
+            <Divider />
             <div
               style={{
                 overflow: "hidden",
@@ -261,7 +382,7 @@ const TaskList = ({
 
               {!openForms[category] && (
                 <button onClick={() => toggleForm(category)}>
-                  {openForms[category] ? "– Cancel" : "➕ Add Task"}
+                  ➕ Add Task
                 </button>
               )}
 

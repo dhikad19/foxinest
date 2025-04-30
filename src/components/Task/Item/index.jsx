@@ -1,7 +1,19 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Divider, Checkbox } from "@mui/material";
+import {
+  Divider,
+  Checkbox,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+  List,
+  ListItem,
+  ListItemText,
+} from "@mui/material";
 
 // Styles
 const containerStyle = (isDragging, transform, transition) => ({
@@ -30,6 +42,48 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
     setActivatorNodeRef,
     isDragging,
   } = useSortable({ id: task.id });
+
+  // State for managing comments dialog and input
+  const [openDialog, setOpenDialog] = useState(false);
+  const [newComment, setNewComment] = useState("");
+  const [comments, setComments] = useState([]);
+
+  // Load comments from localStorage when the component mounts
+  useEffect(() => {
+    const storedComments = JSON.parse(
+      localStorage.getItem(`task_${task.id}_comments`)
+    );
+    if (storedComments) {
+      setComments(storedComments);
+    }
+  }, [task.id]);
+
+  // Function to open the comments dialog
+  const handleOpenDialog = () => {
+    setOpenDialog(true);
+  };
+
+  // Function to close the comments dialog
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+
+  // Function to add a new comment
+  const handleAddComment = () => {
+    if (newComment.trim()) {
+      const newCommentObj = {
+        text: newComment,
+        date: new Date().toLocaleString(), // Date when the comment was created
+      };
+      const updatedComments = [...comments, newCommentObj];
+      setComments(updatedComments);
+      localStorage.setItem(
+        `task_${task.id}_comments`,
+        JSON.stringify(updatedComments)
+      ); // Save to localStorage
+      setNewComment(""); // Clear the comment input
+    }
+  };
 
   return (
     <div
@@ -76,6 +130,12 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
           <button onClick={() => onDelete(task.id)} aria-label="Delete task">
             🗑️
           </button>
+
+          {/* Comments Button */}
+          <Button variant="outlined" size="small" onClick={handleOpenDialog}>
+            💬 Comments
+          </Button>
+
           <div
             ref={setActivatorNodeRef}
             {...attributes}
@@ -96,6 +156,40 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
       </div>
 
       {!isDragging && <Divider />}
+
+      {/* Dialog for Comments */}
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
+        <DialogTitle>Comments</DialogTitle>
+        <DialogContent>
+          <List>
+            {comments.map((comment, index) => (
+              <ListItem key={index}>
+                <ListItemText
+                  primary={comment.text}
+                  secondary={`Posted on: ${comment.date}`}
+                />
+              </ListItem>
+            ))}
+          </List>
+          <TextField
+            label="Add a comment"
+            fullWidth
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            multiline
+            rows={3}
+            variant="outlined"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="primary">
+            Close
+          </Button>
+          <Button onClick={handleAddComment} color="primary">
+            Add Comment
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
