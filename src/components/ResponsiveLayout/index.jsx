@@ -18,16 +18,27 @@ import {
   FormControl,
   InputLabel,
   Select,
+  Menu,
   MenuItem,
   Switch,
   FormControlLabel,
   IconButton as MuiIconButton,
 } from "@mui/material";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/DriveFileRenameOutlineOutlined";
+import MoreVertOutlined from "@mui/icons-material/MoreVertOutlined";
+import DeleteIcon from "@mui/icons-material/DeleteOutlined";
+import TagIcon from "@mui/icons-material/TagOutlined";
+import FolderIcon from "@mui/icons-material/Folder";
+import FolderOpenIcon from "@mui/icons-material/FolderOpen";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import MenuIcon from "@mui/icons-material/Menu";
-import AddIcon from "@mui/icons-material/Add";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+import {
+  AddHomeOutlined as HomeIcon,
+  InfoOutlined as InfoIcon,
+  CheckCircleOutlined as CompletedIcon,
+} from "@mui/icons-material";
 
 const drawerWidth = 240;
 
@@ -48,12 +59,44 @@ const ResponsiveLayout = ({ children }) => {
     }
   });
 
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
   const navigate = useNavigate();
   const location = useLocation();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
+
+  useEffect(() => {
+    // Load initial projects
+    const storedProjects = localStorage.getItem("projects");
+    if (storedProjects) {
+      setProjects(JSON.parse(storedProjects));
+    }
+
+    // Add event listener for project updates
+    const handleProjectsUpdate = () => {
+      const updatedProjects =
+        JSON.parse(localStorage.getItem("projects")) || [];
+      setProjects(updatedProjects);
+    };
+
+    window.addEventListener("projectsUpdated", handleProjectsUpdate);
+
+    // Cleanup event listener on component unmount
+    return () => {
+      window.removeEventListener("projectsUpdated", handleProjectsUpdate);
+    };
+  }, []);
 
   useEffect(() => {
     if (mobileOpen) {
@@ -129,45 +172,148 @@ const ResponsiveLayout = ({ children }) => {
   const drawer = (
     <div>
       <Toolbar />
+
       <List>
         {/* Static Pages */}
         {[
-          { label: "Home", path: "/" },
-          { label: "About", path: "/about" },
-          { label: "Completed", path: "/completed" },
-        ].map(({ label, path }) => (
-          <ListItem button key={label}>
+          {
+            label: "Home",
+            path: "/",
+            icon: <HomeIcon style={{ fontSize: "22px" }} />,
+          },
+          {
+            label: "About",
+            path: "/about",
+            icon: <InfoIcon style={{ fontSize: "22px" }} />,
+          },
+          {
+            label: "Completed",
+            path: "/completed",
+            icon: <CompletedIcon style={{ fontSize: "22px" }} />,
+          },
+        ].map(({ label, path, icon }) => (
+          <ListItem
+            button
+            key={label}
+            sx={{
+              "&:hover": {
+                backgroundColor: "transparent", // Default to transparent
+                "& .not-active": {
+                  backgroundColor: "#ffe3cb",
+                  borderRadius: "4px", // Red background on hover for non-active links
+                },
+              },
+            }}
+            style={{ padding: "0px 8px 0px 8px" }}
+          >
             <NavLink
               to={path}
-              className={({ isActive }) => (isActive ? "active-link" : "")}
+              className={({ isActive }) =>
+                isActive ? "active-link" : "not-active"
+              }
               style={{
                 textDecoration: "none",
                 width: "100%",
+                padding: "8px 10px 8px 10px",
                 color: "inherit",
+                display: "flex", // Ensures icon and text align properly
+                alignItems: "center",
               }}
             >
-              <ListItemText primary={label} />
+              <ListItemIcon
+                sx={{ minWidth: "36px", color: "inherit" }} // Optional: Adjust spacing and inherit color
+              >
+                {icon}
+              </ListItemIcon>
+              <Typography
+                variant="body1"
+                sx={{
+                  fontSize: "14px",
+                }}
+              >
+                {label}
+              </Typography>
             </NavLink>
           </ListItem>
         ))}
 
         {favoriteProjects.length > 0 && (
           <>
-            <ListItem>
-              <ListItemText primary="Favorites" />
+            <ListItem
+              style={{
+                padding: "0px 8px 0px 8px",
+                marginTop: "20px",
+                marginLeft: "10px",
+              }}
+              sx={{
+                "&:hover": {
+                  backgroundColor: "transparent", // Default to transparent
+                  "& .not-active": {
+                    backgroundColor: "#ffe3cb",
+                    borderRadius: "4px", // Red background on hover for non-active links
+                  },
+                },
+              }}
+            >
+              <ListItemText
+                primary={
+                  <span
+                    style={{
+                      fontSize: "15px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Favorites
+                  </span>
+                }
+              />
             </ListItem>
             {favoriteProjects.map((project) => (
-              <ListItem button key={project.id}>
+              <ListItem
+                button
+                style={{ padding: "0px 8px 0px 8px" }}
+                key={project.id}
+                sx={{
+                  "&:hover": {
+                    backgroundColor: "transparent", // Default to transparent
+                    "& .not-active": {
+                      backgroundColor: "#ffe3cb",
+                      borderRadius: "4px", // Red background on hover for non-active links
+                    },
+                  },
+                }}
+              >
                 <NavLink
                   to={`/project/${project.id}`}
-                  className={({ isActive }) => (isActive ? "active-link" : "")}
+                  className={({ isActive }) =>
+                    isActive ? "active-link" : "not-active"
+                  }
                   style={{
                     textDecoration: "none",
                     width: "100%",
+                    padding: "8px 10px 8px 10px",
                     color: "inherit",
+                    display: "flex",
+                    alignItems: "center",
                   }}
                 >
-                  <ListItemText primary={project.name} />
+                  <ListItemIcon sx={{ minWidth: "36px", color: "inherit" }}>
+                    <TagIcon style={{ fontSize: "22px" }} />{" "}
+                    {/* Example icon */}
+                  </ListItemIcon>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      fontSize: "14px",
+                      maxWidth: "120px",
+                      overflow: "hidden",
+                      whiteSpace: "nowrap",
+                      textOverflow: "ellipsis",
+                      fontWeight: "400",
+                    }}
+                  >
+                    {project.name}
+                  </Typography>
                 </NavLink>
               </ListItem>
             ))}
@@ -176,56 +322,146 @@ const ResponsiveLayout = ({ children }) => {
 
         {/* My Projects header */}
         <ListItem
+          style={{ padding: "0px 8px 0px 8px", marginTop: "20px" }}
+          sx={{
+            "&:hover": {
+              backgroundColor: "transparent", // Default to transparent
+              "& .not-active": {
+                backgroundColor: "#ffe3cb",
+                borderRadius: "4px", // Red background on hover for non-active links
+              },
+            },
+          }}
           secondaryAction={
             <IconButton edge="end" onClick={handleModalOpen}>
-              <AddIcon />
+              <AddIcon style={{ color: "#000000", marginRight: "5px" }} />
             </IconButton>
           }
         >
           <NavLink
             to="/project"
-            className={({ isActive }) => (isActive ? "active-link" : "")}
+            className={({ isActive }) =>
+              isActive ? "active-link" : "not-active"
+            }
             style={{
               textDecoration: "none",
               width: "100%",
               color: "inherit",
+              display: "flex",
+              alignItems: "center",
+              padding: "8px 10px 8px 10px",
             }}
-            end // Only activate when exactly at "/project"
+            end
           >
-            <ListItemText primary="My Projects" />
+            <Typography
+              variant="body1"
+              sx={{
+                fontSize: "14px",
+                fontWeight: "bold",
+              }}
+            >
+              My Projects
+            </Typography>
           </NavLink>
         </ListItem>
 
         {/* Dynamic project list */}
         {projects.map((project) => (
-          <ListItem button key={project.id}>
+          <ListItem
+            button
+            style={{ padding: "0px 8px 0px 8px" }}
+            key={project.id}
+            sx={{
+              "&:hover": {
+                backgroundColor: "transparent", // Default to transparent
+                "& .not-active": {
+                  backgroundColor: "#ffe3cb",
+                  borderRadius: "4px", // Red background on hover for non-active links
+                },
+              },
+            }}
+          >
             <NavLink
               to={`/project/${project.id}`}
-              className={({ isActive }) => (isActive ? "active-link" : "")}
+              className={({ isActive }) =>
+                isActive ? "active-link" : "not-active"
+              }
               style={{
                 textDecoration: "none",
                 width: "100%",
                 color: "inherit",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "8px 10px 8px 10px",
               }}
             >
-              <ListItemText primary={project.name} />
-            </NavLink>
+              <div style={{ display: "flex" }}>
+                <ListItemIcon sx={{ minWidth: "36px", color: "inherit" }}>
+                  <TagIcon style={{ fontSize: "22px" }} />
+                </ListItemIcon>
 
-            {/* Edit & Delete icons */}
-            <MuiIconButton
-              edge="end"
-              onClick={() => handleEditProject(project)}
-              sx={{ color: "blue" }}
-            >
-              <EditIcon />
-            </MuiIconButton>
-            <MuiIconButton
-              edge="end"
-              onClick={() => handleDeleteProject(project.id)}
-              sx={{ color: "red" }}
-            >
-              <DeleteIcon />
-            </MuiIconButton>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    fontSize: "14px",
+                    maxWidth: "100px",
+                    overflow: "hidden",
+                    whiteSpace: "nowrap",
+                    textOverflow: "ellipsis",
+                    fontWeight: "400",
+                  }}
+                >
+                  {project.name}
+                </Typography>
+              </div>
+
+              <MoreVertOutlined
+                style={{ fontSize: "22px" }}
+                onClick={(e) => {
+                  e.preventDefault(); // Prevents navigation click
+                  handleMenuOpen(e);
+                }}
+              />
+
+              <Menu
+                id={`menu-${project.id}`}
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleMenuClose}
+                PaperProps={{
+                  elevation: 2, // Adjust elevation to make the shadow lighter
+                  sx: {
+                    boxShadow: "rgba(0, 0, 0, 0.007) 0px 4px 6px",
+                    borderRadius: "6px", // Custom shadow if needed
+                    minWidth: "200px",
+                  },
+                }}
+              >
+                <MenuItem
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleEditProject(project);
+                    handleMenuClose();
+                  }}
+                >
+                  <EditIcon style={{ marginRight: "20px", fontSize: "22px" }} />
+                  <span style={{ fontSize: "14px" }}>Edit</span>
+                </MenuItem>
+                <MenuItem
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleDeleteProject(project.id);
+                    handleMenuClose();
+                  }}
+                >
+                  <DeleteIcon
+                    style={{ marginRight: "20px", fontSize: "22px" }}
+                  />
+                  <span style={{ fontSize: "14px" }}>Delete</span>
+                </MenuItem>
+              </Menu>
+            </NavLink>
           </ListItem>
         ))}
       </List>
@@ -249,7 +485,13 @@ const ResponsiveLayout = ({ children }) => {
           ModalProps={{ keepMounted: true }}
           sx={{
             display: { xs: "block", sm: "none" },
-            "& .MuiDrawer-paper": { width: drawerWidth },
+            "& .MuiDrawer-paper": {
+              width: drawerWidth,
+              backgroundColor: "#FFF7E6",
+              color: "#000000",
+              scrollbarWidth: "thin",
+              overflowX: "hidden",
+            },
           }}
         >
           {drawer}
@@ -261,9 +503,13 @@ const ResponsiveLayout = ({ children }) => {
             display: { xs: "none", sm: "block" },
             "& .MuiDrawer-paper": {
               width: drawerWidth,
+              backgroundColor: "#FFF7E6",
+              color: "#000000",
               boxSizing: "border-box",
               height: "100vh",
               position: "fixed",
+              overflowX: "hidden",
+              scrollbarWidth: "thin",
               top: 0,
               left: 0,
             },

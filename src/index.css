@@ -1,8 +1,8 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+  font-family: "Roboto", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -70,6 +70,8 @@ div p {
 }
 
 .active-link {
-  background-color: #ff7800; /* Highlight color */
-  color: white;
+  background-color: #ffe3cb;
+  color: #ff7800 !important;
+  border-radius: 4px;
+  font-weight: bold !important;
 }
