@@ -60,15 +60,18 @@ const CompletedSection = () => {
       }
     }
 
-    // Get from `todo-app-data`
-    const todoRaw = localStorage.getItem("todo-app-data");
+    // Get from `home_projects_data`
+    const todoRaw = localStorage.getItem("home_projects_data");
     if (todoRaw) {
       const todo = JSON.parse(todoRaw);
       if (todo && todo.tasks && Array.isArray(todo.tasks)) {
         todo.tasks
           .filter((task) => task.completed)
           .forEach((task) =>
-            combinedCompletedTasks.push({ ...task, source: "todo-app-data" })
+            combinedCompletedTasks.push({
+              ...task,
+              source: "home_projects_data",
+            })
           );
       }
     }
@@ -105,15 +108,15 @@ const CompletedSection = () => {
       localStorage.setItem("projects_data", JSON.stringify(updatedProjects));
     }
 
-    if (taskToRemove.source === "todo-app-data") {
-      const raw = localStorage.getItem("todo-app-data");
+    if (taskToRemove.source === "home_projects_data") {
+      const raw = localStorage.getItem("home_projects_data");
       if (!raw) return;
       const todo = JSON.parse(raw);
       const updatedTodo = {
         ...todo,
         tasks: todo.tasks.filter((t) => t.id !== taskIdToDelete),
       };
-      localStorage.setItem("todo-app-data", JSON.stringify(updatedTodo));
+      localStorage.setItem("home_projects_data", JSON.stringify(updatedTodo));
     }
 
     // Update state

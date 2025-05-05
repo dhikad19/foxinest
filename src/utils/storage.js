@@ -1,4 +1,4 @@
-const STORAGE_KEY = "todo-app-data";
+const STORAGE_KEY = "home_projects_data";
 
 export const loadFromStorage = () => {
   if (typeof window === "undefined") return { tasks: [], sections: [] }; // Ensure this works in non-browser environments (e.g., SSR).

@@ -5,7 +5,7 @@ import { Outlet } from "react-router-dom";
 const Layout = () => {
   return (
     <ResponsiveLayout>
-      <Outlet /> {/* This renders the matched route's page */}
+      <Outlet />
     </ResponsiveLayout>
   );
 };

@@ -8,7 +8,7 @@ const IntroductionPage = () => {
   const handleSubmit = () => {
     if (name.trim()) {
       // Save data in localStorage
-      localStorage.setItem("userData", JSON.stringify({ name }));
+      localStorage.setItem("user_data", JSON.stringify({ name }));
 
       // After storing data, redirect to home page
       history.push("/home");

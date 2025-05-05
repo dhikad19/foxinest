@@ -15,7 +15,7 @@ const App = () => {
   const [userData, setUserData] = useState(null);
 
   useEffect(() => {
-    const storedData = localStorage.getItem("userData");
+    const storedData = localStorage.getItem("user_data");
 
     if (!storedData) {
       setUserData(null);
@@ -27,7 +27,7 @@ const App = () => {
   }, []);
 
   const handleUserSubmit = (data) => {
-    localStorage.setItem("userData", JSON.stringify(data));
+    localStorage.setItem("user_data", JSON.stringify(data));
     setUserData(data); // <-- update state here
   };
 

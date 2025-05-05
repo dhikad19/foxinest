@@ -27,6 +27,7 @@ const ProjectDetail = () => {
     const stored = localStorage.getItem("projects_data");
     if (stored) {
       const parsed = JSON.parse(stored);
+      // Pastikan projectId yang baru mendapatkan nilai default kosong
       return parsed[projectId] || { sections: [], tasks: [] };
     }
     return { sections: [], tasks: [] };
@@ -40,12 +41,13 @@ const ProjectDetail = () => {
   // Load project from localStorage
   useEffect(() => {
     const stored = localStorage.getItem("projects_data");
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      if (parsed[projectId]) {
-        setData(parsed[projectId]);
-      }
+    const allProjects = stored ? JSON.parse(stored) : {};
+    if (!allProjects[projectId]) {
+      // Inisialisasi proyek baru jika belum ada
+      allProjects[projectId] = { sections: [], tasks: [] };
+      localStorage.setItem("projects_data", JSON.stringify(allProjects));
     }
+    setData(allProjects[projectId]);
   }, [projectId]);
 
   // Save project to localStorage
