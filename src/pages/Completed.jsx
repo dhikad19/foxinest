@@ -2,11 +2,7 @@ import React from "react";
 import CompletedSection from "../components/Task/CompletedSection";
 
 const CompletedPage = () => {
-  return (
-    <>
-      <CompletedSection />
-    </>
-  );
+  return <CompletedSection />;
 };
 
 export default CompletedPage;

@@ -31,6 +31,7 @@ import MoreVertOutlined from "@mui/icons-material/MoreVertOutlined";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import TagIcon from "@mui/icons-material/TagOutlined";
 import FolderIcon from "@mui/icons-material/Folder";
+import CalendarIcon from "@mui/icons-material/CalendarMonthOutlined";
 import FolderOpenIcon from "@mui/icons-material/FolderOpen";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -38,6 +39,7 @@ import {
   AddHomeOutlined as HomeIcon,
   InfoOutlined as InfoIcon,
   CheckCircleOutlined as CompletedIcon,
+  Home,
 } from "@mui/icons-material";
 
 const drawerWidth = 240;
@@ -190,6 +192,11 @@ const ResponsiveLayout = ({ children }) => {
             label: "Completed",
             path: "/completed",
             icon: <CompletedIcon style={{ fontSize: "22px" }} />,
+          },
+          {
+            label: "Calendar",
+            path: "/calendar",
+            icon: <CalendarIcon style={{ fontSize: "22px" }} />,
           },
         ].map(({ label, path, icon }) => (
           <ListItem

@@ -8,6 +8,7 @@ import Layout from "./components/Layout";
 import Project from "./pages/Project";
 import ProjectDetail from "./pages/ProjectDetail";
 import WelcomePage from "./pages/Welcome";
+import Calendar from "./pages/Calendar";
 import { CircularProgress, Box, Typography } from "@mui/material";
 
 const App = () => {
@@ -73,6 +74,16 @@ const App = () => {
             path="about"
             element={
               userData ? <About /> : <WelcomePage onSubmit={handleUserSubmit} />
+            }
+          />
+          <Route
+            path="calendar"
+            element={
+              userData ? (
+                <Calendar />
+              ) : (
+                <WelcomePage onSubmit={handleUserSubmit} />
+              )
             }
           />
           <Route
