@@ -19,15 +19,61 @@ const Calendar = () => {
   const [events, setEvents] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [calendarView, setCalendarView] = useState("dayGridMonth");
+  const [editTitle, setEditTitle] = useState("");
+  const [editStart, setEditStart] = useState("");
+  const [editEnd, setEditEnd] = useState("");
+  const [isHoliday, setIsHoliday] = useState(false);
+
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newEventTitle, setNewEventTitle] = useState("");
   const [newEventDates, setNewEventDates] = useState({ start: "", end: "" });
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
 
   const addOneDay = (dateStr) => {
     const date = new Date(dateStr);
     date.setDate(date.getDate() + 1);
     return date.toISOString().split("T")[0];
+  };
+
+  const handleEditEvent = () => {
+    if (!selectedEvent) return;
+
+    const updatedEvents = events.map((evt) => {
+      if (
+        evt.title === selectedEvent.title &&
+        evt.start === selectedEvent.start &&
+        evt.end === selectedEvent.end &&
+        evt.backgroundColor === "#4caf50"
+      ) {
+        return {
+          ...evt,
+          title: editTitle,
+          start: editStart,
+          end: addOneDay(editEnd),
+        };
+      }
+      return evt;
+    });
+
+    setEvents(updatedEvents);
+    setDetailDialogOpen(false);
+  };
+
+  const handleDeleteEvent = () => {
+    if (!selectedEvent) return;
+    const filtered = events.filter((evt) => {
+      return !(
+        evt.title === selectedEvent.title &&
+        evt.start === selectedEvent.start &&
+        evt.end === selectedEvent.end &&
+        evt.backgroundColor === "#4caf50"
+      );
+    });
+
+    setEvents(filtered);
+    setDetailDialogOpen(false);
   };
 
   // Load holidays and local events
@@ -136,6 +182,16 @@ const Calendar = () => {
     return merged ? updatedEvents : [...updatedEvents, newEvent];
   };
 
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    return new Date(dateStr).toLocaleDateString("id-ID", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
   const handleAddEvent = (newEvent) => {
     setEvents((prevEvents) => mergeUserEvent(prevEvents, newEvent));
   };
@@ -151,6 +207,23 @@ const Calendar = () => {
     >
       {isLoaded ? (
         <FullCalendar
+          eventClick={(info) => {
+            const startStr = info.event.startStr;
+            const endStr = info.event.endStr || info.event.startStr;
+
+            const holiday = info.event.backgroundColor !== "#4caf50"; // libur jika bukan user event
+
+            setSelectedEvent({
+              title: info.event.title,
+              start: startStr,
+              end: endStr,
+            });
+            setEditTitle(info.event.title);
+            setEditStart(startStr);
+            setEditEnd(endStr);
+            setIsHoliday(holiday);
+            setDetailDialogOpen(true);
+          }}
           plugins={[
             dayGridPlugin,
             listPlugin,
@@ -166,13 +239,13 @@ const Calendar = () => {
             center: "title",
             right: "dayGridMonth,timeGridWeek,timeGridDay,listMonth",
           }}
-          aspectRatio={window.innerWidth < 768 ? 0 : 1}
+          aspectRatio={window.innerWidth < 768 ? 0.5 : 2}
           eventDisplay="block"
           dateClick={(info) => {
             setNewEventTitle("");
             setNewEventDates({
               start: info.dateStr,
-              end: addOneDay(info.dateStr),
+              end: info.dateStr, // Ubah jadi sama dengan start
             });
             setDialogOpen(true);
           }}
@@ -180,7 +253,7 @@ const Calendar = () => {
             setNewEventTitle("");
             setNewEventDates({
               start: selectionInfo.startStr,
-              end: addOneDay(selectionInfo.endStr),
+              end: selectionInfo.endStr, // Gunakan endStr langsung, jangan ditambah
             });
             setDialogOpen(true);
           }}
@@ -188,6 +261,7 @@ const Calendar = () => {
       ) : (
         <p>Loading calendar...</p>
       )}
+
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
         <DialogTitle>Tambah Event</DialogTitle>
         <DialogContent>
@@ -208,7 +282,7 @@ const Calendar = () => {
                 handleAddEvent({
                   title: newEventTitle,
                   start: newEventDates.start,
-                  end: newEventDates.end,
+                  end: addOneDay(newEventDates.end),
                   backgroundColor: "#4caf50",
                   textColor: "#fff",
                 });
@@ -218,6 +292,71 @@ const Calendar = () => {
           >
             Simpan
           </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={detailDialogOpen}
+        onClose={() => setDetailDialogOpen(false)}
+      >
+        <DialogTitle>Detail Event</DialogTitle>
+        <DialogContent>
+          {selectedEvent && (
+            <>
+              <p>
+                <strong>Judul:</strong> {selectedEvent.title}
+              </p>
+              <p>
+                <strong>Tanggal:</strong>{" "}
+                {selectedEvent.end && selectedEvent.start !== selectedEvent.end
+                  ? `${formatDate(selectedEvent.start)} sampai ${formatDate(
+                      selectedEvent.end
+                    )}`
+                  : formatDate(selectedEvent.start)}
+              </p>
+
+              {!isHoliday && (
+                <>
+                  <TextField
+                    label="Edit Judul Event"
+                    fullWidth
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                    margin="dense"
+                  />
+                  <TextField
+                    label="Tanggal Mulai"
+                    type="date"
+                    fullWidth
+                    margin="dense"
+                    value={editStart}
+                    onChange={(e) => setEditStart(e.target.value)}
+                    InputLabelProps={{ shrink: true }}
+                  />
+                  <TextField
+                    label="Tanggal Selesai"
+                    type="date"
+                    fullWidth
+                    margin="dense"
+                    value={editEnd}
+                    onChange={(e) => setEditEnd(e.target.value)}
+                    InputLabelProps={{ shrink: true }}
+                  />
+                </>
+              )}
+            </>
+          )}
+        </DialogContent>
+
+        <DialogActions>
+          <Button onClick={() => setDetailDialogOpen(false)}>Tutup</Button>
+          {!isHoliday && (
+            <>
+              <Button onClick={handleDeleteEvent} color="error">
+                Hapus
+              </Button>
+              <Button onClick={handleEditEvent}>Simpan</Button>
+            </>
+          )}
         </DialogActions>
       </Dialog>
     </div>

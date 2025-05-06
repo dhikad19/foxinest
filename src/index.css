@@ -77,7 +77,9 @@ div p {
 }
 
 .fc-h-event {
-  border: none !important;
+  border: 1px solid #ffffff !important;
+  border-radius: 4px !important;
+  padding-left: 4px !important;
 }
 
 /* calendar-theme.css */
@@ -88,6 +90,9 @@ div p {
 .fc-toolbar-title {
   color: #000000;
   font-weight: 500;
+  @media screen and (max-width: 786px) {
+    font-size: 18px !important;
+  }
 }
 
 .fc-button {
@@ -97,4 +102,12 @@ div p {
   color: #fff !important;
   font-size: 15px !important;
   font-weight: 500 !important;
+}
+
+.fc-toolbar {
+  @media screen and (max-width: 786px) {
+    flex-direction: column !important;
+    align-items: start !important;
+    gap: 10px;
+  }
 }
