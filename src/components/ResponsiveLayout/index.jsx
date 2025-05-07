@@ -176,17 +176,11 @@ const ResponsiveLayout = ({ children }) => {
       <Toolbar />
 
       <List>
-        {/* Static Pages */}
         {[
           {
             label: "Home",
             path: "/",
             icon: <HomeIcon style={{ fontSize: "22px" }} />,
-          },
-          {
-            label: "About",
-            path: "/about",
-            icon: <InfoIcon style={{ fontSize: "22px" }} />,
           },
           {
             label: "Completed",
@@ -198,6 +192,11 @@ const ResponsiveLayout = ({ children }) => {
             path: "/calendar",
             icon: <CalendarIcon style={{ fontSize: "22px" }} />,
           },
+          {
+            label: "About",
+            path: "/about",
+            icon: <InfoIcon style={{ fontSize: "22px" }} />,
+          },
         ].map(({ label, path, icon }) => (
           <ListItem
             button
@@ -206,7 +205,7 @@ const ResponsiveLayout = ({ children }) => {
               "&:hover": {
                 backgroundColor: "transparent", // Default to transparent
                 "& .not-active": {
-                  backgroundColor: "#ffe3cb",
+                  backgroundColor: "#c0c0c042",
                   borderRadius: "4px", // Red background on hover for non-active links
                 },
               },
@@ -256,7 +255,7 @@ const ResponsiveLayout = ({ children }) => {
                 "&:hover": {
                   backgroundColor: "transparent", // Default to transparent
                   "& .not-active": {
-                    backgroundColor: "#ffe3cb",
+                    backgroundColor: "#c0c0c042",
                     borderRadius: "4px", // Red background on hover for non-active links
                   },
                 },
@@ -284,7 +283,7 @@ const ResponsiveLayout = ({ children }) => {
                   "&:hover": {
                     backgroundColor: "transparent", // Default to transparent
                     "& .not-active": {
-                      backgroundColor: "#ffe3cb",
+                      backgroundColor: "#c0c0c042",
                       borderRadius: "4px", // Red background on hover for non-active links
                     },
                   },
@@ -334,7 +333,7 @@ const ResponsiveLayout = ({ children }) => {
             "&:hover": {
               backgroundColor: "transparent", // Default to transparent
               "& .not-active": {
-                backgroundColor: "#ffe3cb",
+                backgroundColor: "#c0c0c042",
                 borderRadius: "4px", // Red background on hover for non-active links
               },
             },
@@ -382,7 +381,7 @@ const ResponsiveLayout = ({ children }) => {
               "&:hover": {
                 backgroundColor: "transparent", // Default to transparent
                 "& .not-active": {
-                  backgroundColor: "#ffe3cb",
+                  backgroundColor: "#c0c0c042",
                   borderRadius: "4px", // Red background on hover for non-active links
                 },
               },
@@ -549,9 +548,11 @@ const ResponsiveLayout = ({ children }) => {
                 <MenuIcon />
               </IconButton>
             )}
-            <Typography variant="h6" noWrap>
-              My App
-            </Typography>
+            <img
+              src="/logo-todo.png"
+              style={{ objectFit: "contain", maxWidth: 120 }}
+              alt=""
+            />
           </Toolbar>
         </AppBar>
 

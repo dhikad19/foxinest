@@ -10,6 +10,9 @@ import {
   DialogActions,
   Button,
   TextField,
+  Box,
+  Typography,
+  CircularProgress,
 } from "@mui/material";
 
 import interactionPlugin from "@fullcalendar/interaction"; // Required for interactions
@@ -202,7 +205,7 @@ const Calendar = () => {
         maxWidth: "100%",
         height: "100%",
         margin: "0 auto",
-        padding: "15px",
+        padding: "0px 15px 0px 15px",
       }}
     >
       {isLoaded ? (
@@ -259,7 +262,20 @@ const Calendar = () => {
           }}
         />
       ) : (
-        <p>Loading calendar...</p>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100vh",
+          }}
+        >
+          <CircularProgress sx={{ color: "#ff7800" }} />
+          <Typography variant="subtitle1" sx={{ marginTop: 2 }}>
+            Please wait
+          </Typography>
+        </Box>
       )}
 
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
