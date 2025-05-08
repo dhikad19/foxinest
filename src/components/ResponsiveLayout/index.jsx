@@ -41,25 +41,30 @@ import {
   CheckCircleOutlined as CompletedIcon,
   Home,
 } from "@mui/icons-material";
+import ProjectDetail from "../../pages/ProjectDetail";
 
 const drawerWidth = 240;
 
 const ResponsiveLayout = ({ children }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [projects, setProjects] = useState(() => {
+    const storedProjects = localStorage.getItem("projects");
+    return storedProjects ? JSON.parse(storedProjects) : [];
+  });
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [projectName, setProjectName] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const [isFavorite, setIsFavorite] = useState(false);
   const [editProject, setEditProject] = useState(null);
-  const [projects, setProjects] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("projects")) || [];
-    } catch {
-      return [];
-    }
-  });
+  // const [projects, setProjects] = useState(() => {
+  //   try {
+  //     return JSON.parse(localStorage.getItem("projects")) || [];
+  //   } catch {
+  //     return [];
+  //   }
+  // });
 
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -79,30 +84,37 @@ const ResponsiveLayout = ({ children }) => {
   };
 
   useEffect(() => {
-    // Load initial projects
-    const storedProjects = localStorage.getItem("projects");
-    if (storedProjects) {
-      setProjects(JSON.parse(storedProjects));
-    }
-
-    // Add event listener for project updates
-    const handleProjectsUpdate = () => {
-      const updatedProjects =
-        JSON.parse(localStorage.getItem("projects")) || [];
-      setProjects(updatedProjects);
+    const updateProjects = () => {
+      const stored = localStorage.getItem("projects");
+      setProjects(stored ? JSON.parse(stored) : []);
     };
 
-    window.addEventListener("projectsUpdated", handleProjectsUpdate);
+    // Listen for storage changes or custom events
+    window.addEventListener("localStorage-update", updateProjects);
+    window.addEventListener("storage", updateProjects);
 
-    // Cleanup event listener on component unmount
     return () => {
-      window.removeEventListener("projectsUpdated", handleProjectsUpdate);
+      window.removeEventListener("localStorage-update", updateProjects);
+      window.removeEventListener("storage", updateProjects);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleProjectChange = () => {
+      const storedProjects = localStorage.getItem("projects");
+      setProjects(storedProjects ? JSON.parse(storedProjects) : []);
+    };
+
+    window.addEventListener("projectChange", handleProjectChange);
+
+    return () => {
+      window.removeEventListener("projectChange", handleProjectChange);
     };
   }, []);
 
   useEffect(() => {
     if (mobileOpen) {
-      setMobileOpen(false); // Close drawer on route change
+      setMobileOpen(false); // Closfe drawer on route change
     }
   }, [location.pathname]);
 
