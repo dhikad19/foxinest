@@ -6,25 +6,26 @@ const WelcomePage = ({ onSubmit }) => {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
+    email: "",
   });
 
+  const [emailError, setEmailError] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-  };
 
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   localStorage.setItem("userData", JSON.stringify(formData));
-  //   navigate("/");
-  // };
+    if (name === "email") {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      setEmailError(!emailRegex.test(value));
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData); // <-- panggil handler dari App
-    navigate("/"); // navigasi setelah submit
+    onSubmit(formData);
+    navigate("/");
   };
 
   return (
@@ -49,12 +50,24 @@ const WelcomePage = ({ onSubmit }) => {
           fullWidth
           margin="normal"
         />
+        <TextField
+          label="Email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          error={emailError}
+          helperText={emailError ? "Please enter a valid email address" : ""}
+          fullWidth
+          margin="normal"
+        />
         <Button
           type="submit"
           variant="contained"
           color="primary"
           fullWidth
-          disabled={!formData.firstName.trim()}
+          disabled={
+            !formData.firstName.trim() || !formData.email.trim() || emailError
+          }
         >
           Submit
         </Button>

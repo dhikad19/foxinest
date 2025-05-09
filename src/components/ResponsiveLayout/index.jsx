@@ -186,7 +186,51 @@ const ResponsiveLayout = ({ children }) => {
   const drawer = (
     <div>
       <Toolbar />
-
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          marginTop: "-48px",
+          marginBottom: "10px",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: "50%",
+            backgroundColor: "#ff7800",
+            minHeight: "35px",
+            minWidth: "35px",
+            color: "#ffffff",
+            marginRight: "10px",
+            marginLeft: "10px",
+          }}
+        >
+          D
+        </div>
+        <div>
+          <p
+            style={{
+              marginBottom: "0px",
+              lineHeight: "normal",
+              fontWeight: "500",
+            }}
+          >
+            Dwi Andika
+          </p>
+          {/* <p
+            style={{
+              marginBottom: "0px",
+              lineHeight: "normal",
+              fontSize: "14px",
+            }}
+          >
+            dwiandika911@gmail.com
+          </p> */}
+        </div>
+      </div>
       <List>
         {[
           {
