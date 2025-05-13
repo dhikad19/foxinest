@@ -58,6 +58,34 @@ const ResponsiveLayout = ({ children }) => {
   const [selectedColor, setSelectedColor] = useState("");
   const [isFavorite, setIsFavorite] = useState(false);
   const [editProject, setEditProject] = useState(null);
+  const [showBorder, setShowBorder] = useState(false);
+  const [showTitle, setShowTitle] = useState(false);
+
+  const getTitle = () => {
+    switch (location.pathname) {
+      case "/":
+        return "Home";
+      case "/about":
+        return "About";
+      case "/calendar":
+        return "";
+      default:
+        return location.pathname;
+    }
+  };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      setShowBorder(scrollY > 0);
+      setShowTitle(scrollY > 40);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
   // const [projects, setProjects] = useState(() => {
   //   try {
   //     return JSON.parse(localStorage.getItem("projects")) || [];
@@ -124,8 +152,75 @@ const ResponsiveLayout = ({ children }) => {
     setEditProject(null); // Reset the edit project state when modal is closed
   };
 
+  // const handleAddProject = () => {
+  //   if (projectName.trim()) {
+  //     const newProject = {
+  //       id: Date.now(),
+  //       name: projectName.trim(),
+  //       color: selectedColor || "default", // Default color if no selection is made
+  //       isFavorite,
+  //     };
+  //     const updatedProjects = [...projects, newProject];
+
+  //     setProjects(updatedProjects);
+  //     localStorage.setItem("projects", JSON.stringify(updatedProjects));
+
+  //     setProjectName("");
+  //     setSelectedColor("");
+  //     setIsFavorite(false);
+  //     setOpenModal(false);
+  //     navigate(`/project/${newProject.id}`);
+  //   }
+  // };
+
+  const handleEditProject = (project) => {
+    setEditProject(project);
+    setProjectName(project.name);
+    setSelectedColor(project.color);
+    setIsFavorite(project.isFavorite);
+    setOpenModal(true);
+  };
+
+  const handleDeleteProject = (projectId) => {
+    const updatedProjects = projects.filter(
+      (project) => project.id !== projectId
+    );
+    setProjects(updatedProjects);
+    localStorage.setItem("projects", JSON.stringify(updatedProjects));
+  };
+
+  // const handleSaveProjectEdit = () => {
+  //   if (editProject) {
+  //     const updatedProjects = projects.map((project) =>
+  //       project.id === editProject.id
+  //         ? { ...project, name: projectName, color: selectedColor, isFavorite }
+  //         : project
+  //     );
+
+  //     setProjects(updatedProjects);
+  //     localStorage.setItem("projects", JSON.stringify(updatedProjects));
+
+  //     setProjectName("");
+  //     setSelectedColor("");
+  //     setIsFavorite(false);
+  //     setOpenModal(false);
+  //     setEditProject(null);
+  //   }
+  // };
+
   const handleAddProject = () => {
     if (projectName.trim()) {
+      // Check if project name already exists
+      const projectExists = projects.some(
+        (project) =>
+          project.name.toLowerCase() === projectName.trim().toLowerCase()
+      );
+
+      if (projectExists) {
+        alert("A project with this name already exists."); // Show an error message
+        return;
+      }
+
       const newProject = {
         id: Date.now(),
         name: projectName.trim(),
@@ -145,24 +240,20 @@ const ResponsiveLayout = ({ children }) => {
     }
   };
 
-  const handleEditProject = (project) => {
-    setEditProject(project);
-    setProjectName(project.name);
-    setSelectedColor(project.color);
-    setIsFavorite(project.isFavorite);
-    setOpenModal(true);
-  };
-
-  const handleDeleteProject = (projectId) => {
-    const updatedProjects = projects.filter(
-      (project) => project.id !== projectId
-    );
-    setProjects(updatedProjects);
-    localStorage.setItem("projects", JSON.stringify(updatedProjects));
-  };
-
   const handleSaveProjectEdit = () => {
     if (editProject) {
+      // Check if the updated project name already exists in other projects
+      const projectExists = projects.some(
+        (project) =>
+          project.id !== editProject.id &&
+          project.name.toLowerCase() === projectName.trim().toLowerCase()
+      );
+
+      if (projectExists) {
+        alert("A project with this name already exists."); // Show an error message
+        return;
+      }
+
       const updatedProjects = projects.map((project) =>
         project.id === editProject.id
           ? { ...project, name: projectName, color: selectedColor, isFavorite }
@@ -346,7 +437,7 @@ const ResponsiveLayout = ({ children }) => {
                 }}
               >
                 <NavLink
-                  to={`/project/${project.id}`}
+                  to={`/project/${project.name}`}
                   className={({ isActive }) =>
                     isActive ? "active-link" : "not-active"
                   }
@@ -367,7 +458,7 @@ const ResponsiveLayout = ({ children }) => {
                     variant="body1"
                     sx={{
                       fontSize: "14px",
-                      maxWidth: "120px",
+                      maxWidth: "110px",
                       overflow: "hidden",
                       whiteSpace: "nowrap",
                       textOverflow: "ellipsis",
@@ -395,9 +486,10 @@ const ResponsiveLayout = ({ children }) => {
             },
           }}
           secondaryAction={
-            <IconButton edge="end" onClick={handleModalOpen}>
-              <AddIcon style={{ color: "#000000", marginRight: "5px" }} />
-            </IconButton>
+            <AddIcon
+              onClick={handleModalOpen}
+              style={{ color: "#000000", marginTop: "7px" }}
+            />
           }
         >
           <NavLink
@@ -444,7 +536,7 @@ const ResponsiveLayout = ({ children }) => {
             }}
           >
             <NavLink
-              to={`/project/${project.id}`}
+              to={`/project/${project.name}`}
               className={({ isActive }) =>
                 isActive ? "active-link" : "not-active"
               }
@@ -588,12 +680,12 @@ const ResponsiveLayout = ({ children }) => {
           position="sticky"
           elevation={0}
           sx={{
-            borderBottom: "1px solid #ddd",
             backgroundColor: "#fff",
             color: "#000",
+            borderBottom: showBorder ? "1px solid #eee" : "none",
           }}
         >
-          <Toolbar>
+          <Toolbar sx={{ position: "relative", alignItems: "center" }}>
             {isMobile && (
               <IconButton
                 color="inherit"
@@ -607,8 +699,23 @@ const ResponsiveLayout = ({ children }) => {
             <img
               src="/logo-todo.png"
               style={{ objectFit: "contain", maxWidth: 120 }}
-              alt=""
+              alt="Logo"
             />
+
+            {/* Animated Title */}
+            <Typography
+              variant="h6"
+              sx={{
+                position: "absolute",
+                top: showTitle ? "50%" : "80%",
+                left: isMobile ? "90%" : "50%",
+                transform: "translate(-50%, -50%)",
+                opacity: showTitle ? 1 : 0,
+                transition: "top 0.2s ease, opacity 0.1s ease",
+              }}
+            >
+              {getTitle()}
+            </Typography>
           </Toolbar>
         </AppBar>
 

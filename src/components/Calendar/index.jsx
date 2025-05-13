@@ -11,6 +11,8 @@ import {
   Button,
   TextField,
   Box,
+  useTheme,
+  useMediaQuery,
   Typography,
   CircularProgress,
 } from "@mui/material";
@@ -33,6 +35,9 @@ const Calendar = () => {
   const [newEventDates, setNewEventDates] = useState({ start: "", end: "" });
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const addOneDay = (dateStr) => {
     const date = new Date(dateStr);
@@ -205,7 +210,7 @@ const Calendar = () => {
         maxWidth: "100%",
         height: "100%",
         margin: "0 auto",
-        padding: "0px 15px 0px 15px",
+        padding: isMobile ? "0px 15px 0px 15px" : "0px 25px 0px 25px",
       }}
     >
       {isLoaded ? (

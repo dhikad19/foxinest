@@ -3,9 +3,9 @@ import { loadFromStorage, saveToStorage } from "../../utils/storage";
 import TaskList from "../../components/Task/List";
 import EditModal from "../../components/Modal/Edit";
 import SearchBar from "../../components/Search";
-import Snackbar from "../../components/Snackbar"; // Import Snackbar component
+import Snackbar from "../../components/Snackbar";
 
-import { Button, TextField, Divider } from "@mui/material";
+import { Button, TextField, Divider, Typography } from "@mui/material";
 
 const Section = () => {
   const [tasks, setTasks] = useState([]);
@@ -168,13 +168,14 @@ const Section = () => {
         paddingRight: "45px",
         maxWidth: "700px",
         margin: "0 auto",
-        overflow: "visible" /* 👈 allows dragged item to be seen outside */,
+        overflow: "visible",
         position: "relative",
       }}
     >
-      <h1>📋 To-Do List with Sections</h1>
-
-      <SearchBar query={searchQuery} setQuery={setSearchQuery} />
+      <div style={{ paddingLeft: "3px", paddingRight: "3px" }}>
+        <h2 style={{ marginBottom: "0px", marginTop: "10px" }}>Home</h2>
+        <SearchBar query={searchQuery} setQuery={setSearchQuery} />
+      </div>
 
       {!showForm ? (
         <div
@@ -201,8 +202,44 @@ const Section = () => {
       ) : (
         <form
           onSubmit={handleSubmit}
-          style={{ gap: 8, marginTop: 10, marginBottom: 30, padding: 4 }}
+          style={{ gap: 8, marginTop: 10, marginBottom: 30, padding: 3 }}
         >
+          {/* <div
+            style={{
+              borderBottom: "1px solid #ff7800",
+              width: "100%",
+              marginBottom: 30,
+            }}
+          ></div> */}
+          {/* <p
+            style={{
+              fontWeight: 500,
+              marginBottom: "10px",
+              color: "#ff7800",
+              fontSize: 15,
+              textAlign: "center",
+            }}
+          >
+            Add new section
+          </p> */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              userSelect: "none",
+              marginBottom: 16,
+              marginTop: 7,
+            }}
+          >
+            <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
+            <span
+              style={{ fontWeight: "bold", color: "#ff7800", fontSize: "15px" }}
+            >
+              Add new section
+            </span>
+            <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
+          </div>
           <TextField
             fullWidth
             id="section"
@@ -210,9 +247,24 @@ const Section = () => {
             size="small"
             placeholder="New section name"
             value={inputValue}
+            margin="none"
             onChange={(e) => setInputValue(e.target.value)}
+            sx={{
+              mb: 2,
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: "#ccc", // Default border color
+                },
+                "&:hover fieldset": {
+                  borderColor: "#ff7800", // Hover border color
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#ff7800", // Focus border color
+                },
+              },
+            }}
           />
-          <div style={{ marginTop: "8px" }}>
+          <div>
             <Button
               type="submit"
               variant="contained"

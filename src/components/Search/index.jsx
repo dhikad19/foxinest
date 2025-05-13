@@ -1,17 +1,28 @@
 import React from "react";
+import TextField from "@mui/material/TextField";
 
 const SearchBar = ({ query, setQuery }) => (
-  <input
-    type="text"
-    placeholder="🔍 Search title or category..."
+  <TextField
+    fullWidth
+    variant="outlined"
+    placeholder="Search title or category"
     value={query}
     onChange={(e) => setQuery(e.target.value)}
-    style={{
-      width: "100%",
-      padding: 8,
-      marginBottom: 20,
-      borderRadius: 4,
-      border: "1px solid #ccc",
+    margin="dense"
+    size="small"
+    sx={{
+      mb: 2,
+      "& .MuiOutlinedInput-root": {
+        "& fieldset": {
+          borderColor: "#ccc", // Default border color
+        },
+        "&:hover fieldset": {
+          borderColor: "#ff7800", // Hover border color
+        },
+        "&.Mui-focused fieldset": {
+          borderColor: "#ff7800", // Focus border color
+        },
+      },
     }}
   />
 );

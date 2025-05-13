@@ -13,7 +13,15 @@ import {
   List,
   ListItem,
   ListItemText,
+  Menu,
+  MenuItem,
 } from "@mui/material";
+import CommentsIcon from "@mui/icons-material/ChatBubbleOutline";
+import DeleteIcon from "@mui/icons-material/DeleteOutlined";
+import EditIcon from "@mui/icons-material/EditOutlined";
+import DragIcon from "@mui/icons-material/DragIndicator";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import DateIcon from "@mui/icons-material/DateRangeOutlined";
 
 // Styles
 const containerStyle = (isDragging, transform, transition) => ({
@@ -25,7 +33,6 @@ const containerStyle = (isDragging, transform, transition) => ({
   display: "flex",
   flexDirection: "column",
   gap: 8,
-  cursor: "grab",
   boxShadow: isDragging ? "0 2px 6px rgba(0, 0, 0, 0.1)" : "none",
   touchAction: "none",
   zIndex: isDragging ? 9999 : "auto",
@@ -68,6 +75,16 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
     setOpenDialog(false);
   };
 
+  const [menuAnchor, setMenuAnchor] = useState(null);
+
+  const handleMenuOpen = (event) => {
+    setMenuAnchor(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setMenuAnchor(null);
+  };
+
   // Function to add a new comment
   const handleAddComment = () => {
     if (newComment.trim()) {
@@ -102,40 +119,171 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
               style={{ marginLeft: -2 }}
               size="small"
               sx={{
-                "&.Mui-checked": { color: "#ff7800" },
+                "& .MuiSvgIcon-root": {
+                  color:
+                    task.priority === "High"
+                      ? "red"
+                      : task.priority === "Medium"
+                      ? "green"
+                      : task.priority === "Low"
+                      ? "blue"
+                      : "black", // Default color for unchecked state
+                },
+                "&.Mui-checked .MuiSvgIcon-root": {
+                  color:
+                    task.priority === "High"
+                      ? "red"
+                      : task.priority === "Medium"
+                      ? "green"
+                      : task.priority === "Low"
+                      ? "blue"
+                      : "black", // Same color for checked state
+                },
                 p: 0,
               }}
             />
           </div>
-          <div>
-            <span style={{ fontWeight: "bold", fontSize: 15 }}>
-              {task.title}
-            </span>
+          <div style={{ width: "100%" }}>
             <div
-              style={{ margin: 0, fontSize: 14 }}
+              style={{
+                width: "100%",
+                alignItems: "start",
+                display: "flex",
+                marginBottom: "5px",
+              }}
+            >
+              <span
+                style={{ fontWeight: "bold", fontSize: 15, maxWidth: "80%" }}
+              >
+                {task.title}
+              </span>
+              {task.dueDate && (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginLeft: "15px",
+                    marginBottom: "2.5px",
+                  }}
+                >
+                  <DateIcon style={{ fontSize: "14px", color: "grey" }} />
+                  <p
+                    style={{
+                      fontSize: "13px",
+                      color: "grey",
+                      marginLeft: "5px",
+                    }}
+                  >
+                    {(() => {
+                      const currentYear = new Date().getFullYear();
+                      const dueDate = new Date(task.dueDate);
+                      const options = {
+                        day: "2-digit",
+                        month: "short",
+                        ...(dueDate.getFullYear() !== currentYear && {
+                          year: "numeric",
+                        }), // Add year only if it's not the current year
+                      };
+                      return new Intl.DateTimeFormat("en-GB", options).format(
+                        dueDate
+                      );
+                    })()}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div
+              style={{ margin: 0, fontSize: 14, maxWidth: "90%" }}
               dangerouslySetInnerHTML={{ __html: task.description }}
             ></div>
-            <p>
-              <strong>Due:</strong> {task.dueDate || "—"} |{" "}
-              <strong>Priority:</strong> {task.priority}
-            </p>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              {/* Due Date */}
+              {/* {task.dueDate && (
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <DateIcon style={{ fontSize: "14px", color: "#ff7800" }} />
+                  <p
+                    style={{
+                      fontSize: "13px",
+                      color: "#ff7800",
+                      marginTop: "2px",
+                      marginLeft: "5px",
+                    }}
+                  >
+                    {(() => {
+                      const currentYear = new Date().getFullYear();
+                      const dueDate = new Date(task.dueDate);
+                      const options = {
+                        day: "2-digit",
+                        month: "short",
+                        ...(dueDate.getFullYear() !== currentYear && {
+                          year: "numeric",
+                        }), // Add year only if it's not the current year
+                      };
+                      return new Intl.DateTimeFormat("en-GB", options).format(
+                        dueDate
+                      );
+                    })()}
+                  </p>
+                </div>
+              )} */}
+
+              {/* Priority */}
+            </div>
           </div>
         </div>
-
         {/* Action Buttons */}
+
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <button onClick={() => onEdit(task)} aria-label="Edit task">
-            ✏️
-          </button>
-          <button onClick={() => onDelete(task.id)} aria-label="Delete task">
-            🗑️
-          </button>
+          {/* Action Menu Trigger */}
+          <MoreVertIcon
+            style={{ fontSize: "20px", cursor: "pointer" }}
+            onClick={handleMenuOpen}
+          />
 
-          {/* Comments Button */}
-          <Button variant="outlined" size="small" onClick={handleOpenDialog}>
-            💬 Comments
-          </Button>
+          {/* Action Menu */}
+          <Menu
+            anchorEl={menuAnchor}
+            open={Boolean(menuAnchor)}
+            onClose={handleMenuClose}
+          >
+            <MenuItem
+              onClick={() => {
+                onEdit(task);
+                handleMenuClose();
+              }}
+            >
+              <EditIcon style={{ fontSize: "20px", marginRight: 12 }} />{" "}
+              <p style={{ fontSize: "14px" }}>Edit</p>
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                onDelete(task.id);
+                handleMenuClose();
+              }}
+            >
+              <DeleteIcon style={{ fontSize: "20px", marginRight: 12 }} />{" "}
+              <p style={{ fontSize: "14px" }}>Delete</p>
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleOpenDialog();
+                handleMenuClose();
+              }}
+            >
+              <CommentsIcon
+                style={{ fontSize: "18px", marginRight: 12, marginLeft: 2 }}
+              />{" "}
+              <p style={{ fontSize: "14px" }}>Comments</p>
+            </MenuItem>
+          </Menu>
 
+          {/* Drag Handle */}
           <div
             ref={setActivatorNodeRef}
             {...attributes}
@@ -143,14 +291,13 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
             title="Drag"
             style={{
               cursor: "grab",
-              padding: "4px 8px",
+              padding: "4px 4px 0px 4px",
               background: "#eee",
               borderRadius: 4,
-              fontSize: 18,
             }}
             aria-label="Drag task"
           >
-            ⠿
+            <DragIcon style={{ fontSize: "18px" }} />
           </div>
         </div>
       </div>

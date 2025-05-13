@@ -13,6 +13,8 @@ import {
   verticalListSortingStrategy,
   arrayMove,
 } from "@dnd-kit/sortable";
+import AddIcon from "@mui/icons-material/Add";
+import AddIconFilled from "@mui/icons-material/AddCircle";
 import TaskItem from "../Item";
 import TaskForm from "../Form";
 
@@ -87,7 +89,7 @@ const TaskList = ({
   const [activeTask, setActiveTask] = useState(null);
   const [showOverdue, setShowOverdue] = useState(true);
   const sensors = useSensors(useSensor(PointerSensor));
-
+  const [isHovered, setIsHovered] = useState(false);
   // 📅 Date picker state
   const [selectedDate, setSelectedDate] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -354,7 +356,22 @@ const TaskList = ({
                   onChange={(newName) => onEditSection(category, newName)}
                 />
               </div>
-              <button onClick={() => onDeleteSection(category)}>Delete</button>
+              <Button
+                variant="contained"
+                onClick={() => onDeleteSection(category)}
+                sx={{
+                  backgroundColor: "#ff7800",
+                  boxShadow: "none",
+                  "&:hover": {
+                    backgroundColor: "#e06600", // Adjust hover color if needed
+                    boxShadow: "none",
+                  },
+                  textTransform: "capitalize",
+                }}
+                size="small"
+              >
+                Delete
+              </Button>
             </div>
             <Divider />
             <div
@@ -381,9 +398,26 @@ const TaskList = ({
               </SortableContext>
 
               {!openForms[category] && (
-                <button onClick={() => toggleForm(category)}>
-                  ➕ Add Task
-                </button>
+                <div
+                  onClick={() => toggleForm(category)}
+                  onMouseEnter={() => setIsHovered(true)}
+                  onMouseLeave={() => setIsHovered(false)}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    color: isHovered ? "#ff7800" : "inherit", // Change color on hover
+                    cursor: "pointer",
+                    marginTop: 10,
+                  }}
+                >
+                  {isHovered ? (
+                    <AddIconFilled style={{ marginRight: "8px" }} />
+                  ) : (
+                    <AddIcon style={{ marginRight: "8px" }} />
+                  )}
+
+                  <p style={{ fontSize: 15 }}>Add task</p>
+                </div>
               )}
 
               {openForms[category] && (
