@@ -89,7 +89,8 @@ const TaskList = ({
   const [activeTask, setActiveTask] = useState(null);
   const [showOverdue, setShowOverdue] = useState(true);
   const sensors = useSensors(useSensor(PointerSensor));
-  const [isHovered, setIsHovered] = useState(false);
+  const [hoveredCategory, setHoveredCategory] = useState(null);
+
   // 📅 Date picker state
   const [selectedDate, setSelectedDate] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -206,8 +207,7 @@ const TaskList = ({
       modifiers={[restrictToVerticalAxis]}
       sensors={sensors}
       collisionDetection={closestCenter}
-      onDragEnd={handleDragEnd}
-    >
+      onDragEnd={handleDragEnd}>
       <div>
         {/* 🔴 Overdue Section */}
         {overdueTasks.length > 0 && (
@@ -218,8 +218,7 @@ const TaskList = ({
                 justifyContent: "space-between",
                 alignItems: "center",
                 marginBottom: 10,
-              }}
-            >
+              }}>
               <div style={{ display: "flex", alignItems: "center" }}>
                 <div
                   onClick={() => setShowOverdue((prev) => !prev)}
@@ -234,8 +233,7 @@ const TaskList = ({
                     width: 22,
                     marginLeft: "-30px",
                     backgroundColor: "#fafafa",
-                  }}
-                >
+                  }}>
                   {showOverdue ? (
                     <FaChevronDown size={10} color="grey" />
                   ) : (
@@ -256,8 +254,7 @@ const TaskList = ({
                     borderRadius: 4,
                     backgroundColor: "#f5f5f5",
                     fontSize: 13,
-                  }}
-                >
+                  }}>
                   {selectedDate
                     ? selectedDate.format("MMM D, YYYY")
                     : "Select Date 📅"}
@@ -270,22 +267,19 @@ const TaskList = ({
                   anchorOrigin={{
                     vertical: "bottom",
                     horizontal: "left",
-                  }}
-                >
+                  }}>
                   <Box p={1}>
                     <Stack direction="row" spacing={1} padding={2}>
                       <Button
                         size="small"
                         variant="outlined"
-                        onClick={() => handleDateChange(today)}
-                      >
+                        onClick={() => handleDateChange(today)}>
                         Today
                       </Button>
                       <Button
                         size="small"
                         variant="outlined"
-                        onClick={() => handleDateChange(tomorrow)}
-                      >
+                        onClick={() => handleDateChange(tomorrow)}>
                         Tomorrow
                       </Button>
                     </Stack>
@@ -319,16 +313,14 @@ const TaskList = ({
         {Object.entries(filteredTasksByCategory).map(([category, tasks]) => (
           <div
             key={category}
-            style={{ marginBottom: "1rem", borderRadius: 8, padding: 4 }}
-          >
+            style={{ marginBottom: "1rem", borderRadius: 8, padding: 4 }}>
             <div
               style={{
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
                 marginBottom: 10,
-              }}
-            >
+              }}>
               <div style={{ display: "flex", alignItems: "center" }}>
                 <div
                   onClick={() => toggleExpand(category)}
@@ -343,8 +335,7 @@ const TaskList = ({
                     width: 22,
                     marginLeft: "-30px",
                     backgroundColor: "#fafafa",
-                  }}
-                >
+                  }}>
                   {expandedSections[category] ? (
                     <FaChevronDown size={10} color="grey" />
                   ) : (
@@ -368,8 +359,7 @@ const TaskList = ({
                   },
                   textTransform: "capitalize",
                 }}
-                size="small"
-              >
+                size="small">
                 Delete
               </Button>
             </div>
@@ -380,12 +370,10 @@ const TaskList = ({
                 paddingLeft: 4,
                 paddingRight: 4,
                 maxHeight: expandedSections[category] ? "100%" : "0",
-              }}
-            >
+              }}>
               <SortableContext
                 items={tasks.map((t) => t.id)}
-                strategy={verticalListSortingStrategy}
-              >
+                strategy={verticalListSortingStrategy}>
                 {tasks.map((task) => (
                   <TaskItem
                     key={task.id}
@@ -400,23 +388,24 @@ const TaskList = ({
               {!openForms[category] && (
                 <div
                   onClick={() => toggleForm(category)}
-                  onMouseEnter={() => setIsHovered(true)}
-                  onMouseLeave={() => setIsHovered(false)}
+                  onMouseEnter={() => setHoveredCategory(category)}
+                  onMouseLeave={() => setHoveredCategory(null)}
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    color: isHovered ? "#ff7800" : "inherit", // Change color on hover
+                    color: hoveredCategory === category ? "#ff7800" : "inherit",
                     cursor: "pointer",
                     marginTop: 10,
-                  }}
-                >
-                  {isHovered ? (
-                    <AddIconFilled style={{ marginRight: "8px" }} />
+                  }}>
+                  {hoveredCategory === category ? (
+                    <AddIconFilled
+                      style={{ marginRight: "8px", fontSize: 20 }}
+                    />
                   ) : (
-                    <AddIcon style={{ marginRight: "8px" }} />
+                    <AddIcon style={{ marginRight: "8px", fontSize: 20 }} />
                   )}
 
-                  <p style={{ fontSize: 15 }}>Add task</p>
+                  <p style={{ fontSize: 14, fontWeight: 500 }}>Add Task</p>
                 </div>
               )}
 

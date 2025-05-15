@@ -14,6 +14,7 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
+import FlagIcon from "@mui/icons-material/Flag";
 import CheckIcon from "@mui/icons-material/Check";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -77,23 +78,20 @@ const DueDateMenuPicker = ({ form, setForm }) => {
         anchorOrigin={{
           vertical: "bottom",
           horizontal: "left",
-        }}
-      >
+        }}>
         <Box p={1}>
           {/* Quick Action Buttons */}
           <Stack direction="row" spacing={1} padding={3}>
             <Button
               size="small"
               variant="outlined"
-              onClick={() => handleDateChange(today)}
-            >
+              onClick={() => handleDateChange(today)}>
               Today
             </Button>
             <Button
               size="small"
               variant="outlined"
-              onClick={() => handleDateChange(tomorrow)}
-            >
+              onClick={() => handleDateChange(tomorrow)}>
               Tomorrow
             </Button>
           </Stack>
@@ -111,9 +109,9 @@ const DueDateMenuPicker = ({ form, setForm }) => {
 };
 
 const priorities = [
-  { label: "High 🔥", value: "High" },
-  { label: "Medium ⚖️", value: "Medium" },
-  { label: "Low 🧊", value: "Low" },
+  { label: "High", value: "High", color: "#ff77009d" },
+  { label: "Medium", value: "Medium", color: "#4f4f4f9f" },
+  { label: "Low", value: "Low", color: "#1f50ff93" },
 ];
 
 const PrioritySelector = ({ form, setForm }) => {
@@ -139,15 +137,17 @@ const PrioritySelector = ({ form, setForm }) => {
   return (
     <>
       <div onClick={handleClick} style={buttonMenu}>
+        <FlagIcon
+          style={{ color: selected.color, fontSize: 16, marginRight: 5 }}
+        />
         <span>{selected.label}</span>
       </div>
       <Menu
         MenuListProps={{ sx: { py: 0 } }}
         anchorEl={anchorEl}
         open={open}
-        onClose={() => handleClose()}
-      >
-        <span
+        onClose={() => handleClose()}>
+        {/* <span
           style={{
             display: "flex",
             alignItems: "center",
@@ -157,23 +157,33 @@ const PrioritySelector = ({ form, setForm }) => {
             fontWeight: "bold",
             marginTop: 5,
             marginBottom: 5,
-          }}
-        >
+          }}>
           Priority
         </span>
-        <Divider></Divider>
-        {priorities.map((p) => (
-          <MenuItem key={p.value} onClick={() => handleClose(p.value)}>
-            {selectedPriority === p.value && (
-              <ListItemIcon>
-                <CheckIcon fontSize="12px" />
-              </ListItemIcon>
-            )}
-            <ListItemText inset={selectedPriority !== p.value}>
-              <span style={{ fontSize: 13, color: "#4f4f4f" }}>{p.label}</span>
-            </ListItemText>
-          </MenuItem>
-        ))}
+        <Divider></Divider> */}
+        {priorities.map((p) => {
+          const isSelected = selectedPriority === p.value;
+          const iconColor = isSelected ? p.color : "#bdbdbd";
+          const textColor = isSelected ? p.color : "#4f4f4f";
+
+          return (
+            <MenuItem key={p.value} onClick={() => handleClose(p.value)}>
+              <ListItemText>
+                <span
+                  style={{
+                    fontSize: 13,
+                    color: textColor,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6,
+                  }}>
+                  <FlagIcon style={{ color: iconColor, fontSize: 16 }} />
+                  <p>Priority {p.label}</p>
+                </span>
+              </ListItemText>
+            </MenuItem>
+          );
+        })}
       </Menu>
     </>
   );
@@ -321,8 +331,7 @@ const TaskForm = ({ onAdd, defaultCategory = "", onCancel }) => {
           marginTop: 10,
           alignItems: "center",
           justifyContent: "space-between",
-        }}
-      >
+        }}>
         <span style={{ fontSize: 14, fontWeight: "bold", color: "#4f4f4f" }}>
           # {form.category}
         </span>
@@ -341,8 +350,7 @@ const TaskForm = ({ onAdd, defaultCategory = "", onCancel }) => {
                 fontWeight: "bold",
                 fontSize: "12px",
               }}
-              onClick={onCancel}
-            >
+              onClick={onCancel}>
               Cancel
             </Button>
           )}
@@ -362,8 +370,7 @@ const TaskForm = ({ onAdd, defaultCategory = "", onCancel }) => {
               fontSize: "12px",
               marginRight: "6px",
             }}
-            type="submit"
-          >
+            type="submit">
             Add Task
           </Button>
         </div>

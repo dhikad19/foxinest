@@ -283,8 +283,7 @@ const ResponsiveLayout = ({ children }) => {
           alignItems: "center",
           marginTop: "-48px",
           marginBottom: "10px",
-        }}
-      >
+        }}>
         <div
           style={{
             display: "flex",
@@ -297,8 +296,7 @@ const ResponsiveLayout = ({ children }) => {
             color: "#ffffff",
             marginRight: "10px",
             marginLeft: "10px",
-          }}
-        >
+          }}>
           D
         </div>
         <div>
@@ -307,8 +305,7 @@ const ResponsiveLayout = ({ children }) => {
               marginBottom: "0px",
               lineHeight: "normal",
               fontWeight: "500",
-            }}
-          >
+            }}>
             Dwi Andika
           </p>
           {/* <p
@@ -357,8 +354,7 @@ const ResponsiveLayout = ({ children }) => {
                 },
               },
             }}
-            style={{ padding: "0px 8px 0px 8px" }}
-          >
+            style={{ padding: "0px 8px 0px 8px" }}>
             <NavLink
               to={path}
               className={({ isActive }) =>
@@ -371,8 +367,7 @@ const ResponsiveLayout = ({ children }) => {
                 color: "inherit",
                 display: "flex", // Ensures icon and text align properly
                 alignItems: "center",
-              }}
-            >
+              }}>
               <ListItemIcon
                 sx={{ minWidth: "36px", color: "inherit" }} // Optional: Adjust spacing and inherit color
               >
@@ -382,8 +377,7 @@ const ResponsiveLayout = ({ children }) => {
                 variant="body1"
                 sx={{
                   fontSize: "14px",
-                }}
-              >
+                }}>
                 {label}
               </Typography>
             </NavLink>
@@ -406,16 +400,14 @@ const ResponsiveLayout = ({ children }) => {
                     borderRadius: "4px", // Red background on hover for non-active links
                   },
                 },
-              }}
-            >
+              }}>
               <ListItemText
                 primary={
                   <span
                     style={{
                       fontSize: "15px",
                       fontWeight: "bold",
-                    }}
-                  >
+                    }}>
                     Favorites
                   </span>
                 }
@@ -434,8 +426,7 @@ const ResponsiveLayout = ({ children }) => {
                       borderRadius: "4px", // Red background on hover for non-active links
                     },
                   },
-                }}
-              >
+                }}>
                 <NavLink
                   to={`/project/${project.name}`}
                   className={({ isActive }) =>
@@ -448,8 +439,7 @@ const ResponsiveLayout = ({ children }) => {
                     color: "inherit",
                     display: "flex",
                     alignItems: "center",
-                  }}
-                >
+                  }}>
                   <ListItemIcon sx={{ minWidth: "36px", color: "inherit" }}>
                     <TagIcon style={{ fontSize: "22px" }} />{" "}
                     {/* Example icon */}
@@ -463,8 +453,7 @@ const ResponsiveLayout = ({ children }) => {
                       whiteSpace: "nowrap",
                       textOverflow: "ellipsis",
                       fontWeight: "400",
-                    }}
-                  >
+                    }}>
                     {project.name}
                   </Typography>
                 </NavLink>
@@ -490,8 +479,7 @@ const ResponsiveLayout = ({ children }) => {
               onClick={handleModalOpen}
               style={{ color: "#000000", marginTop: "7px" }}
             />
-          }
-        >
+          }>
           <NavLink
             to="/project"
             className={({ isActive }) =>
@@ -505,15 +493,13 @@ const ResponsiveLayout = ({ children }) => {
               alignItems: "center",
               padding: "8px 10px 8px 10px",
             }}
-            end
-          >
+            end>
             <Typography
               variant="body1"
               sx={{
                 fontSize: "14px",
                 fontWeight: "bold",
-              }}
-            >
+              }}>
               My Projects
             </Typography>
           </NavLink>
@@ -533,8 +519,7 @@ const ResponsiveLayout = ({ children }) => {
                   borderRadius: "4px", // Red background on hover for non-active links
                 },
               },
-            }}
-          >
+            }}>
             <NavLink
               to={`/project/${project.name}`}
               className={({ isActive }) =>
@@ -548,8 +533,7 @@ const ResponsiveLayout = ({ children }) => {
                 alignItems: "center",
                 justifyContent: "space-between",
                 padding: "8px 10px 8px 10px",
-              }}
-            >
+              }}>
               <div style={{ display: "flex" }}>
                 <ListItemIcon sx={{ minWidth: "36px", color: "inherit" }}>
                   <TagIcon style={{ fontSize: "22px" }} />
@@ -564,8 +548,7 @@ const ResponsiveLayout = ({ children }) => {
                     whiteSpace: "nowrap",
                     textOverflow: "ellipsis",
                     fontWeight: "400",
-                  }}
-                >
+                  }}>
                   {project.name}
                 </Typography>
               </div>
@@ -590,15 +573,13 @@ const ResponsiveLayout = ({ children }) => {
                     borderRadius: "6px", // Custom shadow if needed
                     minWidth: "200px",
                   },
-                }}
-              >
+                }}>
                 <MenuItem
                   onClick={(e) => {
                     e.preventDefault();
                     handleEditProject(project);
                     handleMenuClose();
-                  }}
-                >
+                  }}>
                   <EditIcon style={{ marginRight: "20px", fontSize: "22px" }} />
                   <span style={{ fontSize: "14px" }}>Edit</span>
                 </MenuItem>
@@ -607,8 +588,7 @@ const ResponsiveLayout = ({ children }) => {
                     e.preventDefault();
                     handleDeleteProject(project.id);
                     handleMenuClose();
-                  }}
-                >
+                  }}>
                   <DeleteIcon
                     style={{ marginRight: "20px", fontSize: "22px" }}
                   />
@@ -630,8 +610,7 @@ const ResponsiveLayout = ({ children }) => {
       <Box
         component="nav"
         sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
-        aria-label="sidebar"
-      >
+        aria-label="sidebar">
         <Drawer
           variant="temporary"
           open={mobileOpen}
@@ -646,8 +625,7 @@ const ResponsiveLayout = ({ children }) => {
               scrollbarWidth: "thin",
               overflowX: "hidden",
             },
-          }}
-        >
+          }}>
           {drawer}
         </Drawer>
 
@@ -668,8 +646,7 @@ const ResponsiveLayout = ({ children }) => {
               left: 0,
             },
           }}
-          open
-        >
+          open>
           {drawer}
         </Drawer>
       </Box>
@@ -682,17 +659,15 @@ const ResponsiveLayout = ({ children }) => {
           sx={{
             backgroundColor: "#fff",
             color: "#000",
-            borderBottom: showBorder ? "1px solid #eee" : "none",
-          }}
-        >
+            borderBottom: showBorder ? "1px solid rgba(0, 0, 0, 0.12)" : "none",
+          }}>
           <Toolbar sx={{ position: "relative", alignItems: "center" }}>
             {isMobile && (
               <IconButton
                 color="inherit"
                 edge="start"
                 onClick={handleDrawerToggle}
-                sx={{ mr: 2 }}
-              >
+                sx={{ mr: 2 }}>
                 <MenuIcon />
               </IconButton>
             )}
@@ -712,8 +687,7 @@ const ResponsiveLayout = ({ children }) => {
                 transform: "translate(-50%, -50%)",
                 opacity: showTitle ? 1 : 0,
                 transition: "top 0.2s ease, opacity 0.1s ease",
-              }}
-            >
+              }}>
               {getTitle()}
             </Typography>
           </Toolbar>
@@ -737,8 +711,7 @@ const ResponsiveLayout = ({ children }) => {
             boxShadow: 24,
             borderRadius: 2,
             p: 3,
-          }}
-        >
+          }}>
           <Typography variant="h6" gutterBottom>
             {editProject ? "Edit Project" : "Add New Project"}
           </Typography>
@@ -754,8 +727,7 @@ const ResponsiveLayout = ({ children }) => {
             <Select
               value={selectedColor}
               label="Color"
-              onChange={(e) => setSelectedColor(e.target.value)}
-            >
+              onChange={(e) => setSelectedColor(e.target.value)}>
               <MenuItem value="default">Default</MenuItem>
               <MenuItem value="blue">Blue</MenuItem>
               <MenuItem value="green">Green</MenuItem>
@@ -774,8 +746,7 @@ const ResponsiveLayout = ({ children }) => {
           <Button
             variant="contained"
             fullWidth
-            onClick={editProject ? handleSaveProjectEdit : handleAddProject}
-          >
+            onClick={editProject ? handleSaveProjectEdit : handleAddProject}>
             {editProject ? "Save Changes" : "Add Project"}
           </Button>
         </Box>

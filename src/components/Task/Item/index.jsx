@@ -105,38 +105,36 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
   return (
     <div
       ref={setNodeRef}
-      style={containerStyle(isDragging, transform, transition)}
-    >
+      style={containerStyle(isDragging, transform, transition)}>
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         {/* Task Details */}
         <div
-          style={{ flex: 1, display: "flex", height: "100%", marginTop: 10 }}
-        >
+          style={{ flex: 1, display: "flex", height: "100%", marginTop: 10 }}>
           <div style={{ marginRight: 10 }}>
             <Checkbox
               checked={task.completed}
               onChange={() => onComplete(task.id)}
-              style={{ marginLeft: -2 }}
+              style={{ marginLeft: -2, marginTop: -9 }}
               size="small"
               sx={{
                 "& .MuiSvgIcon-root": {
                   color:
                     task.priority === "High"
-                      ? "red"
+                      ? "#ff77009d"
                       : task.priority === "Medium"
-                      ? "green"
+                      ? "#4f4f4f9f"
                       : task.priority === "Low"
-                      ? "blue"
+                      ? "#1f50ff93"
                       : "black", // Default color for unchecked state
                 },
                 "&.Mui-checked .MuiSvgIcon-root": {
                   color:
                     task.priority === "High"
-                      ? "red"
+                      ? "#ff77009d"
                       : task.priority === "Medium"
-                      ? "green"
+                      ? "#4f4f4f9f"
                       : task.priority === "Low"
-                      ? "blue"
+                      ? "#1f50ff93"
                       : "black", // Same color for checked state
                 },
                 p: 0,
@@ -149,89 +147,121 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                 width: "100%",
                 alignItems: "start",
                 display: "flex",
-                marginBottom: "5px",
-              }}
-            >
+                flexDirection: "column",
+              }}>
               <span
-                style={{ fontWeight: "bold", fontSize: 15, maxWidth: "80%" }}
-              >
+                style={{
+                  fontWeight: "bold",
+                  fontSize: 15,
+                  maxWidth: "93%",
+                  display: "-webkit-box",
+                  WebkitLineClamp: 3,
+                  WebkitBoxOrient: "vertical",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  wordBreak: "break-word",
+                  whiteSpace: "normal",
+                  lineHeight: "normal",
+                  marginBottom: "3px",
+                }}>
                 {task.title}
               </span>
-              {task.dueDate && (
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    marginLeft: "15px",
-                    marginBottom: "2.5px",
-                  }}
-                >
-                  <DateIcon style={{ fontSize: "14px", color: "grey" }} />
-                  <p
-                    style={{
-                      fontSize: "13px",
-                      color: "grey",
-                      marginLeft: "5px",
-                    }}
-                  >
-                    {(() => {
-                      const currentYear = new Date().getFullYear();
-                      const dueDate = new Date(task.dueDate);
-                      const options = {
-                        day: "2-digit",
-                        month: "short",
-                        ...(dueDate.getFullYear() !== currentYear && {
-                          year: "numeric",
-                        }), // Add year only if it's not the current year
-                      };
-                      return new Intl.DateTimeFormat("en-GB", options).format(
-                        dueDate
-                      );
-                    })()}
-                  </p>
-                </div>
-              )}
             </div>
 
             <div
-              style={{ margin: 0, fontSize: 14, maxWidth: "90%" }}
-              dangerouslySetInnerHTML={{ __html: task.description }}
-            ></div>
+              style={{
+                margin: 0,
+                fontSize: 14,
+                maxWidth: "93%",
+                display: "-webkit-box",
+                WebkitLineClamp: 1,
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "normal",
+                wordBreak: "break-word",
+              }}
+              dangerouslySetInnerHTML={{ __html: task.description }}></div>
+
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-              }}
-            >
+              }}>
               {/* Due Date */}
-              {/* {task.dueDate && (
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <DateIcon style={{ fontSize: "14px", color: "#ff7800" }} />
-                  <p
-                    style={{
-                      fontSize: "13px",
-                      color: "#ff7800",
-                      marginTop: "2px",
-                      marginLeft: "5px",
-                    }}
-                  >
-                    {(() => {
-                      const currentYear = new Date().getFullYear();
-                      const dueDate = new Date(task.dueDate);
-                      const options = {
-                        day: "2-digit",
-                        month: "short",
-                        ...(dueDate.getFullYear() !== currentYear && {
-                          year: "numeric",
-                        }), // Add year only if it's not the current year
-                      };
-                      return new Intl.DateTimeFormat("en-GB", options).format(
-                        dueDate
-                      );
-                    })()}
-                  </p>
+              {/* Due Date and Comment Count */}
+              {(task.dueDate || comments.length > 0) && (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    marginTop: "5px",
+                  }}>
+                  {/* Due Date */}
+                  {task.dueDate && (
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginTop: 5,
+                      }}>
+                      <DateIcon style={{ fontSize: "14px", color: "grey" }} />
+                      <p
+                        style={{
+                          fontSize: "13px",
+                          color: "grey",
+                          marginLeft: "5px",
+                        }}>
+                        {(() => {
+                          const currentYear = new Date().getFullYear();
+                          const dueDate = new Date(task.dueDate);
+                          const options = {
+                            day: "2-digit",
+                            month: "short",
+                            ...(dueDate.getFullYear() !== currentYear && {
+                              year: "numeric",
+                            }),
+                          };
+                          return new Intl.DateTimeFormat(
+                            "en-GB",
+                            options
+                          ).format(dueDate);
+                        })()}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Comment Count */}
+                  {comments.length > 0 && (
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        cursor: "pointer",
+                        marginTop: 5,
+                      }}
+                      onClick={handleOpenDialog}
+                      title="View comments">
+                      <CommentsIcon
+                        style={{
+                          fontSize: "14px",
+                          color: "grey",
+                          marginLeft: 6,
+                        }}
+                      />
+                      <p
+                        style={{
+                          fontSize: "13px",
+                          color: "grey",
+                          marginLeft: "5px",
+                        }}>
+                        {comments.length}
+                      </p>
+                    </div>
+                  )}
                 </div>
-              )} */}
+              )}
 
               {/* Priority */}
             </div>
@@ -250,36 +280,33 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
           <Menu
             anchorEl={menuAnchor}
             open={Boolean(menuAnchor)}
-            onClose={handleMenuClose}
-          >
+            MenuListProps={{ sx: { py: 0 } }}
+            onClose={handleMenuClose}>
             <MenuItem
               onClick={() => {
                 onEdit(task);
                 handleMenuClose();
-              }}
-            >
-              <EditIcon style={{ fontSize: "20px", marginRight: 12 }} />{" "}
-              <p style={{ fontSize: "14px" }}>Edit</p>
+              }}>
+              <EditIcon style={{ fontSize: "19px", marginRight: 12 }} />{" "}
+              <p style={{ fontSize: "13px" }}>Edit</p>
             </MenuItem>
             <MenuItem
               onClick={() => {
                 onDelete(task.id);
                 handleMenuClose();
-              }}
-            >
-              <DeleteIcon style={{ fontSize: "20px", marginRight: 12 }} />{" "}
-              <p style={{ fontSize: "14px" }}>Delete</p>
+              }}>
+              <DeleteIcon style={{ fontSize: "19px", marginRight: 12 }} />{" "}
+              <p style={{ fontSize: "13px" }}>Delete</p>
             </MenuItem>
             <MenuItem
               onClick={() => {
                 handleOpenDialog();
                 handleMenuClose();
-              }}
-            >
+              }}>
               <CommentsIcon
-                style={{ fontSize: "18px", marginRight: 12, marginLeft: 2 }}
+                style={{ fontSize: "17px", marginRight: 12, marginLeft: 2 }}
               />{" "}
-              <p style={{ fontSize: "14px" }}>Comments</p>
+              <p style={{ fontSize: "13px" }}>Comments</p>
             </MenuItem>
           </Menu>
 
@@ -295,8 +322,7 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
               background: "#eee",
               borderRadius: 4,
             }}
-            aria-label="Drag task"
-          >
+            aria-label="Drag task">
             <DragIcon style={{ fontSize: "18px" }} />
           </div>
         </div>
