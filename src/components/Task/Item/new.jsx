@@ -1,15 +1,32 @@
 import React, { useState } from "react";
-import { EditorContent, useEditor } from "@tiptap/react";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  List,
+  ListItem,
+  ListItemText,
+  IconButton,
+  Button,
+  Tooltip,
+  Menu,
+  MenuItem,
+} from "@mui/material";
+import InsertEmoticonIcon from "@mui/icons-material/InsertEmoticon";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import AttachFileIcon from "@mui/icons-material/AttachFile";
+import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
-import IconButton from "@mui/material/IconButton";
-import InsertEmoticonIcon from "@mui/icons-material/InsertEmoticon";
-import Popover from "@mui/material/Popover";
 import EmojiPicker from "emoji-picker-react";
 
-const AddComment = () => {
-  const [newComment, setNewComment] = useState("");
+const CommentsDialog = ({ openDialog, handleCloseDialog, task, comments }) => {
+  const [commentToEdit, setCommentToEdit] = useState(null);
+  const [editingContent, setEditingContent] = useState("");
   const [anchorElEmoji, setAnchorElEmoji] = useState(null);
+  const [anchorElCommentMenu, setAnchorElCommentMenu] = useState(null);
+  const [commentMenuIndex, setCommentMenuIndex] = useState(null);
 
   const addCommentEditor = useEditor({
     extensions: [
@@ -19,58 +36,7 @@ const AddComment = () => {
       }),
     ],
     content: "",
-    onUpdate: ({ editor }) => {
-      setNewComment(editor.getHTML());
-    },
   });
-
-  const handleOpenEmojiPicker = (event) =>
-    setAnchorElEmoji(event.currentTarget);
-  const handleCloseEmojiPicker = () => setAnchorElEmoji(null);
-
-  const handleEmojiClick = (_, emojiObject) => {
-    addCommentEditor.chain().focus().insertContent(emojiObject.emoji).run();
-    handleCloseEmojiPicker();
-  };
-
-  return (
-    <div className="p-4 border rounded-md shadow-sm">
-      <h3 className="text-lg font-bold mb-2">Add a Comment</h3>
-      <EditorContent
-        editor={addCommentEditor}
-        className="border p-2 rounded-md mb-2"
-      />
-      <IconButton onClick={handleOpenEmojiPicker} size="small">
-        <InsertEmoticonIcon style={{ fontSize: 20, color: "#4f4f4f" }} />
-      </IconButton>
-      <Popover
-        open={Boolean(anchorElEmoji)}
-        anchorEl={anchorElEmoji}
-        onClose={handleCloseEmojiPicker}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "center",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "center",
-        }}
-      >
-        <EmojiPicker onEmojiClick={handleEmojiClick} />
-      </Popover>
-      <button
-        onClick={() => console.log("Submitted comment:", newComment)}
-        className="bg-blue-500 text-white px-4 py-2 rounded-md mt-2"
-        disabled={!newComment.trim()}
-      >
-        Submit
-      </button>
-    </div>
-  );
-};
-
-const EditComment = () => {
-  const [anchorElEmoji, setAnchorElEmoji] = useState(null);
 
   const editCommentEditor = useEditor({
     extensions: [
@@ -79,62 +45,202 @@ const EditComment = () => {
         placeholder: "Edit your comment here...",
       }),
     ],
-    content: "",
+    content: editingContent,
+    onUpdate: ({ editor }) => {
+      setEditingContent(editor.getHTML());
+    },
   });
 
   const handleOpenEmojiPicker = (event) =>
     setAnchorElEmoji(event.currentTarget);
   const handleCloseEmojiPicker = () => setAnchorElEmoji(null);
 
-  const handleEmojiClick = (_, emojiObject) => {
-    editCommentEditor.chain().focus().insertContent(emojiObject.emoji).run();
+  const handleEmojiSelect = (_, emojiObject) => {
+    if (commentToEdit !== null) {
+      editCommentEditor.chain().focus().insertContent(emojiObject.emoji).run();
+    } else {
+      addCommentEditor.chain().focus().insertContent(emojiObject.emoji).run();
+    }
     handleCloseEmojiPicker();
   };
 
+  const handleOpenCommentMenu = (event, index) => {
+    setAnchorElCommentMenu(event.currentTarget);
+    setCommentMenuIndex(index);
+  };
+
+  const handleCloseCommentMenu = () => {
+    setAnchorElCommentMenu(null);
+    setCommentMenuIndex(null);
+  };
+
+  const handleEditComment = (index) => {
+    setCommentToEdit(index);
+    setEditingContent(comments[index].text);
+    handleCloseCommentMenu();
+  };
+
+  const handleDeleteComment = (index) => {
+    console.log(`Delete comment at index ${index}`);
+    handleCloseCommentMenu();
+  };
+
+  const saveEditedComment = () => {
+    console.log("Edited comment content:", editingContent);
+    setCommentToEdit(null);
+  };
+
+  const handleAddComment = () => {
+    const newComment = addCommentEditor.getHTML();
+    console.log("Added comment:", newComment);
+    addCommentEditor.commands.clearContent();
+  };
+
   return (
-    <div className="p-4 border rounded-md shadow-sm mt-4">
-      <h3 className="text-lg font-bold mb-2">Edit a Comment</h3>
-      <EditorContent
-        editor={editCommentEditor}
-        className="border p-2 rounded-md mb-2"
-      />
-      <IconButton onClick={handleOpenEmojiPicker} size="small">
-        <InsertEmoticonIcon style={{ fontSize: 20, color: "#4f4f4f" }} />
-      </IconButton>
-      <Popover
-        open={Boolean(anchorElEmoji)}
-        anchorEl={anchorElEmoji}
-        onClose={handleCloseEmojiPicker}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "center",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "center",
+    <Dialog
+      open={openDialog}
+      onClose={handleCloseDialog}
+      fullWidth
+      maxWidth="sm"
+    >
+      <DialogTitle>Comments</DialogTitle>
+      <DialogContent
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          maxHeight: "500px",
+          overflow: "hidden",
         }}
       >
-        <EmojiPicker onEmojiClick={handleEmojiClick} />
-      </Popover>
-      <button
-        onClick={() =>
-          console.log("Edited content:", editCommentEditor?.getHTML())
-        }
-        className="bg-green-500 text-white px-4 py-2 rounded-md mt-2"
-      >
-        Save Changes
-      </button>
-    </div>
+        <div style={{ flexGrow: 1, overflowY: "auto", padding: "8px" }}>
+          <div style={{ marginBottom: "16px" }}>
+            <h3>{task.title}</h3>
+            <p>{task.description}</p>
+          </div>
+
+          <List>
+            {comments.map((comment, index) => (
+              <ListItem key={index} style={{ alignItems: "flex-start" }}>
+                {commentToEdit === index ? (
+                  <div style={{ flexGrow: 1 }}>
+                    <EditorContent
+                      editor={editCommentEditor}
+                      style={{
+                        border: "1px solid #ccc",
+                        borderRadius: "4px",
+                        padding: "8px",
+                        minHeight: "120px",
+                      }}
+                    />
+                    <div
+                      style={{
+                        display: "flex",
+                        marginTop: 10,
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <div>
+                        <IconButton
+                          onClick={handleOpenEmojiPicker}
+                          size="small"
+                        >
+                          <InsertEmoticonIcon
+                            style={{ fontSize: 20, color: "#4f4f4f" }}
+                          />
+                        </IconButton>
+                        <Tooltip title="In development" arrow>
+                          <IconButton size="small">
+                            <AttachFileIcon
+                              style={{ fontSize: 20, color: "#4f4f4f" }}
+                            />
+                          </IconButton>
+                        </Tooltip>
+                      </div>
+                      <div>
+                        <Button
+                          onClick={() => setCommentToEdit(null)}
+                          variant="outlined"
+                          size="small"
+                          style={{ marginRight: 6 }}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={saveEditedComment}
+                          variant="contained"
+                          size="small"
+                          style={{ backgroundColor: "#ff7800", color: "#fff" }}
+                        >
+                          Save
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <ListItemText
+                      primary={
+                        <div
+                          dangerouslySetInnerHTML={{ __html: comment.text }}
+                        />
+                      }
+                      secondary={`Posted on: ${comment.date}`}
+                    />
+                    <IconButton
+                      onClick={(e) => handleOpenCommentMenu(e, index)}
+                    >
+                      <MoreVertIcon />
+                    </IconButton>
+                    <Menu
+                      anchorEl={anchorElCommentMenu}
+                      open={
+                        Boolean(anchorElCommentMenu) &&
+                        commentMenuIndex === index
+                      }
+                      onClose={handleCloseCommentMenu}
+                    >
+                      <MenuItem onClick={() => handleEditComment(index)}>
+                        Edit
+                      </MenuItem>
+                      <MenuItem onClick={() => handleDeleteComment(index)}>
+                        Delete
+                      </MenuItem>
+                    </Menu>
+                  </>
+                )}
+              </ListItem>
+            ))}
+          </List>
+        </div>
+
+        <div style={{ marginTop: "16px" }}>
+          <EditorContent
+            editor={addCommentEditor}
+            style={{
+              border: "1px solid #ccc",
+              borderRadius: "4px",
+              padding: "8px",
+              minHeight: "100px",
+            }}
+          />
+          <div style={{ marginTop: "8px" }}>
+            <IconButton onClick={handleOpenEmojiPicker}>
+              <InsertEmoticonIcon style={{ fontSize: 20, color: "#4f4f4f" }} />
+            </IconButton>
+            <Tooltip title="In development" arrow>
+              <AttachFileIcon style={{ fontSize: 20, color: "#4f4f4f" }} />
+            </Tooltip>
+          </div>
+        </div>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleCloseDialog}>Close</Button>
+        <Button onClick={handleAddComment} color="primary">
+          Add Comment
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };
 
-const App = () => {
-  return (
-    <div>
-      <AddComment />
-      <EditComment />
-    </div>
-  );
-};
-
-export default App;
+export default CommentsDialog;
