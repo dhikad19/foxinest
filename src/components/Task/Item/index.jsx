@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import {
@@ -9,7 +9,6 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  TextField,
   List,
   ListItem,
   ListItemText,
@@ -57,24 +56,13 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
     setActivatorNodeRef,
     isDragging,
   } = useSortable({ id: task.id });
-  // let focusedEditor = null; // Menyimpan referensi editor yang aktif
 
-  // editCommentEditor.on("focus", () => {
-  //   focusedEditor = "edit";
-  // });
-
-  // addCommentEditor.on("focus", () => {
-  //   focusedEditor = "add";
-  // });
-
-  // State for managing comments dialog and input
   const [openDialog, setOpenDialog] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState([]);
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [anchorCm, setAnchorCm] = useState(null);
   const [commentToEdit, setCommentToEdit] = useState(null);
   const [editingContent, setEditingContent] = useState("");
+  const [lastFocusedEditor, setLastFocusedEditor] = useState(null); // 'add' | 'edit'
 
   const [anchorElEmoji, setAnchorElEmoji] = useState(null);
   const [anchorElCommentMenu, setAnchorElCommentMenu] = useState(null);
@@ -82,10 +70,23 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
 
   const [addCommentEditor, setAddCommentEditor] = useState(null);
   const [editCommentEditor, setEditCommentEditor] = useState(null);
+  const commentContainerRef = useRef(null);
+  function formatDate(date) {
+    const currentYear = new Date().getFullYear();
+    const parsedDate = new Date(date);
+
+    const options = {
+      day: "2-digit",
+      month: "short",
+      ...(parsedDate.getFullYear() !== currentYear && { year: "numeric" }),
+    };
+
+    return new Intl.DateTimeFormat("en-GB", options).format(parsedDate);
+  }
 
   const handleOpenCommentMenu = (event, index) => {
     setAnchorElCommentMenu(event.currentTarget);
-    setCommentMenuIndex(index); // Track which comment menu is open
+    setCommentMenuIndex(index);
   };
 
   const handleCloseCommentMenu = () => {
@@ -93,51 +94,79 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
     setCommentMenuIndex(null);
   };
 
+  // Scroll to the bottom of the container
+  const scrollToBottom = () => {
+    if (commentContainerRef.current) {
+      commentContainerRef.current.scrollTo({
+        top: commentContainerRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (openDialog) {
+      // beri delay supaya DOM sudah update
+      setTimeout(() => {
+        scrollToBottom();
+      }, 100);
+    }
+  }, [openDialog]);
+
+  const prevCommentsLength = useRef(comments.length);
+
+  useEffect(() => {
+    if (openDialog) {
+      // Kalau ada penambahan komentar baru
+      if (comments.length > prevCommentsLength.current) {
+        setTimeout(() => {
+          scrollToBottom();
+        }, 100);
+      }
+      prevCommentsLength.current = comments.length;
+    }
+  }, [comments, openDialog]);
+
   const handleOpenEmojiPicker = (event) =>
     setAnchorElEmoji(event.currentTarget);
   const handleCloseEmojiPicker = () => setAnchorElEmoji(null);
 
-  const editor = useEditor({
-    extensions: [
-      StarterKit,
-      Placeholder.configure({
-        placeholder: "Write your comment here...",
-      }),
-    ],
-    content: newComment,
-    onUpdate: ({ editor }) => {
-      setNewComment(editor.getHTML());
-    },
-  });
-
-  // Emoji Picker handlers
-  // const handleOpenEmojiPicker = (event) => {
-  //   setAnchorEl(event.currentTarget);
-  // };
-
-  // const handleCloseEmojiPicker = () => {
-  //   setAnchorEl(null);
-  // };
-
   const handleEmojiSelect = (emoji) => {
-    // Periksa apakah editor Edit Comment sedang terbuka dan memiliki konten
-    if (commentToEdit !== null && editCommentEditor?.state.selection) {
-      // Tambahkan emoji ke editor Edit Comment
+    if (lastFocusedEditor === "edit" && editCommentEditor) {
       editCommentEditor.chain().focus().insertContent(emoji.emoji).run();
-    }
-    // Jika editor Add Comment aktif
-    else if (addCommentEditor?.state.selection) {
+    } else if (lastFocusedEditor === "add" && addCommentEditor) {
       addCommentEditor.chain().focus().insertContent(emoji.emoji).run();
     } else {
-      // Default ke Add Comment jika tidak ada yang fokus
       addCommentEditor?.chain().focus().insertContent(emoji.emoji).run();
     }
 
-    // Tutup emoji picker
     handleCloseEmojiPicker();
   };
 
-  // Load comments from localStorage when the component mounts
+  useEffect(() => {
+    if (addCommentEditor) {
+      const dom = addCommentEditor.view.dom;
+      const handleFocus = () => setLastFocusedEditor("add");
+      dom.addEventListener("focus", handleFocus);
+
+      return () => {
+        dom.removeEventListener("focus", handleFocus);
+      };
+    }
+  }, [addCommentEditor]);
+
+  useEffect(() => {
+    if (editCommentEditor) {
+      const dom = editCommentEditor.view.dom;
+      const handleFocus = () => setLastFocusedEditor("edit");
+      dom.addEventListener("focus", handleFocus);
+
+      return () => {
+        dom.removeEventListener("focus", handleFocus);
+      };
+    }
+  }, [editCommentEditor]);
+
   useEffect(() => {
     const storedComments = JSON.parse(
       localStorage.getItem(`task_${task.id}_comments`)
@@ -171,23 +200,19 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
   });
 
   useEffect(() => {
-    // Set the editors to state after initializing them
     setAddCommentEditor(addEditor);
     setEditCommentEditor(editEditor);
 
     return () => {
-      // Destroy the editors on unmount
       addEditor?.destroy();
       editEditor?.destroy();
     };
   }, [addEditor, editEditor]);
 
-  // Function to open the comments dialog
   const handleOpenDialog = () => {
     setOpenDialog(true);
   };
 
-  // Function to close the comments dialog
   const handleCloseDialog = () => {
     setOpenDialog(false);
   };
@@ -202,7 +227,6 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
     setMenuAnchor(null);
   };
 
-  // Function to add a new comment
   const handleAddComment = () => {
     if (addCommentEditor && !addCommentEditor.isEmpty) {
       const newComment = {
@@ -220,10 +244,24 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
   };
 
   const handleEditComment = (index) => {
+    const commentText = comments[index]?.text || "";
+
+    // Tampilkan editor edit
     setCommentToEdit(index);
-    setEditingContent(comments[index]?.text || ""); // Initialize editor content
-    editor?.commands.setContent(comments[index]?.text || ""); // Set editor content
+    setEditingContent(commentText);
+
+    // Masukkan konten ke editor dan fokuskan editor
+    if (editCommentEditor) {
+      editCommentEditor.commands.setContent(commentText);
+      editCommentEditor.chain().focus().run();
+    }
+
     handleCloseCommentMenu();
+  };
+
+  const cancelEdit = () => {
+    setCommentToEdit(null);
+    editCommentEditor?.commands.clearContent();
   };
 
   const saveEditedComment = () => {
@@ -250,7 +288,7 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
       `task_${task.id}_comments`,
       JSON.stringify(updatedComments)
     );
-    handleCloseCommentMenu(); // Close the menu
+    handleCloseCommentMenu();
   };
 
   return (
@@ -259,7 +297,6 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
       style={containerStyle(isDragging, transform, transition)}
     >
       <div style={{ display: "flex", justifyContent: "space-between" }}>
-        {/* Task Details */}
         <div
           style={{ flex: 1, display: "flex", height: "100%", marginTop: 10 }}
         >
@@ -278,7 +315,7 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                       ? "#4f4f4f9f"
                       : task.priority === "Low"
                       ? "#1f50ff93"
-                      : "black", // Default color for unchecked state
+                      : "black",
                 },
                 "&.Mui-checked .MuiSvgIcon-root": {
                   color:
@@ -288,7 +325,7 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                       ? "#4f4f4f9f"
                       : task.priority === "Low"
                       ? "#1f50ff93"
-                      : "black", // Same color for checked state
+                      : "black",
                 },
                 p: 0,
               }}
@@ -345,8 +382,6 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                 alignItems: "center",
               }}
             >
-              {/* Due Date */}
-              {/* Due Date and Comment Count */}
               {(task.dueDate || comments.length > 0) && (
                 <div
                   style={{
@@ -356,7 +391,6 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                     marginTop: "5px",
                   }}
                 >
-                  {/* Due Date */}
                   {task.dueDate && (
                     <div
                       style={{
@@ -392,7 +426,6 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                     </div>
                   )}
 
-                  {/* Comment Count */}
                   {comments.length > 0 && (
                     <div
                       style={{
@@ -424,21 +457,15 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                   )}
                 </div>
               )}
-
-              {/* Priority */}
             </div>
           </div>
         </div>
-        {/* Action Buttons */}
-
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          {/* Action Menu Trigger */}
           <MoreVertIcon
             style={{ fontSize: "20px", cursor: "pointer" }}
             onClick={handleMenuOpen}
           />
 
-          {/* Action Menu */}
           <Menu
             anchorEl={menuAnchor}
             open={Boolean(menuAnchor)}
@@ -476,7 +503,6 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
             </MenuItem>
           </Menu>
 
-          {/* Drag Handle */}
           <div
             ref={setActivatorNodeRef}
             {...attributes}
@@ -497,7 +523,6 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
 
       {!isDragging && <Divider />}
 
-      {/* Dialog for Comments */}
       <Dialog
         open={openDialog}
         onClose={handleCloseDialog}
@@ -513,15 +538,68 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
             overflow: "hidden",
           }}
         >
-          {/* Scrollable Content */}
-          <div style={{ flexGrow: 1, overflowY: "auto", padding: "8px" }}>
-            {/* Content Item */}
-            <div style={{ marginBottom: "16px" }}>
-              <h3>{task.title}</h3>
-              <p>{task.description}</p>
+          <div
+            ref={commentContainerRef}
+            style={{ flexGrow: 1, overflowY: "auto", padding: "8px" }}
+          >
+            <div
+              style={{
+                marginBottom: "16px",
+                display: "flex",
+                alignItems: "flex-start",
+              }}
+            >
+              {/* Checkbox */}
+              <Checkbox
+                checked={task.completed}
+                onChange={() => onComplete(task.id)}
+                style={{ marginRight: "10px", marginLeft: "-10px" }}
+                size="small"
+                sx={{
+                  "& .MuiSvgIcon-root": {
+                    color:
+                      task.priority === "High"
+                        ? "#ff77009d"
+                        : task.priority === "Medium"
+                        ? "#4f4f4f9f"
+                        : task.priority === "Low"
+                        ? "#1f50ff93"
+                        : "black",
+                  },
+                  "&.Mui-checked .MuiSvgIcon-root": {
+                    color:
+                      task.priority === "High"
+                        ? "#ff77009d"
+                        : task.priority === "Medium"
+                        ? "#4f4f4f9f"
+                        : task.priority === "Low"
+                        ? "#1f50ff93"
+                        : "black",
+                  },
+                  p: 0,
+                }}
+              />
+
+              {/* Title & Description */}
+              <div style={{ marginLeft: 4 }}>
+                <p
+                  style={{
+                    fontSize: "15px",
+                    fontWeight: 500,
+                    lineHeight: "normal",
+                    marginBottom: 10,
+                    marginTop: 0,
+                  }}
+                >
+                  {task.title}
+                </p>
+                <div
+                  style={{ fontSize: "14px" }}
+                  dangerouslySetInnerHTML={{ __html: task.description }}
+                />
+              </div>
             </div>
 
-            {/* Comment List */}
             <List>
               {comments.map((comment, index) => (
                 <ListItem
@@ -530,7 +608,6 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                 >
                   {commentToEdit === index ? (
                     <div style={{ flexGrow: 1 }}>
-                      {/* Editor with placeholder */}
                       <div
                         style={{ position: "relative", marginBottom: "8px" }}
                       >
@@ -551,7 +628,6 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                             fontSize: "14px",
                           }}
                         >
-                          {/* Edit Comment Box */}
                           <div
                             style={{
                               position: "relative",
@@ -563,15 +639,7 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                                 Edit your comment here...
                               </div>
                             )}
-                            {/* <EditorContent
-                              editor={editCommentEditor}
-                              style={{
-                                border: "1px solid #ccc",
-                                borderRadius: "4px",
-                                padding: "8px",
-                                minHeight: "120px",
-                              }}
-                            /> */}
+
                             <EditorContent
                               editor={editCommentEditor}
                               className="border p-2 rounded-md"
@@ -658,8 +726,6 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                           </div>
                         </div>
                       </div>
-
-                      {/* Emoji Picker and File Attachment */}
                     </div>
                   ) : (
                     <>
@@ -670,7 +736,11 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                             dangerouslySetInnerHTML={{ __html: comment.text }}
                           />
                         }
-                        secondary={`Posted on: ${comment.date}`}
+                        secondary={
+                          <p style={{ fontSize: "12px" }}>
+                            Posted on: {formatDate(comment.date)}
+                          </p>
+                        }
                         style={{ flexGrow: 1 }}
                       />
                       <IconButton
@@ -700,25 +770,14 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
             </List>
           </div>
 
-          {/* Comment Box */}
           <div style={{ marginTop: "16px" }}>
-            {/* Editor with placeholder */}
-            {/* Add Comment Box */}
             <div style={{ position: "relative", marginBottom: "8px" }}>
               {addCommentEditor?.isEmpty && (
                 <div style={placeholderStyleDescription}>
                   Write your comment here...
                 </div>
               )}
-              {/* <EditorContent
-                editor={addCommentEditor}
-                style={{
-                  border: "1px solid #ccc",
-                  borderRadius: "4px",
-                  padding: "8px",
-                  minHeight: "100px",
-                }}
-              /> */}
+
               <EditorContent
                 editor={addCommentEditor}
                 style={{
@@ -731,7 +790,6 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
               />
             </div>
 
-            {/* Action Buttons */}
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <InsertEmoticonIcon
                 onClick={handleOpenEmojiPicker}
