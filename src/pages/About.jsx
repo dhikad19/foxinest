@@ -1,5 +1,5 @@
 // pages/Home.jsx
-import Section from "../components/Section";
+import Section from "../components/About";
 
 const About = () => {
   return <Section />;

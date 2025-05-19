@@ -30,16 +30,13 @@ import EditIcon from "@mui/icons-material/DriveFileRenameOutlineOutlined";
 import MoreVertOutlined from "@mui/icons-material/MoreVertOutlined";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import TagIcon from "@mui/icons-material/TagOutlined";
-import FolderIcon from "@mui/icons-material/Folder";
 import CalendarIcon from "@mui/icons-material/CalendarMonthOutlined";
-import FolderOpenIcon from "@mui/icons-material/FolderOpen";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import MenuIcon from "@mui/icons-material/Menu";
 import {
   AddHomeOutlined as HomeIcon,
   InfoOutlined as InfoIcon,
   CheckCircleOutlined as CompletedIcon,
-  Home,
 } from "@mui/icons-material";
 import ProjectDetail from "../../pages/ProjectDetail";
 
@@ -68,10 +65,19 @@ const ResponsiveLayout = ({ children }) => {
       case "/about":
         return "About";
       case "/calendar":
-        return "";
+        return "Calendar";
+      case "/completed":
+        return "Completed";
       default:
         return location.pathname;
     }
+  };
+
+  const [isFilterActive, setIsFilterActive] = useState(false);
+
+  const toggleFilter = () => {
+    setIsFilterActive((prev) => !prev);
+    // Add logic to trigger filtering or update relevant state
   };
 
   useEffect(() => {
@@ -86,13 +92,6 @@ const ResponsiveLayout = ({ children }) => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
-  // const [projects, setProjects] = useState(() => {
-  //   try {
-  //     return JSON.parse(localStorage.getItem("projects")) || [];
-  //   } catch {
-  //     return [];
-  //   }
-  // });
 
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -117,7 +116,6 @@ const ResponsiveLayout = ({ children }) => {
       setProjects(stored ? JSON.parse(stored) : []);
     };
 
-    // Listen for storage changes or custom events
     window.addEventListener("localStorage-update", updateProjects);
     window.addEventListener("storage", updateProjects);
 
@@ -142,36 +140,15 @@ const ResponsiveLayout = ({ children }) => {
 
   useEffect(() => {
     if (mobileOpen) {
-      setMobileOpen(false); // Closfe drawer on route change
+      setMobileOpen(false);
     }
   }, [location.pathname]);
 
   const handleModalOpen = () => setOpenModal(true);
   const handleModalClose = () => {
     setOpenModal(false);
-    setEditProject(null); // Reset the edit project state when modal is closed
+    setEditProject(null);
   };
-
-  // const handleAddProject = () => {
-  //   if (projectName.trim()) {
-  //     const newProject = {
-  //       id: Date.now(),
-  //       name: projectName.trim(),
-  //       color: selectedColor || "default", // Default color if no selection is made
-  //       isFavorite,
-  //     };
-  //     const updatedProjects = [...projects, newProject];
-
-  //     setProjects(updatedProjects);
-  //     localStorage.setItem("projects", JSON.stringify(updatedProjects));
-
-  //     setProjectName("");
-  //     setSelectedColor("");
-  //     setIsFavorite(false);
-  //     setOpenModal(false);
-  //     navigate(`/project/${newProject.id}`);
-  //   }
-  // };
 
   const handleEditProject = (project) => {
     setEditProject(project);
@@ -189,42 +166,22 @@ const ResponsiveLayout = ({ children }) => {
     localStorage.setItem("projects", JSON.stringify(updatedProjects));
   };
 
-  // const handleSaveProjectEdit = () => {
-  //   if (editProject) {
-  //     const updatedProjects = projects.map((project) =>
-  //       project.id === editProject.id
-  //         ? { ...project, name: projectName, color: selectedColor, isFavorite }
-  //         : project
-  //     );
-
-  //     setProjects(updatedProjects);
-  //     localStorage.setItem("projects", JSON.stringify(updatedProjects));
-
-  //     setProjectName("");
-  //     setSelectedColor("");
-  //     setIsFavorite(false);
-  //     setOpenModal(false);
-  //     setEditProject(null);
-  //   }
-  // };
-
   const handleAddProject = () => {
     if (projectName.trim()) {
-      // Check if project name already exists
       const projectExists = projects.some(
         (project) =>
           project.name.toLowerCase() === projectName.trim().toLowerCase()
       );
 
       if (projectExists) {
-        alert("A project with this name already exists."); // Show an error message
+        alert("A project with this name already exists.");
         return;
       }
 
       const newProject = {
         id: Date.now(),
         name: projectName.trim(),
-        color: selectedColor || "default", // Default color if no selection is made
+        color: selectedColor || "default",
         isFavorite,
       };
       const updatedProjects = [...projects, newProject];
@@ -242,7 +199,6 @@ const ResponsiveLayout = ({ children }) => {
 
   const handleSaveProjectEdit = () => {
     if (editProject) {
-      // Check if the updated project name already exists in other projects
       const projectExists = projects.some(
         (project) =>
           project.id !== editProject.id &&
@@ -250,7 +206,7 @@ const ResponsiveLayout = ({ children }) => {
       );
 
       if (projectExists) {
-        alert("A project with this name already exists."); // Show an error message
+        alert("A project with this name already exists.");
         return;
       }
 
@@ -277,13 +233,15 @@ const ResponsiveLayout = ({ children }) => {
   const drawer = (
     <div>
       <Toolbar />
+
       <div
         style={{
           display: "flex",
           alignItems: "center",
           marginTop: "-48px",
           marginBottom: "10px",
-        }}>
+        }}
+      >
         <div
           style={{
             display: "flex",
@@ -296,7 +254,8 @@ const ResponsiveLayout = ({ children }) => {
             color: "#ffffff",
             marginRight: "10px",
             marginLeft: "10px",
-          }}>
+          }}
+        >
           D
         </div>
         <div>
@@ -305,223 +264,211 @@ const ResponsiveLayout = ({ children }) => {
               marginBottom: "0px",
               lineHeight: "normal",
               fontWeight: "500",
-            }}>
-            Dwi Andika
-          </p>
-          {/* <p
-            style={{
-              marginBottom: "0px",
-              lineHeight: "normal",
-              fontSize: "14px",
             }}
           >
-            dwiandika911@gmail.com
-          </p> */}
+            Dwi Andika
+          </p>
         </div>
       </div>
-      <List>
-        {[
-          {
-            label: "Home",
-            path: "/",
-            icon: <HomeIcon style={{ fontSize: "22px" }} />,
-          },
-          {
-            label: "Completed",
-            path: "/completed",
-            icon: <CompletedIcon style={{ fontSize: "22px" }} />,
-          },
-          {
-            label: "Calendar",
-            path: "/calendar",
-            icon: <CalendarIcon style={{ fontSize: "22px" }} />,
-          },
-          {
-            label: "About",
-            path: "/about",
-            icon: <InfoIcon style={{ fontSize: "22px" }} />,
-          },
-        ].map(({ label, path, icon }) => (
-          <ListItem
-            button
-            key={label}
-            sx={{
-              "&:hover": {
-                backgroundColor: "transparent", // Default to transparent
-                "& .not-active": {
-                  backgroundColor: "#c0c0c042",
-                  borderRadius: "4px", // Red background on hover for non-active links
-                },
-              },
-            }}
-            style={{ padding: "0px 8px 0px 8px" }}>
-            <NavLink
-              to={path}
-              className={({ isActive }) =>
-                isActive ? "active-link" : "not-active"
-              }
-              style={{
-                textDecoration: "none",
-                width: "100%",
-                padding: "8px 10px 8px 10px",
-                color: "inherit",
-                display: "flex", // Ensures icon and text align properly
-                alignItems: "center",
-              }}>
-              <ListItemIcon
-                sx={{ minWidth: "36px", color: "inherit" }} // Optional: Adjust spacing and inherit color
-              >
-                {icon}
-              </ListItemIcon>
-              <Typography
-                variant="body1"
-                sx={{
-                  fontSize: "14px",
-                }}>
-                {label}
-              </Typography>
-            </NavLink>
-          </ListItem>
-        ))}
 
-        {favoriteProjects.length > 0 && (
-          <>
+      <div
+        style={{
+          overflowY: "auto",
+          overflowX: "hidden",
+          height: "calc(100vh - 61px)",
+          paddingRight: "4px",
+
+          // Scrollbar styling (Webkit-based browsers)
+          scrollbarWidth: "thin", // Firefox
+          scrollbarColor: "#c0c0c0 transparent", // Firefox
+
+          // Webkit (Chrome, Edge, Safari)
+          WebkitScrollbarWidth: "thin", // Not standard, but safe fallback
+        }}
+      >
+        <style>
+          {`
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background-color: #bbb;
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+    `}
+        </style>
+
+        <List>
+          {[
+            {
+              label: "Home",
+              path: "/",
+              icon: <HomeIcon style={{ fontSize: "22px" }} />,
+            },
+            {
+              label: "Completed",
+              path: "/completed",
+              icon: <CompletedIcon style={{ fontSize: "22px" }} />,
+            },
+            {
+              label: "Calendar",
+              path: "/calendar",
+              icon: <CalendarIcon style={{ fontSize: "22px" }} />,
+            },
+            {
+              label: "About",
+              path: "/about",
+              icon: <InfoIcon style={{ fontSize: "22px" }} />,
+            },
+          ].map(({ label, path, icon }) => (
             <ListItem
-              style={{
-                padding: "0px 8px 0px 8px",
-                marginTop: "20px",
-                marginLeft: "10px",
-              }}
+              button
+              key={label}
               sx={{
                 "&:hover": {
-                  backgroundColor: "transparent", // Default to transparent
+                  backgroundColor: "transparent",
                   "& .not-active": {
                     backgroundColor: "#c0c0c042",
-                    borderRadius: "4px", // Red background on hover for non-active links
+                    borderRadius: "4px",
                   },
                 },
-              }}>
-              <ListItemText
-                primary={
-                  <span
-                    style={{
-                      fontSize: "15px",
-                      fontWeight: "bold",
-                    }}>
-                    Favorites
-                  </span>
+              }}
+              style={{ padding: "0px 8px 0px 8px" }}
+            >
+              <NavLink
+                to={path}
+                className={({ isActive }) =>
+                  isActive ? "active-link" : "not-active"
                 }
-              />
+                style={{
+                  textDecoration: "none",
+                  width: "100%",
+                  padding: "8px 10px 8px 10px",
+                  color: "inherit",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <ListItemIcon sx={{ minWidth: "36px", color: "inherit" }}>
+                  {icon}
+                </ListItemIcon>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    fontSize: "14px",
+                  }}
+                >
+                  {label}
+                </Typography>
+              </NavLink>
             </ListItem>
-            {favoriteProjects.map((project) => (
+          ))}
+
+          {favoriteProjects.length > 0 && (
+            <>
               <ListItem
-                button
-                style={{ padding: "0px 8px 0px 8px" }}
-                key={project.id}
+                style={{
+                  padding: "0px 8px 0px 8px",
+                  marginTop: "20px",
+                  marginLeft: "10px",
+                }}
                 sx={{
                   "&:hover": {
-                    backgroundColor: "transparent", // Default to transparent
+                    backgroundColor: "transparent",
                     "& .not-active": {
                       backgroundColor: "#c0c0c042",
-                      borderRadius: "4px", // Red background on hover for non-active links
+                      borderRadius: "4px",
                     },
                   },
-                }}>
-                <NavLink
-                  to={`/project/${project.name}`}
-                  className={({ isActive }) =>
-                    isActive ? "active-link" : "not-active"
+                }}
+              >
+                <ListItemText
+                  primary={
+                    <span
+                      style={{
+                        fontSize: "15px",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Favorites
+                    </span>
                   }
-                  style={{
-                    textDecoration: "none",
-                    width: "100%",
-                    padding: "8px 10px 8px 10px",
-                    color: "inherit",
-                    display: "flex",
-                    alignItems: "center",
-                  }}>
-                  <ListItemIcon sx={{ minWidth: "36px", color: "inherit" }}>
-                    <TagIcon style={{ fontSize: "22px" }} />{" "}
-                    {/* Example icon */}
-                  </ListItemIcon>
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      fontSize: "14px",
-                      maxWidth: "110px",
-                      overflow: "hidden",
-                      whiteSpace: "nowrap",
-                      textOverflow: "ellipsis",
-                      fontWeight: "400",
-                    }}>
-                    {project.name}
-                  </Typography>
-                </NavLink>
+                />
               </ListItem>
-            ))}
-          </>
-        )}
+              {favoriteProjects.map((project) => (
+                <ListItem
+                  button
+                  style={{ padding: "0px 8px 0px 8px" }}
+                  key={project.id}
+                  sx={{
+                    "&:hover": {
+                      backgroundColor: "transparent",
+                      "& .not-active": {
+                        backgroundColor: "#c0c0c042",
+                        borderRadius: "4px",
+                      },
+                    },
+                  }}
+                >
+                  <NavLink
+                    to={`/project/${project.name}`}
+                    className={({ isActive }) =>
+                      isActive ? "active-link" : "not-active"
+                    }
+                    style={{
+                      textDecoration: "none",
+                      width: "100%",
+                      padding: "8px 10px 8px 10px",
+                      color: "inherit",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <ListItemIcon sx={{ minWidth: "36px", color: "inherit" }}>
+                      <TagIcon style={{ fontSize: "22px" }} />{" "}
+                    </ListItemIcon>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        fontSize: "14px",
+                        maxWidth: "110px",
+                        overflow: "hidden",
+                        whiteSpace: "nowrap",
+                        textOverflow: "ellipsis",
+                        fontWeight: "400",
+                      }}
+                    >
+                      {project.name}
+                    </Typography>
+                  </NavLink>
+                </ListItem>
+              ))}
+            </>
+          )}
 
-        {/* My Projects header */}
-        <ListItem
-          style={{ padding: "0px 8px 0px 8px", marginTop: "20px" }}
-          sx={{
-            "&:hover": {
-              backgroundColor: "transparent", // Default to transparent
-              "& .not-active": {
-                backgroundColor: "#c0c0c042",
-                borderRadius: "4px", // Red background on hover for non-active links
-              },
-            },
-          }}
-          secondaryAction={
-            <AddIcon
-              onClick={handleModalOpen}
-              style={{ color: "#000000", marginTop: "7px" }}
-            />
-          }>
-          <NavLink
-            to="/project"
-            className={({ isActive }) =>
-              isActive ? "active-link" : "not-active"
-            }
-            style={{
-              textDecoration: "none",
-              width: "100%",
-              color: "inherit",
-              display: "flex",
-              alignItems: "center",
-              padding: "8px 10px 8px 10px",
-            }}
-            end>
-            <Typography
-              variant="body1"
-              sx={{
-                fontSize: "14px",
-                fontWeight: "bold",
-              }}>
-              My Projects
-            </Typography>
-          </NavLink>
-        </ListItem>
-
-        {/* Dynamic project list */}
-        {projects.map((project) => (
           <ListItem
-            button
-            style={{ padding: "0px 8px 0px 8px" }}
-            key={project.id}
+            style={{ padding: "0px 8px 0px 8px", marginTop: "20px" }}
             sx={{
               "&:hover": {
-                backgroundColor: "transparent", // Default to transparent
+                backgroundColor: "transparent",
                 "& .not-active": {
                   backgroundColor: "#c0c0c042",
-                  borderRadius: "4px", // Red background on hover for non-active links
+                  borderRadius: "4px",
                 },
               },
-            }}>
+            }}
+            secondaryAction={
+              <AddIcon
+                onClick={handleModalOpen}
+                style={{ color: "#000000", marginTop: "7px" }}
+              />
+            }
+          >
             <NavLink
-              to={`/project/${project.name}`}
+              to="/project"
               className={({ isActive }) =>
                 isActive ? "active-link" : "not-active"
               }
@@ -531,86 +478,135 @@ const ResponsiveLayout = ({ children }) => {
                 color: "inherit",
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "space-between",
                 padding: "8px 10px 8px 10px",
-              }}>
-              <div style={{ display: "flex" }}>
-                <ListItemIcon sx={{ minWidth: "36px", color: "inherit" }}>
-                  <TagIcon style={{ fontSize: "22px" }} />
-                </ListItemIcon>
-
-                <Typography
-                  variant="body1"
-                  sx={{
-                    fontSize: "14px",
-                    maxWidth: "100px",
-                    overflow: "hidden",
-                    whiteSpace: "nowrap",
-                    textOverflow: "ellipsis",
-                    fontWeight: "400",
-                  }}>
-                  {project.name}
-                </Typography>
-              </div>
-
-              <MoreVertOutlined
-                style={{ fontSize: "22px" }}
-                onClick={(e) => {
-                  e.preventDefault(); // Prevents navigation click
-                  handleMenuOpen(e);
+              }}
+              end
+            >
+              <Typography
+                variant="body1"
+                sx={{
+                  fontSize: "14px",
+                  fontWeight: "bold",
                 }}
-              />
-
-              <Menu
-                id={`menu-${project.id}`}
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleMenuClose}
-                PaperProps={{
-                  elevation: 2, // Adjust elevation to make the shadow lighter
-                  sx: {
-                    boxShadow: "rgba(0, 0, 0, 0.007) 0px 4px 6px",
-                    borderRadius: "6px", // Custom shadow if needed
-                    minWidth: "200px",
-                  },
-                }}>
-                <MenuItem
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleEditProject(project);
-                    handleMenuClose();
-                  }}>
-                  <EditIcon style={{ marginRight: "20px", fontSize: "22px" }} />
-                  <span style={{ fontSize: "14px" }}>Edit</span>
-                </MenuItem>
-                <MenuItem
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleDeleteProject(project.id);
-                    handleMenuClose();
-                  }}>
-                  <DeleteIcon
-                    style={{ marginRight: "20px", fontSize: "22px" }}
-                  />
-                  <span style={{ fontSize: "14px" }}>Delete</span>
-                </MenuItem>
-              </Menu>
+              >
+                My Projects
+              </Typography>
             </NavLink>
           </ListItem>
-        ))}
-      </List>
+
+          {projects.map((project) => (
+            <ListItem
+              button
+              style={{ padding: "0px 8px 0px 8px" }}
+              key={project.id}
+              sx={{
+                "&:hover": {
+                  backgroundColor: "transparent",
+                  "& .not-active": {
+                    backgroundColor: "#c0c0c042",
+                    borderRadius: "4px",
+                  },
+                },
+              }}
+            >
+              <NavLink
+                to={`/project/${project.name}`}
+                className={({ isActive }) =>
+                  isActive ? "active-link" : "not-active"
+                }
+                style={{
+                  textDecoration: "none",
+                  width: "100%",
+                  color: "inherit",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "8px 10px 8px 10px",
+                }}
+              >
+                <div style={{ display: "flex" }}>
+                  <ListItemIcon sx={{ minWidth: "36px", color: "inherit" }}>
+                    <TagIcon style={{ fontSize: "22px" }} />
+                  </ListItemIcon>
+
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      fontSize: "14px",
+                      maxWidth: "100px",
+                      overflow: "hidden",
+                      whiteSpace: "nowrap",
+                      textOverflow: "ellipsis",
+                      fontWeight: "400",
+                    }}
+                  >
+                    {project.name}
+                  </Typography>
+                </div>
+
+                <MoreVertOutlined
+                  style={{ fontSize: "22px" }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleMenuOpen(e);
+                  }}
+                />
+
+                <Menu
+                  id={`menu-${project.id}`}
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  onClose={handleMenuClose}
+                  PaperProps={{
+                    elevation: 2,
+                    sx: {
+                      boxShadow: "rgba(0, 0, 0, 0.007) 0px 4px 6px",
+                      borderRadius: "6px",
+                      minWidth: "200px",
+                    },
+                  }}
+                >
+                  <MenuItem
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleEditProject(project);
+                      handleMenuClose();
+                    }}
+                  >
+                    <EditIcon
+                      style={{ marginRight: "20px", fontSize: "22px" }}
+                    />
+                    <span style={{ fontSize: "14px" }}>Edit</span>
+                  </MenuItem>
+                  <MenuItem
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleDeleteProject(project.id);
+                      handleMenuClose();
+                    }}
+                  >
+                    <DeleteIcon
+                      style={{ marginRight: "20px", fontSize: "22px" }}
+                    />
+                    <span style={{ fontSize: "14px" }}>Delete</span>
+                  </MenuItem>
+                </Menu>
+              </NavLink>
+            </ListItem>
+          ))}
+        </List>
+      </div>
     </div>
   );
 
   return (
     <Box sx={{ display: "flex", height: "100vh" }}>
       <CssBaseline />
-
-      {/* Sidebar */}
       <Box
         component="nav"
         sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
-        aria-label="sidebar">
+        aria-label="sidebar"
+      >
         <Drawer
           variant="temporary"
           open={mobileOpen}
@@ -625,7 +621,8 @@ const ResponsiveLayout = ({ children }) => {
               scrollbarWidth: "thin",
               overflowX: "hidden",
             },
-          }}>
+          }}
+        >
           {drawer}
         </Drawer>
 
@@ -646,12 +643,12 @@ const ResponsiveLayout = ({ children }) => {
               left: 0,
             },
           }}
-          open>
+          open
+        >
           {drawer}
         </Drawer>
       </Box>
 
-      {/* AppBar & content */}
       <Box sx={{ flexGrow: 1, width: "100%", pl: { sm: `${drawerWidth}px` } }}>
         <AppBar
           position="sticky"
@@ -660,34 +657,45 @@ const ResponsiveLayout = ({ children }) => {
             backgroundColor: "#fff",
             color: "#000",
             borderBottom: showBorder ? "1px solid rgba(0, 0, 0, 0.12)" : "none",
-          }}>
+          }}
+        >
           <Toolbar sx={{ position: "relative", alignItems: "center" }}>
             {isMobile && (
               <IconButton
                 color="inherit"
                 edge="start"
                 onClick={handleDrawerToggle}
-                sx={{ mr: 2 }}>
+                sx={{ mr: 2 }}
+              >
                 <MenuIcon />
               </IconButton>
             )}
-            <img
-              src="/logo-todo.png"
-              style={{ objectFit: "contain", maxWidth: 120 }}
-              alt="Logo"
-            />
+            {isMobile ? (
+              <img
+                src="/logo.png"
+                style={{ objectFit: "contain", maxWidth: 50 }}
+                alt="Logo"
+              />
+            ) : (
+              <img
+                src="/logo-todo.png"
+                style={{ objectFit: "contain", maxWidth: 120 }}
+                alt="Logo"
+              />
+            )}
 
-            {/* Animated Title */}
             <Typography
               variant="h6"
               sx={{
                 position: "absolute",
                 top: showTitle ? "50%" : "80%",
-                left: isMobile ? "90%" : "50%",
+                left: isMobile ? "50%" : "50%",
                 transform: "translate(-50%, -50%)",
+                fontSize: isMobile ? "16px" : "17px",
                 opacity: showTitle ? 1 : 0,
                 transition: "top 0.2s ease, opacity 0.1s ease",
-              }}>
+              }}
+            >
               {getTitle()}
             </Typography>
           </Toolbar>
@@ -698,7 +706,6 @@ const ResponsiveLayout = ({ children }) => {
         </Box>
       </Box>
 
-      {/* Add/Edit project modal */}
       <Modal open={openModal} onClose={handleModalClose}>
         <Box
           sx={{
@@ -711,7 +718,8 @@ const ResponsiveLayout = ({ children }) => {
             boxShadow: 24,
             borderRadius: 2,
             p: 3,
-          }}>
+          }}
+        >
           <Typography variant="h6" gutterBottom>
             {editProject ? "Edit Project" : "Add New Project"}
           </Typography>
@@ -727,7 +735,8 @@ const ResponsiveLayout = ({ children }) => {
             <Select
               value={selectedColor}
               label="Color"
-              onChange={(e) => setSelectedColor(e.target.value)}>
+              onChange={(e) => setSelectedColor(e.target.value)}
+            >
               <MenuItem value="default">Default</MenuItem>
               <MenuItem value="blue">Blue</MenuItem>
               <MenuItem value="green">Green</MenuItem>
@@ -746,7 +755,8 @@ const ResponsiveLayout = ({ children }) => {
           <Button
             variant="contained"
             fullWidth
-            onClick={editProject ? handleSaveProjectEdit : handleAddProject}>
+            onClick={editProject ? handleSaveProjectEdit : handleAddProject}
+          >
             {editProject ? "Save Changes" : "Add Project"}
           </Button>
         </Box>
