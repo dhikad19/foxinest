@@ -1,4 +1,3 @@
-// pages/Home.jsx
 import Calendar from "../components/Calendar";
 
 const CalendarPage = () => {

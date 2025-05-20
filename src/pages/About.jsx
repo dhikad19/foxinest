@@ -1,4 +1,3 @@
-// pages/Home.jsx
 import Section from "../components/About";
 
 const About = () => {
