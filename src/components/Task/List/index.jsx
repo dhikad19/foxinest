@@ -17,21 +17,15 @@ import AddIcon from "@mui/icons-material/Add";
 import AddIconFilled from "@mui/icons-material/AddCircle";
 import TaskItem from "../Item";
 import TaskForm from "../Form";
-// import EditModal from "../../components/Modal/Edit";
-// Tiptap
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 
-// Icons
 import { FaChevronDown, FaChevronRight } from "react-icons/fa";
-
-// Date Picker
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import dayjs from "dayjs";
 
-// 📝 Section name inline editor
 const LiveSectionEditor = ({ initialContent, onChange }) => {
   const [currentText, setCurrentText] = useState(initialContent);
 
@@ -86,35 +80,15 @@ const TaskList = ({
 }) => {
   const [openForms, setOpenForms] = useState({});
   const [expandedSections, setExpandedSections] = useState({});
-  const [activeTask, setActiveTask] = useState(null);
   const [showOverdue, setShowOverdue] = useState(true);
   const sensors = useSensors(useSensor(PointerSensor));
   const [hoveredCategory, setHoveredCategory] = useState(null);
-  const [editingTaskId, setEditingTaskId] = useState(null);
 
-  // 📅 Date picker state
   const [selectedDate, setSelectedDate] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const today = dayjs();
   const tomorrow = dayjs().add(1, "day");
-
-  // const startEditing = (taskId) => {
-  //   setEditingTaskId(taskId);
-  // };
-
-  // const stopEditing = () => {
-  //   setEditingTaskId(null);
-  // };
-
-  // const handleSave = (updatedTask) => {
-  //   onEdit(updatedTask); // Simpan perubahan ke task
-  //   setEditingTaskId(null); // Keluar dari mode edit
-  // };
-
-  // const handleCancel = () => {
-  //   setEditingTaskId(null); // Batalkan mode edit
-  // };
 
   const handleOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -136,15 +110,6 @@ const TaskList = ({
       ...prev,
       [category]: !prev[category],
     }));
-  };
-
-  const handleDragStart = (event) => {
-    const { active } = event;
-    const allTasks = Object.values(tasksByCategory).flat();
-    const task = allTasks.find((t) => t.id === active.id);
-    if (task) {
-      setActiveTask(task);
-    }
   };
 
   const handleDragEnd = (event) => {
@@ -182,7 +147,6 @@ const TaskList = ({
     }
   }, [tasksByCategory]);
 
-  // 🔍 Overdue tasks filter
   const overdueTasks = [];
   const todayStr = today.format("YYYY-MM-DD");
 
@@ -205,18 +169,15 @@ const TaskList = ({
     setSelectedDate(newDate);
     handleClose();
 
-    // Update all overdue tasks with new date
     const updatedTasks = overdueTasks.map((task) => ({
       ...task,
       dueDate: formattedDate,
     }));
 
-    // Keep non-overdue tasks
     const remainingTasks = Object.values(tasksByCategory)
       .flat()
       .filter((task) => !(task.dueDate && task.dueDate < todayStr));
 
-    // Call external updater
     onReorderTasks([...remainingTasks, ...updatedTasks]);
   };
 
@@ -228,7 +189,6 @@ const TaskList = ({
       onDragEnd={handleDragEnd}
     >
       <div>
-        {/* 🔴 Overdue Section */}
         {overdueTasks.length > 0 && (
           <div style={{ marginBottom: "1rem", borderRadius: 8, padding: 4 }}>
             <div
@@ -264,7 +224,6 @@ const TaskList = ({
                 <strong style={{ fontSize: 15 }}>Overdue</strong>
               </div>
 
-              {/* 📅 Date Picker Button */}
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <div
                   onClick={handleOpen}
@@ -334,7 +293,6 @@ const TaskList = ({
           </div>
         )}
 
-        {/* ✅ Regular Sections */}
         {Object.entries(filteredTasksByCategory).map(([category, tasks]) => (
           <div
             key={category}
