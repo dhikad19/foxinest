@@ -33,6 +33,7 @@ import TagIcon from "@mui/icons-material/TagOutlined";
 import CalendarIcon from "@mui/icons-material/CalendarMonthOutlined";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import MenuIcon from "@mui/icons-material/Menu";
+import ProjectModal from "../Modal/Project/Add";
 import {
   AddHomeOutlined as HomeIcon,
   InfoOutlined as InfoIcon,
@@ -164,6 +165,12 @@ const ResponsiveLayout = ({ children }) => {
     );
     setProjects(updatedProjects);
     localStorage.setItem("projects", JSON.stringify(updatedProjects));
+    triggerProjectChange(); // Trigger event after deletion
+  };
+
+  const triggerProjectChange = () => {
+    const event = new Event("projectChange");
+    window.dispatchEvent(event);
   };
 
   const handleAddProject = () => {
@@ -194,6 +201,8 @@ const ResponsiveLayout = ({ children }) => {
       setIsFavorite(false);
       setOpenModal(false);
       navigate(`/project/${newProject.id}`);
+
+      triggerProjectChange(); // Trigger event after adding
     }
   };
 
@@ -544,15 +553,15 @@ const ResponsiveLayout = ({ children }) => {
                   </Typography>
                 </div>
 
-                <MoreVertOutlined
+                {/* <MoreVertOutlined
                   style={{ fontSize: "22px" }}
                   onClick={(e) => {
                     e.preventDefault();
                     handleMenuOpen(e);
                   }}
-                />
+                /> */}
 
-                <Menu
+                {/* <Menu
                   id={`menu-${project.id}`}
                   anchorEl={anchorEl}
                   open={Boolean(anchorEl)}
@@ -590,7 +599,7 @@ const ResponsiveLayout = ({ children }) => {
                     />
                     <span style={{ fontSize: "14px" }}>Delete</span>
                   </MenuItem>
-                </Menu>
+                </Menu> */}
               </NavLink>
             </ListItem>
           ))}
@@ -706,61 +715,18 @@ const ResponsiveLayout = ({ children }) => {
         </Box>
       </Box>
 
-      <Modal open={openModal} onClose={handleModalClose}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            borderRadius: 2,
-            p: 3,
-          }}
-        >
-          <Typography variant="h6" gutterBottom>
-            {editProject ? "Edit Project" : "Add New Project"}
-          </Typography>
-          <TextField
-            label="Project Name"
-            fullWidth
-            value={projectName}
-            onChange={(e) => setProjectName(e.target.value)}
-            sx={{ mb: 2 }}
-          />
-          <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel>Color</InputLabel>
-            <Select
-              value={selectedColor}
-              label="Color"
-              onChange={(e) => setSelectedColor(e.target.value)}
-            >
-              <MenuItem value="default">Default</MenuItem>
-              <MenuItem value="blue">Blue</MenuItem>
-              <MenuItem value="green">Green</MenuItem>
-              <MenuItem value="red">Red</MenuItem>
-            </Select>
-          </FormControl>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={isFavorite}
-                onChange={() => setIsFavorite(!isFavorite)}
-              />
-            }
-            label="Favorite"
-          />
-          <Button
-            variant="contained"
-            fullWidth
-            onClick={editProject ? handleSaveProjectEdit : handleAddProject}
-          >
-            {editProject ? "Save Changes" : "Add Project"}
-          </Button>
-        </Box>
-      </Modal>
+      <ProjectModal
+        open={openModal}
+        onClose={handleModalClose}
+        onSubmit={editProject ? handleSaveProjectEdit : handleAddProject}
+        projectName={projectName}
+        setProjectName={setProjectName}
+        selectedColor={selectedColor}
+        setSelectedColor={setSelectedColor}
+        isFavorite={isFavorite}
+        setIsFavorite={setIsFavorite}
+        editProject={editProject}
+      />
     </Box>
   );
 };
