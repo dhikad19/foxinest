@@ -61,17 +61,20 @@ const AboutPage = () => {
                   fontSize="large"
                 />
               ),
-              text: "Effortless Task Management: Add, edit, and delete tasks with ease.",
+              title: "Effortless Task Management",
+              text: "Add, edit, and delete tasks with ease.",
             },
             {
               icon: (
                 <DesignServices style={{ color: "#ff7800" }} fontSize="large" />
               ),
-              text: "Intuitive Design: A clean and straightforward interface for a smooth user experience.",
+              title: "Intuitive Design",
+              text: "A clean and straightforward interface for a smooth user experience.",
             },
             {
               icon: <Devices style={{ color: "#ff7800" }} fontSize="large" />,
-              text: "Cross-Platform Compatibility: Works beautifully on desktop and mobile devices.",
+              title: "Cross-Platform Compatibility",
+              text: "Works beautifully on desktop and mobile devices.",
             },
           ].map((feature, idx) => (
             <Card
@@ -79,7 +82,6 @@ const AboutPage = () => {
               variant="outlined"
               sx={{
                 p: 2,
-                textAlign: "center",
                 transition: "transform 0.3s ease, box-shadow 0.3s ease",
                 "&:hover": {
                   transform: "scale(1.05)",
@@ -88,10 +90,19 @@ const AboutPage = () => {
               }}
             >
               {feature.icon}
+              <p
+                style={{
+                  fontWeight: 500,
+                  lineHeight: "normal",
+                  marginTop: "15px",
+                }}
+              >
+                {feature.title}
+              </p>
               <Typography
                 variant="body1"
-                style={{ fontSize: 15 }}
-                sx={{ mt: 2, wordBreak: "break-word", whiteSpace: "normal" }}
+                style={{ fontSize: 14 }}
+                sx={{ mt: 1, wordBreak: "break-word", whiteSpace: "normal" }}
               >
                 {feature.text}
               </Typography>

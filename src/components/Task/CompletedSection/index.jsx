@@ -7,8 +7,9 @@ import {
   TextField,
   useTheme,
   useMediaQuery,
-  Tooltip,
 } from "@mui/material";
+import CheckIcon from "@mui/icons-material/Check";
+import { FaChevronDown } from "react-icons/fa";
 import { SortByAlpha, DateRange, NewReleases } from "@mui/icons-material";
 
 const CompletedSection = () => {
@@ -37,13 +38,6 @@ const CompletedSection = () => {
       default:
         return tasks.sort((a, b) => b.id - a.id);
     }
-  };
-
-  const filterTasks = (tasks) => {
-    if (!searchQuery.trim()) return tasks;
-    return tasks.filter((task) =>
-      task.title.toLowerCase().includes(searchQuery.toLowerCase())
-    );
   };
 
   useEffect(() => {
@@ -87,19 +81,15 @@ const CompletedSection = () => {
       }
     }
 
-    setProjectList(tempProjects); // Set project names (home, yuk ah, asd, etc.)
-
-    // SORT
+    setProjectList(tempProjects);
     let sorted = sortTasks([...combinedCompletedTasks]);
 
-    // SEARCH FILTER
     if (searchQuery.trim()) {
       sorted = sorted.filter((task) =>
         task.title.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
-    // PROJECT FILTER
     if (selectedProject !== "all") {
       sorted = sorted.filter(
         (task) =>
@@ -149,14 +139,17 @@ const CompletedSection = () => {
     setCompletedTasks((prev) => prev.filter((t) => t.id !== taskIdToDelete));
   };
 
+  const [selectedSort, setSelectedSort] = useState("newest");
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const handleSortOptionChange = (option) => {
-    setSortOption(option);
+
+  const handleSortOptionChange = (value) => {
+    setSelectedSort(value);
     handleClose();
   };
 
@@ -186,7 +179,37 @@ const CompletedSection = () => {
     }
   };
 
-  const { text, icon } = getButtonTextAndIcon();
+  const showAllProjects = "all"
+    .toLowerCase()
+    .includes(projectSearch.toLowerCase());
+
+  const listItemStyle = {
+    padding: "6px 12px",
+    cursor: "pointer",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    transition: "background-color 0.2s",
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    maxWidth: 240,
+  };
+
+  const nameTextStyle = {
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+    fontSize: 14,
+    flexGrow: 1,
+    marginRight: 8,
+  };
+
+  const filteredProjects = projectList.filter((name) =>
+    name.toLowerCase().includes(projectSearch.toLowerCase())
+  );
+
+  const { text } = getButtonTextAndIcon();
 
   return (
     <div
@@ -205,71 +228,6 @@ const CompletedSection = () => {
       >
         Completed
       </h2>
-
-      <div>
-        <Tooltip title="Filter by Project">
-          <Button
-            variant="contained"
-            onClick={handleProjectClick}
-            sx={{
-              backgroundColor: "#6c63ff",
-              textTransform: "capitalize",
-              boxShadow: "none",
-              minWidth: "120px",
-              fontSize: 14,
-              "&:hover": { backgroundColor: "#5a54d1" },
-            }}
-            disableElevation
-          >
-            {selectedProject === "all" ? "All Projects" : selectedProject}
-          </Button>
-        </Tooltip>
-
-        <Menu
-          anchorEl={projectAnchorEl}
-          open={openProjectMenu}
-          onClose={handleProjectClose}
-          sx={{
-            "& .MuiMenu-paper": {
-              maxHeight: 300, // max height in px
-              overflowY: "auto", // enables scrolling
-            },
-          }}
-        >
-          {/* Search box - always visible */}
-          <MenuItem disableRipple>
-            <TextField
-              placeholder="Search project..."
-              size="small"
-              fullWidth
-              value={projectSearch}
-              onChange={(e) => setProjectSearch(e.target.value)}
-              autoFocus
-            />
-          </MenuItem>
-
-          {/* All Projects */}
-          <MenuItem onClick={() => handleProjectSelect("all")}>
-            All Projects
-          </MenuItem>
-
-          {/* Filtered list - show/hide based on search match */}
-          {projectList.map((name) => {
-            const isMatch = name
-              .toLowerCase()
-              .includes(projectSearch.toLowerCase());
-            return (
-              <MenuItem
-                key={name}
-                onClick={() => handleProjectSelect(name)}
-                sx={{ display: isMatch ? "block" : "none" }}
-              >
-                {name}
-              </MenuItem>
-            );
-          })}
-        </Menu>
-      </div>
 
       <div style={{ display: isMobile ? "" : "flex", gap: 10 }}>
         <TextField
@@ -293,57 +251,184 @@ const CompletedSection = () => {
           }}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        <Tooltip title="Sort by">
-          <Button
-            aria-controls="simple-menu"
-            aria-haspopup="true"
-            variant="contained"
+      </div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          marginTop: 10,
+          marginBottom: 10,
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            fontSize: 14,
+            alignItems: "center",
+            marginRight: 15,
+          }}
+        >
+          <p>Activity:</p>
+          <div
+            onClick={handleProjectClick}
             style={{
-              marginTop: isMobile ? 10 : 0,
-              marginBottom: isMobile ? 10 : 0,
-              minWidth: "120px",
-              fontSize: 14,
-              textTransform: "capitalize",
+              display: "flex",
+              cursor: "pointer",
+              marginLeft: 6,
+              alignItems: "center",
             }}
+          >
+            <p
+              style={{
+                maxWidth: 150,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {selectedProject === "all" ? "All Projects" : selectedProject}
+            </p>
+            <FaChevronDown style={{ marginLeft: 6 }} size={15} />
+          </div>
+
+          <Menu
+            anchorEl={projectAnchorEl}
+            open={openProjectMenu}
+            onClose={handleProjectClose}
             sx={{
-              backgroundColor: "#ff7800",
-              textTransform: "capitalize",
-              boxShadow: "none",
-              "&:hover": { backgroundColor: "#e06f00" },
+              "& .MuiMenu-paper": {
+                maxHeight: 300,
+                overflowY: "auto",
+                padding: 1,
+                minWidth: 250,
+              },
             }}
-            disableElevation
+          >
+            <TextField
+              placeholder="Search project..."
+              size="small"
+              fullWidth
+              value={projectSearch}
+              onChange={(e) => setProjectSearch(e.target.value)}
+              autoFocus
+            />
+
+            {showAllProjects && (
+              <div
+                onClick={() => handleProjectSelect("all")}
+                style={listItemStyle}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.backgroundColor = "#f0f0f0")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.backgroundColor = "transparent")
+                }
+              >
+                <span style={nameTextStyle}>All Projects</span>
+                {selectedProject === "all" && (
+                  <CheckIcon style={{ fontSize: "16px" }} />
+                )}
+              </div>
+            )}
+
+            {filteredProjects.length > 0 ? (
+              filteredProjects.map((name) => (
+                <div
+                  key={name}
+                  onClick={() => handleProjectSelect(name)}
+                  style={listItemStyle}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.backgroundColor = "#f0f0f0")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.backgroundColor = "transparent")
+                  }
+                >
+                  <span style={nameTextStyle}>{name}</span>
+                  {selectedProject === name && (
+                    <CheckIcon style={{ fontSize: "16px" }} />
+                  )}
+                </div>
+              ))
+            ) : (
+              <div style={{ padding: "6px 12px", color: "#999" }}>
+                No matching projects
+              </div>
+            )}
+          </Menu>
+        </div>
+        <div style={{ fontSize: 14 }}>
+          <div
+            style={{ display: "flex", alignItems: "center" }}
             onClick={handleClick}
           >
-            {text}
-          </Button>
-        </Tooltip>
-        <Menu
-          id="simple-menu"
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={handleClose}
-        >
-          <MenuItem
-            style={{ minWidth: "120px", fontSize: 14 }}
-            onClick={() => handleSortOptionChange("newest")}
+            <p
+              style={{
+                textTransform: "capitalize",
+              }}
+            >
+              {text}
+            </p>
+            <FaChevronDown style={{ marginLeft: 6 }} size={15} />
+          </div>
+          <Menu
+            id="simple-menu"
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+            sx={{
+              "& .MuiMenu-paper": {
+                padding: 1,
+                minWidth: 160,
+              },
+            }}
           >
-            Newest First
-          </MenuItem>
-          <MenuItem
-            style={{ minWidth: "120px", fontSize: 14 }}
-            onClick={() => handleSortOptionChange("alphabetical")}
-          >
-            Alphabetical
-          </MenuItem>
-          <MenuItem
-            style={{ minWidth: "120px", fontSize: 14 }}
-            onClick={() => handleSortOptionChange("dueDate")}
-          >
-            By Due Date
-          </MenuItem>
-        </Menu>
+            {[
+              { value: "newest", label: "Newest First" },
+              { value: "alphabetical", label: "Alphabetical" },
+              { value: "dueDate", label: "By Due Date" },
+            ].map((option) => (
+              <div
+                key={option.value}
+                onClick={() => {
+                  handleSortOptionChange(option.value);
+                  handleClose();
+                }}
+                style={{
+                  padding: "6px 12px",
+                  fontSize: 14,
+                  cursor: "pointer",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  transition: "background-color 0.2s",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.backgroundColor = "#f0f0f0")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.backgroundColor = "transparent")
+                }
+              >
+                <span
+                  style={{
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    flexGrow: 1,
+                    marginRight: 8,
+                  }}
+                >
+                  {option.label}
+                </span>
+                {selectedSort === option.value && (
+                  <FaChevronDown style={{ marginLeft: 6 }} size={15} />
+                )}
+              </div>
+            ))}
+          </Menu>
+        </div>
       </div>
-
       <CompletedTaskList tasks={completedTasks} onDelete={handleDelete} />
     </div>
   );
