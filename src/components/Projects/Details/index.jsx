@@ -1,5 +1,6 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState, useMemo, useRef } from "react";
+
 import {
   Box,
   Typography,
@@ -40,7 +41,7 @@ import {
 const ProjectDetail = () => {
   const { projectId } = useParams();
   const navigate = useNavigate();
-
+  const location = useLocation();
   const [projectData, setProjectData] = useState({ sections: [], tasks: [] });
   const [projects, setProjects] = useState([]);
   const [newSection, setNewSection] = useState("");
@@ -54,12 +55,16 @@ const ProjectDetail = () => {
   const [showOverdue, setShowOverdue] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
-
+  const isFirstRender = useRef(true);
+  const fromEdit = location.state?.fromEdit;
+  const [loading, setLoading] = useState(true);
   const [editProjectData, setEditProjectData] = useState({
     name: "",
     color: "default",
     isFavorite: false,
   });
+
+  const isValidProjectId = projects.some((p) => p.name === projectId);
 
   const sensors = useSensors(useSensor(PointerSensor));
   useEffect(() => {
@@ -82,20 +87,65 @@ const ProjectDetail = () => {
     };
   }, []);
 
-  const isFirstRender = useRef(true);
+  // This will help us track if we are coming from edit
 
   useEffect(() => {
-    if (!projectId) return;
+    const storedProjects = JSON.parse(localStorage.getItem("projects")) || [];
+    const storedProjectsData =
+      JSON.parse(localStorage.getItem("projects_data")) || {};
+
+    const projectExists = storedProjects.some((p) => p.name === projectId);
+    const hasProjectData = Object.prototype.hasOwnProperty.call(
+      storedProjectsData,
+      projectId
+    );
+
+    const cameFromEdit = location.state?.fromEdit;
+
+    if (!projectExists || !hasProjectData) {
+      if (!cameFromEdit) {
+        navigate("/404", { replace: true });
+      }
+    } else {
+      // Delay setting loading to false to avoid flicker on fast systems
+      setTimeout(() => setLoading(false), 100);
+    }
+  }, [projectId, location.state, navigate]);
+
+  useEffect(() => {
+    if (!projectId || projects.length === 0) return;
+
+    // Ensure that the projectId exists in the updated list of projects
+    const cameFromEdit = location.state?.fromEdit;
+    // Cleanup after the edit
+    if (cameFromEdit) {
+      setTimeout(() => {
+        window.history.replaceState({}, document.title);
+      }, 200); // Delay cleanup to allow state to persist before reset
+    }
+  }, [projects, projectId, location.state, navigate]);
+
+  useEffect(() => {
+    if (fromEdit) {
+      // Clean the history state after the first render
+      window.history.replaceState({}, document.title);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!projectId || !projectData || !isValidProjectId) return;
 
     if (isFirstRender.current) {
       isFirstRender.current = false;
       return;
     }
 
+    if (Object.keys(projectData).length === 0) return;
+
     const storedData = JSON.parse(localStorage.getItem("projects_data")) || {};
     storedData[projectId] = projectData;
     localStorage.setItem("projects_data", JSON.stringify(storedData));
-  }, [projectData, projectId]);
+  }, [projectData, projectId, isValidProjectId]);
 
   useEffect(() => {
     if (editDialogOpen) {
@@ -229,13 +279,17 @@ const ProjectDetail = () => {
     const updated = projects.map((project) =>
       project.name === projectId ? { ...project, ...editProjectData } : project
     );
+
     localStorage.setItem("projects", JSON.stringify(updated));
     window.dispatchEvent(new Event("localStorage-update"));
-    setEditDialogOpen(false);
+
+    // Update React state
+    setProjects(updated);
 
     const oldKey = projectId;
     const newKey = editProjectData.name;
 
+    // Handle project data rename in localStorage
     if (oldKey !== newKey) {
       const data = JSON.parse(localStorage.getItem("projects_data")) || {};
       data[newKey] = data[oldKey];
@@ -243,7 +297,12 @@ const ProjectDetail = () => {
       localStorage.setItem("projects_data", JSON.stringify(data));
     }
 
-    navigate(`/project/${editProjectData.name}`);
+    // After state update, navigate with the new name
+    navigate(`/project/${editProjectData.name}`, {
+      state: { fromEdit: true },
+    });
+
+    setEditDialogOpen(false);
   };
 
   const handleDeleteProject = () => {
@@ -308,7 +367,7 @@ const ProjectDetail = () => {
     if (!editor) return null;
     return <EditorContent editor={editor} />;
   };
-
+  if (loading) return null;
   return (
     <div
       style={{

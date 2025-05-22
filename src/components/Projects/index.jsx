@@ -26,13 +26,11 @@ const Projects = ({ projects, onSave, onDelete }) => {
 
   const handleModalOpen = (project = null) => {
     if (project) {
-      // Edit mode
       setEditProject(project);
       setProjectName(project.name);
       setSelectedColor(project.color);
       setIsFavorite(project.isFavorite);
     } else {
-      // Add mode
       setEditProject(null);
       setProjectName("");
       setSelectedColor("");

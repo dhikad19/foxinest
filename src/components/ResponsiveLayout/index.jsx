@@ -12,23 +12,10 @@ import {
   CssBaseline,
   useTheme,
   useMediaQuery,
-  Modal,
-  TextField,
-  Button,
-  FormControl,
-  InputLabel,
-  Select,
-  Menu,
-  MenuItem,
-  Switch,
-  FormControlLabel,
   IconButton as MuiIconButton,
 } from "@mui/material";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import AddIcon from "@mui/icons-material/Add";
-import EditIcon from "@mui/icons-material/DriveFileRenameOutlineOutlined";
-import MoreVertOutlined from "@mui/icons-material/MoreVertOutlined";
-import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import TagIcon from "@mui/icons-material/TagOutlined";
 import CalendarIcon from "@mui/icons-material/CalendarMonthOutlined";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
@@ -39,7 +26,6 @@ import {
   InfoOutlined as InfoIcon,
   CheckCircleOutlined as CompletedIcon,
 } from "@mui/icons-material";
-import ProjectDetail from "../../pages/ProjectDetail";
 
 const drawerWidth = 240;
 
@@ -151,23 +137,6 @@ const ResponsiveLayout = ({ children }) => {
     setEditProject(null);
   };
 
-  const handleEditProject = (project) => {
-    setEditProject(project);
-    setProjectName(project.name);
-    setSelectedColor(project.color);
-    setIsFavorite(project.isFavorite);
-    setOpenModal(true);
-  };
-
-  const handleDeleteProject = (projectId) => {
-    const updatedProjects = projects.filter(
-      (project) => project.id !== projectId
-    );
-    setProjects(updatedProjects);
-    localStorage.setItem("projects", JSON.stringify(updatedProjects));
-    triggerProjectChange(); // Trigger event after deletion
-  };
-
   const triggerProjectChange = () => {
     const event = new Event("projectChange");
     window.dispatchEvent(event);
@@ -200,43 +169,11 @@ const ResponsiveLayout = ({ children }) => {
       setSelectedColor("");
       setIsFavorite(false);
       setOpenModal(false);
-      navigate(`/project/${newProject.id}`);
+      navigate(`/project/${newProject.name}`);
 
-      triggerProjectChange(); // Trigger event after adding
+      triggerProjectChange();
     }
   };
-
-  const handleSaveProjectEdit = () => {
-    if (editProject) {
-      const projectExists = projects.some(
-        (project) =>
-          project.id !== editProject.id &&
-          project.name.toLowerCase() === projectName.trim().toLowerCase()
-      );
-
-      if (projectExists) {
-        alert("A project with this name already exists.");
-        return;
-      }
-
-      const updatedProjects = projects.map((project) =>
-        project.id === editProject.id
-          ? { ...project, name: projectName, color: selectedColor, isFavorite }
-          : project
-      );
-
-      setProjects(updatedProjects);
-      localStorage.setItem("projects", JSON.stringify(updatedProjects));
-
-      setProjectName("");
-      setSelectedColor("");
-      setIsFavorite(false);
-      setOpenModal(false);
-      setEditProject(null);
-    }
-  };
-
-  const isActiveLink = (path) => location.pathname === path;
 
   const favoriteProjects = projects.filter((project) => project.isFavorite);
   const drawer = (
@@ -552,54 +489,6 @@ const ResponsiveLayout = ({ children }) => {
                     {project.name}
                   </Typography>
                 </div>
-
-                {/* <MoreVertOutlined
-                  style={{ fontSize: "22px" }}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleMenuOpen(e);
-                  }}
-                /> */}
-
-                {/* <Menu
-                  id={`menu-${project.id}`}
-                  anchorEl={anchorEl}
-                  open={Boolean(anchorEl)}
-                  onClose={handleMenuClose}
-                  PaperProps={{
-                    elevation: 2,
-                    sx: {
-                      boxShadow: "rgba(0, 0, 0, 0.007) 0px 4px 6px",
-                      borderRadius: "6px",
-                      minWidth: "200px",
-                    },
-                  }}
-                >
-                  <MenuItem
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleEditProject(project);
-                      handleMenuClose();
-                    }}
-                  >
-                    <EditIcon
-                      style={{ marginRight: "20px", fontSize: "22px" }}
-                    />
-                    <span style={{ fontSize: "14px" }}>Edit</span>
-                  </MenuItem>
-                  <MenuItem
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleDeleteProject(project.id);
-                      handleMenuClose();
-                    }}
-                  >
-                    <DeleteIcon
-                      style={{ marginRight: "20px", fontSize: "22px" }}
-                    />
-                    <span style={{ fontSize: "14px" }}>Delete</span>
-                  </MenuItem>
-                </Menu> */}
               </NavLink>
             </ListItem>
           ))}
@@ -718,7 +607,7 @@ const ResponsiveLayout = ({ children }) => {
       <ProjectModal
         open={openModal}
         onClose={handleModalClose}
-        onSubmit={editProject ? handleSaveProjectEdit : handleAddProject}
+        onSubmit={handleAddProject}
         projectName={projectName}
         setProjectName={setProjectName}
         selectedColor={selectedColor}

@@ -193,7 +193,7 @@ const CompletedSection = () => {
     whiteSpace: "nowrap",
     overflow: "hidden",
     textOverflow: "ellipsis",
-    maxWidth: 240,
+    maxWidth: 210,
   };
 
   const nameTextStyle = {
@@ -257,7 +257,7 @@ const CompletedSection = () => {
           display: "flex",
           alignItems: "center",
           marginTop: 10,
-          marginBottom: 10,
+          marginBottom: 30,
         }}
       >
         <div
@@ -268,7 +268,7 @@ const CompletedSection = () => {
             marginRight: 15,
           }}
         >
-          <p>Activity:</p>
+          <p style={{ fontWeight: "bold" }}>Activity:</p>
           <div
             onClick={handleProjectClick}
             style={{
@@ -280,7 +280,7 @@ const CompletedSection = () => {
           >
             <p
               style={{
-                maxWidth: 150,
+                maxWidth: 110,
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 whiteSpace: "nowrap",
@@ -288,7 +288,7 @@ const CompletedSection = () => {
             >
               {selectedProject === "all" ? "All Projects" : selectedProject}
             </p>
-            <FaChevronDown style={{ marginLeft: 6 }} size={15} />
+            <FaChevronDown style={{ marginLeft: 6, color: "grey" }} size={15} />
           </div>
 
           <Menu
@@ -308,7 +308,15 @@ const CompletedSection = () => {
               placeholder="Search project..."
               size="small"
               fullWidth
+              sx={{
+                "& .MuiOutlinedInput-root.Mui-focused": {
+                  "& fieldset": {
+                    borderColor: "#ff7800",
+                  },
+                },
+              }}
               value={projectSearch}
+              style={{ marginBottom: 15 }}
               onChange={(e) => setProjectSearch(e.target.value)}
               autoFocus
             />
@@ -326,7 +334,7 @@ const CompletedSection = () => {
               >
                 <span style={nameTextStyle}>All Projects</span>
                 {selectedProject === "all" && (
-                  <CheckIcon style={{ fontSize: "16px" }} />
+                  <CheckIcon style={{ fontSize: "16px", color: "grey" }} />
                 )}
               </div>
             )}
@@ -346,7 +354,7 @@ const CompletedSection = () => {
                 >
                   <span style={nameTextStyle}>{name}</span>
                   {selectedProject === name && (
-                    <CheckIcon style={{ fontSize: "16px" }} />
+                    <CheckIcon style={{ fontSize: "16px", color: "grey" }} />
                   )}
                 </div>
               ))
@@ -358,18 +366,28 @@ const CompletedSection = () => {
           </Menu>
         </div>
         <div style={{ fontSize: 14 }}>
-          <div
-            style={{ display: "flex", alignItems: "center" }}
-            onClick={handleClick}
-          >
-            <p
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <p style={{ fontWeight: "bold", marginRight: 6 }}>Sort:</p>
+            <div
               style={{
-                textTransform: "capitalize",
+                display: "flex",
+                alignItems: "center",
+                cursor: "pointer",
               }}
+              onClick={handleClick}
             >
-              {text}
-            </p>
-            <FaChevronDown style={{ marginLeft: 6 }} size={15} />
+              <p
+                style={{
+                  textTransform: "capitalize",
+                }}
+              >
+                {text}
+              </p>
+              <FaChevronDown
+                style={{ marginLeft: 6, color: "grey" }}
+                size={15}
+              />
+            </div>
           </div>
           <Menu
             id="simple-menu"
@@ -422,7 +440,7 @@ const CompletedSection = () => {
                   {option.label}
                 </span>
                 {selectedSort === option.value && (
-                  <FaChevronDown style={{ marginLeft: 6 }} size={15} />
+                  <CheckIcon style={{ fontSize: "16px", color: "grey" }} />
                 )}
               </div>
             ))}
