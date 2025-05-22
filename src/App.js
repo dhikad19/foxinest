@@ -9,6 +9,7 @@ import Project from "./pages/Project";
 import ProjectDetail from "./pages/ProjectDetail";
 import WelcomePage from "./pages/Welcome";
 import Calendar from "./pages/Calendar";
+import NotFoundPage from "./components/404";
 import { CircularProgress, Box, Typography } from "@mui/material";
 
 const App = () => {
@@ -58,6 +59,8 @@ const App = () => {
           path="/welcome"
           element={<WelcomePage onSubmit={handleUserSubmit} />}
         />
+
+        {/* Main layout routes */}
         <Route
           path="/"
           element={
@@ -116,7 +119,9 @@ const App = () => {
               )
             }
           />
+          <Route path="*" element={<NotFoundPage />} />
         </Route>
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Router>
   );
