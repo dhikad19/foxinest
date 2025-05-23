@@ -1,7 +1,7 @@
-import Section from "../components/Welcome";
+import Welcome from "../components/Welcome";
 
-const Home = () => {
-  return <Section />;
+const Home = ({ onSubmit }) => {
+  return <Welcome onSubmit={onSubmit} />;
 };
 
 export default Home;

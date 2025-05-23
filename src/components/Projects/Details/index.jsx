@@ -1,4 +1,4 @@
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useNavigate, useLocation, replace } from "react-router-dom";
 import { useEffect, useState, useMemo, useRef } from "react";
 
 import {
@@ -6,7 +6,6 @@ import {
   Typography,
   TextField,
   Button,
-  Paper,
   Divider,
   Stack,
   Popover,
@@ -56,6 +55,7 @@ const ProjectDetail = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
   const isFirstRender = useRef(true);
+  const [project, setProject] = useState(null);
   const fromEdit = location.state?.fromEdit;
   const [loading, setLoading] = useState(true);
   const [editProjectData, setEditProjectData] = useState({
@@ -63,13 +63,17 @@ const ProjectDetail = () => {
     color: "default",
     isFavorite: false,
   });
+  const normalize = (str) => str.replaceAll(" ", "-").toLowerCase();
 
-  const isValidProjectId = projects.some((p) => p.name === projectId);
+  const isValidProjectId = projects.some(
+    (p) => normalize(p.name) === normalize(projectId)
+  );
 
   const sensors = useSensors(useSensor(PointerSensor));
   useEffect(() => {
     const storedData = JSON.parse(localStorage.getItem("projects_data")) || {};
-    setProjectData(storedData[projectId] || { sections: [], tasks: [] });
+    const normalizedId = normalize(projectId);
+    setProjectData(storedData[normalizedId] || { sections: [], tasks: [] });
   }, [projectId]);
 
   useEffect(() => {
@@ -94,23 +98,33 @@ const ProjectDetail = () => {
     const storedProjectsData =
       JSON.parse(localStorage.getItem("projects_data")) || {};
 
-    const projectExists = storedProjects.some((p) => p.name === projectId);
-    const hasProjectData = Object.prototype.hasOwnProperty.call(
-      storedProjectsData,
-      projectId
+    const matchedProject = storedProjects.find(
+      (p) => normalize(p.name) === normalize(projectId)
     );
 
-    const cameFromEdit = location.state?.fromEdit;
-
-    if (!projectExists || !hasProjectData) {
-      if (!cameFromEdit) {
-        navigate("/404", { replace: true });
-      }
-    } else {
-      // Delay setting loading to false to avoid flicker on fast systems
-      setTimeout(() => setLoading(false), 100);
+    if (!matchedProject) {
+      navigate("/404", { replace: true });
+      return;
     }
-  }, [projectId, location.state, navigate]);
+
+    const correctedUrlName = normalize(matchedProject.name);
+    if (normalize(projectId) !== correctedUrlName) {
+      navigate(`/project/${correctedUrlName}`, { replace: true });
+      return;
+    }
+
+    const hasProjectData = Object.prototype.hasOwnProperty.call(
+      storedProjectsData,
+      matchedProject.name
+    );
+    if (!hasProjectData) {
+      navigate("/404", { replace: true });
+      return;
+    }
+
+    setProject(matchedProject);
+    setLoading(false);
+  }, [projectId, navigate]);
 
   useEffect(() => {
     if (!projectId || projects.length === 0) return;
@@ -142,14 +156,19 @@ const ProjectDetail = () => {
 
     if (Object.keys(projectData).length === 0) return;
 
+    const normalizedId = normalize(projectId);
     const storedData = JSON.parse(localStorage.getItem("projects_data")) || {};
-    storedData[projectId] = projectData;
+    storedData[normalizedId] = projectData;
     localStorage.setItem("projects_data", JSON.stringify(storedData));
   }, [projectData, projectId, isValidProjectId]);
 
   useEffect(() => {
+    const normalize = (str) => str.replaceAll(" ", "-").toLowerCase();
+
     if (editDialogOpen) {
-      const currentProject = projects.find((p) => p.name === projectId);
+      const currentProject = projects.find(
+        (p) => normalize(p.name) === normalize(projectId)
+      );
       if (currentProject) {
         setEditProjectData({
           name: currentProject.name || "",
@@ -219,10 +238,18 @@ const ProjectDetail = () => {
   const handleAddSection = () => {
     const trimmed = newSection.trim();
     if (trimmed && !projectData.sections.includes(trimmed)) {
-      setProjectData((prev) => ({
-        ...prev,
-        sections: [...prev.sections, trimmed],
-      }));
+      const updatedData = {
+        ...projectData,
+        sections: [...projectData.sections, trimmed],
+      };
+      setProjectData(updatedData);
+
+      const normalizedId = normalize(projectId);
+      const storedData =
+        JSON.parse(localStorage.getItem("projects_data")) || {};
+      storedData[normalizedId] = updatedData;
+      localStorage.setItem("projects_data", JSON.stringify(storedData));
+
       setNewSection("");
     }
   };
@@ -277,41 +304,53 @@ const ProjectDetail = () => {
 
   const handleEditProject = () => {
     const updated = projects.map((project) =>
-      project.name === projectId ? { ...project, ...editProjectData } : project
+      normalize(project.name) === normalize(projectId)
+        ? { ...project, ...editProjectData }
+        : project
     );
 
     localStorage.setItem("projects", JSON.stringify(updated));
     window.dispatchEvent(new Event("localStorage-update"));
-
-    // Update React state
     setProjects(updated);
 
-    const oldKey = projectId;
+    const oldKey = projects.find(
+      (p) => normalize(p.name) === normalize(projectId)
+    )?.name;
+
     const newKey = editProjectData.name;
 
-    // Handle project data rename in localStorage
-    if (oldKey !== newKey) {
+    if (oldKey && oldKey !== newKey) {
       const data = JSON.parse(localStorage.getItem("projects_data")) || {};
       data[newKey] = data[oldKey];
       delete data[oldKey];
       localStorage.setItem("projects_data", JSON.stringify(data));
     }
 
-    // After state update, navigate with the new name
-    navigate(`/project/${editProjectData.name}`, {
-      state: { fromEdit: true },
-    });
-
+    navigate(`/project/${normalize(newKey)}`, { state: { fromEdit: true } });
     setEditDialogOpen(false);
   };
 
   const handleDeleteProject = () => {
-    const updated = projects.filter((p) => p.name !== projectId);
+    const updated = projects.filter(
+      (p) => normalize(p.name) !== normalize(projectId)
+    );
+
     localStorage.setItem("projects", JSON.stringify(updated));
     window.dispatchEvent(new Event("localStorage-update"));
+
+    const data = JSON.parse(localStorage.getItem("projects_data")) || {};
+    const projectToDelete = projects.find(
+      (p) => normalize(p.name) === normalize(projectId)
+    );
+    if (projectToDelete && data[projectToDelete.name]) {
+      delete data[projectToDelete.name];
+      localStorage.setItem("projects_data", JSON.stringify(data));
+    }
+
     setDeleteDialogOpen(false);
     navigate("/project");
   };
+
   const handleEditSection = (oldName, newName) => {
     if (oldName === newName || !newName.trim()) return;
 

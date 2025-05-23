@@ -1,59 +1,66 @@
-import React from "react";
+import React, { useMemo } from "react";
 import dayjs from "dayjs";
 import { Button, Divider } from "@mui/material";
 import DateIcon from "@mui/icons-material/DateRangeOutlined";
 
 const CompletedTaskItem = ({ task, onDelete }) => {
+  // Get project name by task.id from localStorage
+  const projectName = useMemo(() => {
+    const projects = JSON.parse(localStorage.getItem("projects")) || [];
+    const match = projects.find((p) => p.id === task.id);
+    return match ? match.name : "Unknown Project";
+  }, [task.id]);
+
   return (
     <div>
       <div style={{ display: "flex", alignItems: "start" }}>
         <div style={{ flex: 1 }}>
           <p style={{ fontSize: 15 }}>{task.title}</p>
           <p dangerouslySetInnerHTML={{ __html: task.description }} />
-          <p>{task.name}</p>
-          {task.source === "home_projects_data" ? (
-            <p>Home/{task.category}</p>
-          ) : (
-            <p>My Projects/{task.category}</p>
-          )}
+          {/* Show source path */}
           <p>
-            {task.dueDate && (
-              <div
+            {task.source === "home_projects_data"
+              ? `Home/${task.category}`
+              : `My Projects/${projectName}/${task.category}`}
+          </p>
+          {/* Due date and priority */}
+          {task.dueDate && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginTop: 5,
+              }}
+            >
+              <DateIcon style={{ fontSize: "14px", color: "grey" }} />
+              <p
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  marginTop: 5,
+                  fontSize: "13px",
+                  color: "grey",
+                  marginLeft: "5px",
                 }}
               >
-                <DateIcon style={{ fontSize: "14px", color: "grey" }} />
-                <p
-                  style={{
-                    fontSize: "13px",
-                    color: "grey",
-                    marginLeft: "5px",
-                  }}
-                >
-                  {(() => {
-                    const currentYear = new Date().getFullYear();
-                    const dueDate = new Date(task.dueDate);
-                    const options = {
-                      day: "2-digit",
-                      month: "short",
-                      ...(dueDate.getFullYear() !== currentYear && {
-                        year: "numeric",
-                      }),
-                    };
-                    return new Intl.DateTimeFormat("en-GB", options).format(
-                      dueDate
-                    );
-                  })()}
-                </p>
-              </div>
-            )}
-            <strong>Priority:</strong> {task.priority}
-          </p>
+                {(() => {
+                  const currentYear = new Date().getFullYear();
+                  const dueDate = new Date(task.dueDate);
+                  const options = {
+                    day: "2-digit",
+                    month: "short",
+                    ...(dueDate.getFullYear() !== currentYear && {
+                      year: "numeric",
+                    }),
+                  };
+                  return new Intl.DateTimeFormat("en-GB", options).format(
+                    dueDate
+                  );
+                })()}
+              </p>
+            </div>
+          )}
+          <strong>Priority:</strong> {task.priority}
         </div>
 
+        {/* Delete button */}
         <Button
           onClick={() => onDelete(task.id)}
           variant="contained"

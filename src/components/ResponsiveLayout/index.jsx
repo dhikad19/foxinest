@@ -60,13 +60,6 @@ const ResponsiveLayout = ({ children }) => {
     }
   };
 
-  const [isFilterActive, setIsFilterActive] = useState(false);
-
-  const toggleFilter = () => {
-    setIsFilterActive((prev) => !prev);
-    // Add logic to trigger filtering or update relevant state
-  };
-
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY;
@@ -79,16 +72,6 @@ const ResponsiveLayout = ({ children }) => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
-
-  const [anchorEl, setAnchorEl] = useState(null);
-
-  const handleMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -143,36 +126,48 @@ const ResponsiveLayout = ({ children }) => {
   };
 
   const handleAddProject = () => {
-    if (projectName.trim()) {
-      const projectExists = projects.some(
-        (project) =>
-          project.name.toLowerCase() === projectName.trim().toLowerCase()
-      );
+    const trimmedName = projectName.trim();
+    if (!trimmedName) return;
 
-      if (projectExists) {
-        alert("A project with this name already exists.");
-        return;
-      }
+    const projectExists = projects.some(
+      (project) => project.name.toLowerCase() === trimmedName.toLowerCase()
+    );
 
-      const newProject = {
-        id: Date.now(),
-        name: projectName.trim(),
-        color: selectedColor || "default",
-        isFavorite,
-      };
-      const updatedProjects = [...projects, newProject];
-
-      setProjects(updatedProjects);
-      localStorage.setItem("projects", JSON.stringify(updatedProjects));
-
-      setProjectName("");
-      setSelectedColor("");
-      setIsFavorite(false);
-      setOpenModal(false);
-      navigate(`/project/${newProject.name}`);
-
-      triggerProjectChange();
+    if (projectExists) {
+      alert("A project with this name already exists.");
+      return;
     }
+
+    const newProject = {
+      id: Date.now(),
+      name: trimmedName,
+      color: selectedColor || "default",
+      isFavorite,
+    };
+
+    const updatedProjects = [...projects, newProject];
+    setProjects(updatedProjects);
+    localStorage.setItem("projects", JSON.stringify(updatedProjects));
+
+    const projectsData =
+      JSON.parse(localStorage.getItem("projects_data")) || {};
+
+    projectsData[newProject.name] = {
+      sections: [],
+      tasks: [],
+    };
+
+    localStorage.setItem("projects_data", JSON.stringify(projectsData));
+
+    // UI cleanup
+    setProjectName("");
+    setSelectedColor("");
+    setIsFavorite(false);
+    setOpenModal(false);
+
+    navigate(`/project/${newProject.name.replaceAll(" ", "-").toLowerCase()}`);
+
+    triggerProjectChange();
   };
 
   const favoriteProjects = projects.filter((project) => project.isFavorite);
@@ -223,28 +218,24 @@ const ResponsiveLayout = ({ children }) => {
           overflowX: "hidden",
           height: "calc(100vh - 61px)",
           paddingRight: "4px",
-
-          // Scrollbar styling (Webkit-based browsers)
-          scrollbarWidth: "thin", // Firefox
-          scrollbarColor: "#c0c0c0 transparent", // Firefox
-
-          // Webkit (Chrome, Edge, Safari)
-          WebkitScrollbarWidth: "thin", // Not standard, but safe fallback
+          scrollbarWidth: "thin",
+          scrollbarColor: "#c0c0c0 transparent",
+          WebkitScrollbarWidth: "thin",
         }}
       >
         <style>
           {`
-      ::-webkit-scrollbar {
-        width: 6px;
-      }
-      ::-webkit-scrollbar-thumb {
-        background-color: #bbb;
-        border-radius: 3px;
-      }
-      ::-webkit-scrollbar-track {
-        background: transparent;
-      }
-    `}
+            ::-webkit-scrollbar {
+              width: 6px;
+            }
+            ::-webkit-scrollbar-thumb {
+              background-color: #bbb;
+              border-radius: 3px;
+            }
+            ::-webkit-scrollbar-track {
+              background: transparent;
+            }
+          `}
         </style>
 
         <List>
@@ -360,7 +351,7 @@ const ResponsiveLayout = ({ children }) => {
                   }}
                 >
                   <NavLink
-                    to={`/project/${project.name}`}
+                    to={`/project/${project.name.replaceAll(" ", "-")}`}
                     className={({ isActive }) =>
                       isActive ? "active-link" : "not-active"
                     }
@@ -456,7 +447,9 @@ const ResponsiveLayout = ({ children }) => {
               }}
             >
               <NavLink
-                to={`/project/${project.name}`}
+                to={`/project/${project.name
+                  .replaceAll(" ", "-")
+                  .toLowerCase()}`}
                 className={({ isActive }) =>
                   isActive ? "active-link" : "not-active"
                 }
