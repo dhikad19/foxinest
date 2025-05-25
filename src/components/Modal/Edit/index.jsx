@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import {
-  Modal,
   Box,
   Typography,
   Button,
@@ -80,7 +79,7 @@ const buttonMenu = {
   color: "#4f4f4f",
 };
 
-const EditModal = ({ task, onSave, onClose }) => {
+const EditModal = ({ task, onSave, onClose, onCancel }) => {
   const [form, setForm] = useState(task);
   const [sections, setSections] = useState([]);
 
@@ -113,13 +112,26 @@ const EditModal = ({ task, onSave, onClose }) => {
   });
 
   useEffect(() => {
+    if (titleEditor && task.title !== titleEditor.getText()) {
+      titleEditor.commands.setContent(task.title);
+    }
+    if (descriptionEditor && task.description !== descriptionEditor.getHTML()) {
+      descriptionEditor.commands.setContent(task.description);
+    }
+
     const data = JSON.parse(localStorage.getItem("home_projects_data"));
     if (data?.sections) setSections(data.sections);
     setForm(task);
-  }, [task]);
+  }, [task, titleEditor, descriptionEditor]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!form.title || form.title.trim() === "") {
+      alert("Task title cannot be empty.");
+      return;
+    }
+
     onSave(form);
     onClose();
   };
@@ -127,240 +139,223 @@ const EditModal = ({ task, onSave, onClose }) => {
   const selectedPriority = priorities.find((p) => p.value === form.priority);
 
   return (
-    <Modal
-      open={true}
-      onClose={onClose}
-      style={{ margin: "0px 10px 0px 10px" }}>
-      <Box component="form" sx={modalStyle} onSubmit={handleSubmit}>
-        <div style={{ padding: "0px 15px 0px 15px" }}>
-          <Box sx={{ padding: 2 }}>
-            {/* Header */}
-            {/* '<Box
-            display="flex"
-            alignItems="center"
-            justifyContent="space-between"
-            mb={1}>
-            <Typography variant="h6">Edit Task</Typography>
-          </Box>' */}
+    <Box component="form" sx={modalStyle} onSubmit={handleSubmit}>
+      <div>
+        <Box sx={{ padding: 2 }}>
+          {/* Title Editor */}
+          <Box sx={editorBoxStyle}>
+            <EditorContent
+              editor={titleEditor}
+              style={{ fontWeight: "bold" }}
+            />
+            {form.title === "" && (
+              <div style={placeholderStyle}>Edit task title</div>
+            )}
+          </Box>
 
-            {/* Title Editor */}
-            <Box sx={editorBoxStyle}>
-              <EditorContent
-                editor={titleEditor}
-                style={{ fontWeight: "bold" }}
+          {/* Description Editor */}
+          <Box sx={editorBoxStyle}>
+            <EditorContent editor={descriptionEditor} />
+            {form.description === "" && (
+              <div style={placeholderStyleDescription}>Description</div>
+            )}
+          </Box>
+
+          {/* Menu Selectors */}
+          <Box display="flex" mt={2}>
+            {/* Due Date */}
+            <div
+              onClick={(e) => setDueAnchor(e.currentTarget)}
+              style={buttonMenu}>
+              <EventIcon
+                color="#4f4f4f"
+                style={{ fontSize: 15, marginRight: 5 }}
               />
-              {form.title === "" && (
-                <div style={placeholderStyle}>Edit task title</div>
-              )}
-            </Box>
-
-            {/* Description Editor */}
-            <Box sx={editorBoxStyle}>
-              <EditorContent editor={descriptionEditor} />
-              {form.description === "" && (
-                <div style={placeholderStyleDescription}>Description</div>
-              )}
-            </Box>
-
-            {/* Menu Selectors */}
-            <Box display="flex" mt={2}>
-              {/* Due Date */}
-              <div
-                onClick={(e) => setDueAnchor(e.currentTarget)}
-                style={buttonMenu}>
-                <EventIcon
-                  color="#4f4f4f"
-                  style={{ fontSize: 15, marginRight: 5 }}
-                />
-                {form.dueDate
-                  ? dayjs(form.dueDate).format("MMM D, YYYY")
-                  : "Select Date"}
-              </div>
-              <Popover
-                open={Boolean(dueAnchor)}
-                anchorEl={dueAnchor}
-                onClose={() => setDueAnchor(null)}
-                anchorOrigin={{ vertical: "bottom", horizontal: "left" }}>
-                <Box>
-                  <List dense style={{ marginTop: 10 }}>
-                    {quickDates.map((item) => (
-                      <ListItem disablePadding key={item.label}>
-                        <ListItemButton
-                          onClick={() => {
-                            setForm((prev) => ({
-                              ...prev,
-                              dueDate: item.date.format("YYYY-MM-DD"),
-                            }));
-                            setDueAnchor(null);
-                          }}
-                          sx={{ justifyContent: "space-between" }}>
-                          <ListItemIcon
-                            sx={{ minWidth: 30 }}
-                            style={{ marginLeft: "7px" }}>
-                            {item.icon}
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={
-                              <Typography
-                                sx={{ fontSize: 13, fontWeight: 500 }}>
-                                {item.label}
-                              </Typography>
-                            }
-                          />
-                          <Typography
-                            style={{ marginRight: "7px" }}
-                            sx={{ fontSize: 13, color: "#666" }}>
-                            {item.display(item.date)}
-                          </Typography>
-                        </ListItemButton>
-                      </ListItem>
-                    ))}
-                  </List>
-
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DateCalendar
-                      disablePast
-                      value={form.dueDate ? dayjs(form.dueDate) : null}
-                      onChange={(date) => {
-                        if (date) {
+              {form.dueDate
+                ? dayjs(form.dueDate).format("MMM D, YYYY")
+                : "Select Date"}
+            </div>
+            <Popover
+              open={Boolean(dueAnchor)}
+              anchorEl={dueAnchor}
+              onClose={() => setDueAnchor(null)}
+              anchorOrigin={{ vertical: "bottom", horizontal: "left" }}>
+              <Box>
+                <List dense style={{ marginTop: 10 }}>
+                  {quickDates.map((item) => (
+                    <ListItem disablePadding key={item.label}>
+                      <ListItemButton
+                        onClick={() => {
                           setForm((prev) => ({
                             ...prev,
-                            dueDate: date.format("YYYY-MM-DD"),
+                            dueDate: item.date.format("YYYY-MM-DD"),
                           }));
                           setDueAnchor(null);
-                        }
-                      }}
-                    />
-                  </LocalizationProvider>
-                </Box>
-              </Popover>
+                        }}
+                        sx={{ justifyContent: "space-between" }}>
+                        <ListItemIcon
+                          sx={{ minWidth: 30 }}
+                          style={{ marginLeft: "7px" }}>
+                          {item.icon}
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={
+                            <Typography sx={{ fontSize: 13, fontWeight: 500 }}>
+                              {item.label}
+                            </Typography>
+                          }
+                        />
+                        <Typography
+                          style={{ marginRight: "7px" }}
+                          sx={{ fontSize: 13, color: "#666" }}>
+                          {item.display(item.date)}
+                        </Typography>
+                      </ListItemButton>
+                    </ListItem>
+                  ))}
+                </List>
 
-              {/* Priority */}
-              <div
-                onClick={(e) => setPriorityAnchor(e.currentTarget)}
-                style={buttonMenu}>
-                <FlagIcon
-                  style={{
-                    color: selectedPriority.color,
-                    fontSize: 16,
-                    marginRight: 5,
-                  }}
-                />
-                {selectedPriority?.label || "Priority"}
-              </div>
-              <Menu
-                anchorEl={priorityAnchor}
-                open={Boolean(priorityAnchor)}
-                MenuListProps={{ sx: { py: 0 } }}
-                onClose={() => setPriorityAnchor(null)}>
-                {priorities.map((p) => {
-                  const isSelected = form.priority === p.value;
-                  const iconColor = isSelected ? p.color : "#bdbdbd";
-                  const textColor = isSelected ? p.color : "#4f4f4f";
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DateCalendar
+                    disablePast
+                    value={form.dueDate ? dayjs(form.dueDate) : null}
+                    onChange={(date) => {
+                      if (date) {
+                        setForm((prev) => ({
+                          ...prev,
+                          dueDate: date.format("YYYY-MM-DD"),
+                        }));
+                        setDueAnchor(null);
+                      }
+                    }}
+                  />
+                </LocalizationProvider>
+              </Box>
+            </Popover>
 
-                  return (
-                    <MenuItem
-                      key={p.value}
-                      onClick={() => {
-                        setForm((prev) => ({ ...prev, priority: p.value }));
-                        setPriorityAnchor(null);
-                      }}>
-                      <span
-                        style={{
-                          fontSize: 13,
-                          color: textColor,
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 6,
-                        }}>
-                        <FlagIcon style={{ color: iconColor, fontSize: 16 }} />
-                        <p>Priority {p.label}</p>
-                      </span>
-                    </MenuItem>
-                  );
-                })}
-              </Menu>
+            {/* Priority */}
+            <div
+              onClick={(e) => setPriorityAnchor(e.currentTarget)}
+              style={buttonMenu}>
+              <FlagIcon
+                style={{
+                  color: selectedPriority.color,
+                  fontSize: 16,
+                  marginRight: 5,
+                }}
+              />
+              {selectedPriority?.label || "Priority"}
+            </div>
+            <Menu
+              anchorEl={priorityAnchor}
+              open={Boolean(priorityAnchor)}
+              MenuListProps={{ sx: { py: 0 } }}
+              onClose={() => setPriorityAnchor(null)}>
+              {priorities.map((p) => {
+                const isSelected = form.priority === p.value;
+                const iconColor = isSelected ? p.color : "#bdbdbd";
+                const textColor = isSelected ? p.color : "#4f4f4f";
 
-              {/* Category */}
-              <div
-                onClick={(e) => setCategoryAnchor(e.currentTarget)}
-                style={buttonMenu}>
-                {form.category || "Category 🏷️"}
-              </div>
-              <Menu
-                anchorEl={categoryAnchor}
-                MenuListProps={{ sx: { py: 0 } }}
-                open={Boolean(categoryAnchor)}
-                onClose={() => setCategoryAnchor(null)}>
-                <Divider />
-                {sections.map((section, index) => {
-                  const isSelected = form.category === section;
-                  const textColor = isSelected ? "#ff7800" : "#4f4f4f"; // Blue for selected, gray otherwise
-
-                  return (
-                    <MenuItem
-                      key={index}
-                      onClick={() => {
-                        setForm((prev) => ({ ...prev, category: section }));
-                        setCategoryAnchor(null);
-                      }}
-                      sx={{
-                        fontWeight: isSelected ? 600 : 400,
+                return (
+                  <MenuItem
+                    key={p.value}
+                    onClick={() => {
+                      setForm((prev) => ({ ...prev, priority: p.value }));
+                      setPriorityAnchor(null);
+                    }}>
+                    <span
+                      style={{
                         fontSize: 13,
                         color: textColor,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 6,
                       }}>
-                      {section}
-                    </MenuItem>
-                  );
-                })}
-              </Menu>
-            </Box>
+                      <FlagIcon style={{ color: iconColor, fontSize: 16 }} />
+                      <p>Priority {p.label}</p>
+                    </span>
+                  </MenuItem>
+                );
+              })}
+            </Menu>
 
-            {/* Action Buttons */}
-            <Divider style={{ margin: "15px 0px 15px 0px" }}></Divider>
-            <Box display="flex" justifyContent="flex-end">
-              <Button
-                size="small"
-                variant="contained"
-                disableElevation
-                style={{
-                  textTransform: "capitalize",
-                  marginRight: "6px",
-                }}
-                onClick={onClose}
-                sx={{
-                  color: "#000000",
-                  backgroundColor: "#f0f0f0",
-                }}>
-                Cancel
-              </Button>
-              <Button
-                size="small"
-                type="submit"
-                variant="contained"
-                sx={{
-                  backgroundColor: "#ff7800",
-                  textTransform: "capitalize",
-                  boxShadow: "none",
-                  fontWeight: "bold",
-                  "&:hover": { backgroundColor: "#e06f00" },
-                }}>
-                Save
-              </Button>
-            </Box>
+            {/* Category */}
+            <div
+              onClick={(e) => setCategoryAnchor(e.currentTarget)}
+              style={buttonMenu}>
+              {form.category || "Category 🏷️"}
+            </div>
+            <Menu
+              anchorEl={categoryAnchor}
+              MenuListProps={{ sx: { py: 0 } }}
+              open={Boolean(categoryAnchor)}
+              onClose={() => setCategoryAnchor(null)}>
+              <Divider />
+              {sections.map((section, index) => {
+                const isSelected = form.category === section;
+                const textColor = isSelected ? "#ff7800" : "#4f4f4f"; // Blue for selected, gray otherwise
+
+                return (
+                  <MenuItem
+                    key={index}
+                    onClick={() => {
+                      setForm((prev) => ({ ...prev, category: section }));
+                      setCategoryAnchor(null);
+                    }}
+                    sx={{
+                      fontWeight: isSelected ? 600 : 400,
+                      fontSize: 13,
+                      color: textColor,
+                    }}>
+                    {section}
+                  </MenuItem>
+                );
+              })}
+            </Menu>
           </Box>
-        </div>
-      </Box>
-    </Modal>
+
+          {/* Action Buttons */}
+          <Divider style={{ margin: "15px 0px 15px 0px" }}></Divider>
+          <Box display="flex" justifyContent="flex-end">
+            <Button
+              size="small"
+              variant="contained"
+              disableElevation
+              style={{
+                textTransform: "capitalize",
+                marginRight: "6px",
+              }}
+              onClick={() => {
+                onCancel(); // Opsional, jika ingin menangani penghapusan atau perubahan task sebelum keluar
+                onClose(); // Pastikan onClose dipanggil untuk keluar dari mode edit
+              }}
+              sx={{
+                color: "#000000",
+                backgroundColor: "#f0f0f0",
+              }}>
+              Cancel
+            </Button>
+            <Button
+              size="small"
+              type="submit"
+              variant="contained"
+              sx={{
+                backgroundColor: "#ff7800",
+                textTransform: "capitalize",
+                boxShadow: "none",
+                fontWeight: "bold",
+                "&:hover": { backgroundColor: "#e06f00" },
+              }}>
+              Save
+            </Button>
+          </Box>
+        </Box>
+      </div>
+    </Box>
   );
 };
 
 const modalStyle = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  maxWidth: 450,
   width: "100%",
   bgcolor: "background.paper",
   borderRadius: "8px",

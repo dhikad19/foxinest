@@ -17,6 +17,7 @@ const Section = () => {
   const [snackbarVisible, setSnackbarVisible] = useState(false); // Control Snackbar visibility
   const [taskToUndo, setTaskToUndo] = useState(null); // Store task to undo
   const [prevTasksState, setPrevTasksState] = useState([]); // Store previous tasks state for undo
+  const [tasksByCategory, setTasksByCategory] = useState({});
 
   // Load tasks and sections on first render
   useEffect(() => {
@@ -105,6 +106,14 @@ const Section = () => {
     });
   };
 
+  const handleEditTask = (updatedTask) => {
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === updatedTask.id ? { ...task, ...updatedTask } : task
+      )
+    );
+  };
+
   // Delete completed task
   const handleDeleteCompletedTask = (id) => {
     setTasks((prevTasks) => {
@@ -170,8 +179,7 @@ const Section = () => {
         margin: "0 auto",
         overflow: "visible",
         position: "relative",
-      }}
-    >
+      }}>
       <div style={{ paddingLeft: "3px", paddingRight: "3px" }}>
         <h2 style={{ marginBottom: "0px", marginTop: "10px" }}>Home</h2>
         <SearchBar query={searchQuery} setQuery={setSearchQuery} />
@@ -189,12 +197,10 @@ const Section = () => {
             padding: 4,
             marginTop: 16,
           }}
-          onClick={() => setShowForm(true)}
-        >
+          onClick={() => setShowForm(true)}>
           <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
           <span
-            style={{ fontWeight: "bold", color: "#ff7800", fontSize: "15px" }}
-          >
+            style={{ fontWeight: "bold", color: "#ff7800", fontSize: "15px" }}>
             Add Section
           </span>
           <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
@@ -202,8 +208,7 @@ const Section = () => {
       ) : (
         <form
           onSubmit={handleSubmit}
-          style={{ gap: 8, marginTop: 10, marginBottom: 30, padding: 3 }}
-        >
+          style={{ gap: 8, marginTop: 10, marginBottom: 30, padding: 3 }}>
           {/* <div
             style={{
               borderBottom: "1px solid #ff7800",
@@ -230,12 +235,14 @@ const Section = () => {
               userSelect: "none",
               marginBottom: 16,
               marginTop: 7,
-            }}
-          >
+            }}>
             <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
             <span
-              style={{ fontWeight: "bold", color: "#ff7800", fontSize: "15px" }}
-            >
+              style={{
+                fontWeight: "bold",
+                color: "#ff7800",
+                fontSize: "15px",
+              }}>
               Add new section
             </span>
             <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
@@ -280,8 +287,7 @@ const Section = () => {
                 fontSize: "12px",
                 marginRight: "6px",
               }}
-              disabled={!inputValue.trim()}
-            >
+              disabled={!inputValue.trim()}>
               Add Section
             </Button>
             <Button
@@ -299,8 +305,7 @@ const Section = () => {
               onClick={() => {
                 setShowForm(false);
                 setInputValue("");
-              }}
-            >
+              }}>
               Cancel
             </Button>
           </div>
@@ -316,7 +321,7 @@ const Section = () => {
           return acc;
         }, {})}
         onDelete={handleDeleteTask}
-        onEdit={(task) => setEditTask(task)}
+        onEdit={handleEditTask} // ⬅️ ganti ini
         onEditSection={handleEditSection}
         onAdd={handleAddTask}
         onDeleteSection={handleDeleteSection}

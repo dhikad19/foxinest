@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import {
   DndContext,
   closestCenter,
+  DragOverlay,
   PointerSensor,
   useSensor,
   useSensors,
@@ -17,15 +18,22 @@ import AddIcon from "@mui/icons-material/Add";
 import AddIconFilled from "@mui/icons-material/AddCircle";
 import TaskItem from "../Item";
 import TaskForm from "../Form";
+import EditTask from "../../Modal/Edit";
+// import EditModal from "../../components/Modal/Edit";
+// Tiptap
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 
+// Icons
 import { FaChevronDown, FaChevronRight } from "react-icons/fa";
+
+// Date Picker
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import dayjs from "dayjs";
 
+// 📝 Section name inline editor
 const LiveSectionEditor = ({ initialContent, onChange }) => {
   const [currentText, setCurrentText] = useState(initialContent);
 
@@ -80,16 +88,52 @@ const TaskList = ({
 }) => {
   const [openForms, setOpenForms] = useState({});
   const [expandedSections, setExpandedSections] = useState({});
+  const [activeTask, setActiveTask] = useState(null);
   const [showOverdue, setShowOverdue] = useState(true);
   const sensors = useSensors(useSensor(PointerSensor));
   const [hoveredCategory, setHoveredCategory] = useState(null);
-
+  const [editingTaskId, setEditingTaskId] = useState(null);
+  const [activeId, setActiveId] = useState(null);
+  const [draggedItem, setDraggedItem] = useState(null);
+  // 📅 Date picker state
   const [selectedDate, setSelectedDate] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const today = dayjs();
   const tomorrow = dayjs().add(1, "day");
+  const [isDragging, setIsDragging] = useState(false);
 
+  // const startEditing = (taskId) => {
+  //   setEditingTaskId(taskId);
+  // };
+
+  // const stopEditing = () => {
+  //   setEditingTaskId(null);
+  // };
+
+  // const handleSave = (updatedTask) => {
+  //   onEdit(updatedTask); // Simpan perubahan ke task
+  //   setEditingTaskId(null); // Keluar dari mode edit
+  // };
+
+  // const handleCancel = () => {
+  //   setEditingTaskId(null); // Batalkan mode edit
+  // };
+
+  // const handleDragStart = (event) => {
+  //   const { active } = event;
+  //   setActiveId(active.id);
+  //   setDraggedItem(active.data.current); // Ambil data item yang sedang di-drag
+  // };
+
+  // const handleDragEnd = (event) => {
+  //   const { active, over } = event;
+  //   if (over && active.id !== over.id) {
+  //     const updatedTasks = arrayMove(tasksByCategory, active.index, over.index);
+  //     onReorderTasks(updatedTasks);
+  //   }
+  //   setActiveId(null);
+  // };
   const handleOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -110,6 +154,19 @@ const TaskList = ({
       ...prev,
       [category]: !prev[category],
     }));
+  };
+
+  const onClose = () => {
+    setEditingTaskId(null); // Tutup mode edit
+  };
+
+  const handleDragStart = (event) => {
+    const { active } = event;
+    const allTasks = Object.values(tasksByCategory).flat();
+    const task = allTasks.find((t) => t.id === active.id);
+    if (task) {
+      setActiveTask(task);
+    }
   };
 
   const handleDragEnd = (event) => {
@@ -147,6 +204,7 @@ const TaskList = ({
     }
   }, [tasksByCategory]);
 
+  // 🔍 Overdue tasks filter
   const overdueTasks = [];
   const todayStr = today.format("YYYY-MM-DD");
 
@@ -163,21 +221,41 @@ const TaskList = ({
     })
   );
 
+  const handleEdit = (updatedTask) => {
+    // Update tasksByCategory dengan task yang telah diubah
+    const updatedTasksByCategory = { ...tasksByCategory };
+    const category = updatedTask.category;
+    const taskIndex = updatedTasksByCategory[category].findIndex(
+      (task) => task.id === updatedTask.id
+    );
+    if (taskIndex !== -1) {
+      updatedTasksByCategory[category][taskIndex] = updatedTask;
+    }
+    onReorderTasks(updatedTasksByCategory);
+  };
+
   const handleDateChange = (newDate) => {
     if (!newDate) return;
     const formattedDate = newDate.format("YYYY-MM-DD");
     setSelectedDate(newDate);
     handleClose();
 
+    // Update all overdue tasks with new date
     const updatedTasks = overdueTasks.map((task) => ({
       ...task,
       dueDate: formattedDate,
     }));
 
+    const onClose = () => {
+      setEditingTaskId(null); // Tutup mode edit
+    };
+
+    // Keep non-overdue tasks
     const remainingTasks = Object.values(tasksByCategory)
       .flat()
       .filter((task) => !(task.dueDate && task.dueDate < todayStr));
 
+    // Call external updater
     onReorderTasks([...remainingTasks, ...updatedTasks]);
   };
 
@@ -186,9 +264,31 @@ const TaskList = ({
       modifiers={[restrictToVerticalAxis]}
       sensors={sensors}
       collisionDetection={closestCenter}
-      onDragEnd={handleDragEnd}
+      onDragStart={handleDragStart} // Menangani drag start
+      onDragEnd={handleDragEnd} // Menangani drag end
     >
       <div>
+        <DragOverlay>
+          {draggedItem ? (
+            <div
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#fff",
+                borderRadius: "12px",
+                boxShadow: "0px 10px 20px rgba(0, 0, 0, 0.1)",
+                opacity: isDragging ? 0.7 : 0.9, // Adjust opacity dynamically
+                cursor: "move",
+                fontSize: "16px",
+                fontWeight: "500",
+                color: "#333",
+                // Disable transition during dragging for smooth behavior
+                transition: isDragging ? "none" : "all 0.3s ease",
+              }}>
+              {draggedItem.name}
+            </div>
+          ) : null}
+        </DragOverlay>
+
         {overdueTasks.length > 0 && (
           <div style={{ marginBottom: "1rem", borderRadius: 8, padding: 4 }}>
             <div
@@ -197,8 +297,7 @@ const TaskList = ({
                 justifyContent: "space-between",
                 alignItems: "center",
                 marginBottom: 10,
-              }}
-            >
+              }}>
               <div style={{ display: "flex", alignItems: "center" }}>
                 <div
                   onClick={() => setShowOverdue((prev) => !prev)}
@@ -213,8 +312,7 @@ const TaskList = ({
                     width: 22,
                     marginLeft: "-30px",
                     backgroundColor: "#fafafa",
-                  }}
-                >
+                  }}>
                   {showOverdue ? (
                     <FaChevronDown size={10} color="grey" />
                   ) : (
@@ -224,6 +322,7 @@ const TaskList = ({
                 <strong style={{ fontSize: 15 }}>Overdue</strong>
               </div>
 
+              {/* 📅 Date Picker Button */}
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <div
                   onClick={handleOpen}
@@ -234,8 +333,7 @@ const TaskList = ({
                     borderRadius: 4,
                     backgroundColor: "#f5f5f5",
                     fontSize: 13,
-                  }}
-                >
+                  }}>
                   {selectedDate
                     ? selectedDate.format("MMM D, YYYY")
                     : "Select Date 📅"}
@@ -248,22 +346,19 @@ const TaskList = ({
                   anchorOrigin={{
                     vertical: "bottom",
                     horizontal: "left",
-                  }}
-                >
+                  }}>
                   <Box p={1}>
                     <Stack direction="row" spacing={1} padding={2}>
                       <Button
                         size="small"
                         variant="outlined"
-                        onClick={() => handleDateChange(today)}
-                      >
+                        onClick={() => handleDateChange(today)}>
                         Today
                       </Button>
                       <Button
                         size="small"
                         variant="outlined"
-                        onClick={() => handleDateChange(tomorrow)}
-                      >
+                        onClick={() => handleDateChange(tomorrow)}>
                         Tomorrow
                       </Button>
                     </Stack>
@@ -279,33 +374,45 @@ const TaskList = ({
             <Divider />
             {showOverdue && (
               <div style={{ padding: 4 }}>
-                {overdueTasks.map((task) => (
-                  <TaskItem
-                    key={task.id}
-                    task={task}
-                    onDelete={onDelete}
-                    onEdit={onEdit}
-                    onComplete={onComplete}
-                  />
-                ))}
+                {overdueTasks.map((task) =>
+                  editingTaskId === task.id ? (
+                    <EditTask
+                      key={task.id}
+                      task={task}
+                      onSave={(updatedTask) => {
+                        onEdit(updatedTask);
+                        setEditingTaskId(null);
+                      }}
+                      onCancel={() => onClose()} // Panggil onClose saat Cancel
+                      onClose={onClose} // Pass fungsi onClose ke EditTask
+                    />
+                  ) : (
+                    <TaskItem
+                      key={task.id}
+                      task={task}
+                      onDelete={onDelete} // Fungsi untuk menghapus task
+                      onEdit={() => setEditingTaskId(task.id)} // Masuk ke mode edit ketika tombol edit diklik
+                      onComplete={onComplete} // Fungsi untuk menyelesaikan task
+                    />
+                  )
+                )}
               </div>
             )}
           </div>
         )}
 
+        {/* ✅ Regular Sections */}
         {Object.entries(filteredTasksByCategory).map(([category, tasks]) => (
           <div
             key={category}
-            style={{ marginBottom: "1rem", borderRadius: 8, padding: 4 }}
-          >
+            style={{ marginBottom: "1rem", borderRadius: 8, padding: 4 }}>
             <div
               style={{
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
                 marginBottom: 10,
-              }}
-            >
+              }}>
               <div style={{ display: "flex", alignItems: "center" }}>
                 <div
                   onClick={() => toggleExpand(category)}
@@ -320,8 +427,7 @@ const TaskList = ({
                     width: 22,
                     marginLeft: "-30px",
                     backgroundColor: "#fafafa",
-                  }}
-                >
+                  }}>
                   {expandedSections[category] ? (
                     <FaChevronDown size={10} color="grey" />
                   ) : (
@@ -345,8 +451,7 @@ const TaskList = ({
                   },
                   textTransform: "capitalize",
                 }}
-                size="small"
-              >
+                size="small">
                 Delete
               </Button>
             </div>
@@ -357,21 +462,32 @@ const TaskList = ({
                 paddingLeft: 4,
                 paddingRight: 4,
                 maxHeight: expandedSections[category] ? "100%" : "0",
-              }}
-            >
+              }}>
               <SortableContext
                 items={tasks.map((t) => t.id)}
-                strategy={verticalListSortingStrategy}
-              >
-                {tasks.map((task) => (
-                  <TaskItem
-                    key={task.id}
-                    task={task}
-                    onDelete={onDelete}
-                    onEdit={onEdit}
-                    onComplete={onComplete}
-                  />
-                ))}
+                strategy={verticalListSortingStrategy}>
+                {tasks.map((task) =>
+                  editingTaskId === task.id ? (
+                    <EditTask
+                      key={task.id}
+                      task={task}
+                      onSave={(updatedTask) => {
+                        onEdit(updatedTask);
+                        setEditingTaskId(null);
+                      }}
+                      onCancel={() => onClose()} // Panggil onClose saat Cancel
+                      onClose={onClose} // Pass fungsi onClose ke EditTask
+                    />
+                  ) : (
+                    <TaskItem
+                      key={task.id}
+                      task={task}
+                      onDelete={onDelete}
+                      onEdit={() => setEditingTaskId(task.id)}
+                      onComplete={onComplete}
+                    />
+                  )
+                )}
               </SortableContext>
 
               {!openForms[category] && (
@@ -385,8 +501,7 @@ const TaskList = ({
                     color: hoveredCategory === category ? "#ff7800" : "inherit",
                     cursor: "pointer",
                     marginTop: 10,
-                  }}
-                >
+                  }}>
                   {hoveredCategory === category ? (
                     <AddIconFilled
                       style={{ marginRight: "8px", fontSize: 20 }}
