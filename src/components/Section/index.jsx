@@ -14,41 +14,34 @@ const Section = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [editingSection, setEditingSection] = useState(null);
   const [newSectionName, setNewSectionName] = useState("");
-  const [snackbarVisible, setSnackbarVisible] = useState(false); // Control Snackbar visibility
-  const [taskToUndo, setTaskToUndo] = useState(null); // Store task to undo
-  const [prevTasksState, setPrevTasksState] = useState([]); // Store previous tasks state for undo
-  const [tasksByCategory, setTasksByCategory] = useState({});
+  const [snackbarVisible, setSnackbarVisible] = useState(false);
+  const [taskToUndo, setTaskToUndo] = useState(null);
+  const [prevTasksState, setPrevTasksState] = useState([]);
 
-  // Load tasks and sections on first render
   useEffect(() => {
-    const { tasks, sections } = loadFromStorage(); // Load data from localStorage
+    const { tasks, sections } = loadFromStorage();
     setTasks(tasks);
     setSections(sections);
   }, []);
 
-  // Save tasks and sections to storage whenever they change
   useEffect(() => {
     if (tasks.length || sections.length) {
-      saveToStorage(tasks, sections); // Save the tasks and sections
+      saveToStorage(tasks, sections);
     }
   }, [tasks, sections]);
 
-  // Add task
   const handleAddTask = (newTask) => {
     setTasks((prev) => [...prev, newTask]);
   };
 
-  // Add section
   const handleAddSection = (name) => {
     setSections((prev) => [...prev, name]);
   };
 
-  // Delete task
   const handleDeleteTask = (id) => {
     setTasks((prev) => prev.filter((task) => task.id !== id));
   };
 
-  // Save edited task
   const handleSaveEdit = (updated) => {
     setTasks((prev) =>
       prev.map((task) => (task.id === updated.id ? updated : task))
@@ -56,13 +49,11 @@ const Section = () => {
     setEditTask(null);
   };
 
-  // Delete section and its tasks
   const handleDeleteSection = (name) => {
     setSections((prev) => prev.filter((sec) => sec !== name));
     setTasks((prev) => prev.filter((task) => task.category !== name));
   };
 
-  // Edit section name
   const handleEditSection = (oldName, newName) => {
     setSections((prev) => prev.map((sec) => (sec === oldName ? newName : sec)));
     setTasks((prev) =>
@@ -74,19 +65,28 @@ const Section = () => {
     setNewSectionName("");
   };
 
-  // Toggle task completion
+  const filteredSections = sections.filter((section) =>
+    section.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Kemudian, buat tasksByCategory hanya dari filteredSections:
+  const filteredTasksByCategory = filteredSections.reduce((acc, section) => {
+    acc[section] = tasks.filter(
+      (task) => task.category === section && !task.completed
+    );
+    return acc;
+  }, {});
+
   const handleCompleteTask = (taskId) => {
     setTasks((prev) => {
       const updatedTasks = prev.map((task) => {
         if (task.id === taskId) {
           const updatedTask = { ...task, completed: !task.completed };
 
-          // If task is being completed, save the current state before change
           if (!task.completed) {
-            // Save current tasks state for undo
             setPrevTasksState(prev);
             setSnackbarVisible(true);
-            setTaskToUndo(updatedTask); // Set the task to undo
+            setTaskToUndo(updatedTask);
           }
 
           return updatedTask;
@@ -94,15 +94,6 @@ const Section = () => {
         return task;
       });
       return updatedTasks;
-    });
-  };
-
-  // Clear completed tasks (history)
-  const handleClearHistory = () => {
-    setTasks((prev) => {
-      const remainingTasks = prev.filter((task) => !task.completed);
-      saveToStorage(remainingTasks, sections);
-      return remainingTasks;
     });
   };
 
@@ -114,45 +105,27 @@ const Section = () => {
     );
   };
 
-  // Delete completed task
-  const handleDeleteCompletedTask = (id) => {
-    setTasks((prevTasks) => {
-      const updatedTasks = prevTasks.filter((task) => task.id !== id);
-      saveToStorage(updatedTasks, sections);
-      return updatedTasks;
-    });
-  };
-
-  // Filter tasks based on search query
   const filteredTasks = tasks.filter((task) =>
     task.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Separate completed and non-completed tasks
   const incompleteTasks = filteredTasks.filter((task) => !task.completed);
-  const completedTasks = filteredTasks.filter((task) => task.completed);
-
-  // Reorder tasks
   const handleReorderTasks = (newList) => {
     setTasks(newList);
     saveToStorage(newList, sections);
   };
 
-  // Undo task completion
   const handleUndoComplete = () => {
     if (taskToUndo && prevTasksState.length > 0) {
       const updatedTasks = prevTasksState.map((task) => {
         if (task.id === taskToUndo.id) {
-          return { ...task, completed: false }; // Undo the completion by marking it as incomplete
+          return { ...task, completed: false };
         }
         return task;
       });
 
-      // Update tasks state and localStorage
       setTasks(updatedTasks);
       saveToStorage(updatedTasks, sections);
-
-      // Hide the snackbar after undoing
       setSnackbarVisible(false);
       setTaskToUndo(null);
     }
@@ -179,7 +152,8 @@ const Section = () => {
         margin: "0 auto",
         overflow: "visible",
         position: "relative",
-      }}>
+      }}
+    >
       <div style={{ paddingLeft: "3px", paddingRight: "3px" }}>
         <h2 style={{ marginBottom: "0px", marginTop: "10px" }}>Home</h2>
         <SearchBar query={searchQuery} setQuery={setSearchQuery} />
@@ -197,10 +171,12 @@ const Section = () => {
             padding: 4,
             marginTop: 16,
           }}
-          onClick={() => setShowForm(true)}>
+          onClick={() => setShowForm(true)}
+        >
           <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
           <span
-            style={{ fontWeight: "bold", color: "#ff7800", fontSize: "15px" }}>
+            style={{ fontWeight: "bold", color: "#ff7800", fontSize: "15px" }}
+          >
             Add Section
           </span>
           <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
@@ -208,25 +184,8 @@ const Section = () => {
       ) : (
         <form
           onSubmit={handleSubmit}
-          style={{ gap: 8, marginTop: 10, marginBottom: 30, padding: 3 }}>
-          {/* <div
-            style={{
-              borderBottom: "1px solid #ff7800",
-              width: "100%",
-              marginBottom: 30,
-            }}
-          ></div> */}
-          {/* <p
-            style={{
-              fontWeight: 500,
-              marginBottom: "10px",
-              color: "#ff7800",
-              fontSize: 15,
-              textAlign: "center",
-            }}
-          >
-            Add new section
-          </p> */}
+          style={{ gap: 8, marginTop: 10, marginBottom: 30, padding: 3 }}
+        >
           <div
             style={{
               display: "flex",
@@ -235,14 +194,16 @@ const Section = () => {
               userSelect: "none",
               marginBottom: 16,
               marginTop: 7,
-            }}>
+            }}
+          >
             <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
             <span
               style={{
                 fontWeight: "bold",
                 color: "#ff7800",
                 fontSize: "15px",
-              }}>
+              }}
+            >
               Add new section
             </span>
             <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
@@ -260,13 +221,13 @@ const Section = () => {
               mb: 2,
               "& .MuiOutlinedInput-root": {
                 "& fieldset": {
-                  borderColor: "#ccc", // Default border color
+                  borderColor: "#ccc",
                 },
                 "&:hover fieldset": {
-                  borderColor: "#ff7800", // Hover border color
+                  borderColor: "#ff7800",
                 },
                 "&.Mui-focused fieldset": {
-                  borderColor: "#ff7800", // Focus border color
+                  borderColor: "#ff7800",
                 },
               },
             }}
@@ -287,7 +248,8 @@ const Section = () => {
                 fontSize: "12px",
                 marginRight: "6px",
               }}
-              disabled={!inputValue.trim()}>
+              disabled={!inputValue.trim()}
+            >
               Add Section
             </Button>
             <Button
@@ -305,23 +267,18 @@ const Section = () => {
               onClick={() => {
                 setShowForm(false);
                 setInputValue("");
-              }}>
+              }}
+            >
               Cancel
             </Button>
           </div>
         </form>
       )}
 
-      {/* Non-Completed Tasks */}
       <TaskList
-        tasksByCategory={sections.reduce((acc, section) => {
-          acc[section] = incompleteTasks.filter(
-            (task) => task.category === section
-          );
-          return acc;
-        }, {})}
+        tasksByCategory={filteredTasksByCategory}
         onDelete={handleDeleteTask}
-        onEdit={handleEditTask} // ⬅️ ganti ini
+        onEdit={handleEditTask}
         onEditSection={handleEditSection}
         onAdd={handleAddTask}
         onDeleteSection={handleDeleteSection}
@@ -332,14 +289,6 @@ const Section = () => {
         newSectionName={newSectionName}
         setNewSectionName={setNewSectionName}
       />
-
-      {/* Completed Tasks (History) */}
-      {/* <CompletedTaskList
-        completedTasks={completedTasks}
-        onClearHistory={handleClearHistory}
-        onDeleteCompletedTask={handleDeleteCompletedTask}
-      /> */}
-
       {editTask && (
         <EditModal
           task={editTask}
@@ -347,8 +296,6 @@ const Section = () => {
           onClose={() => setEditTask(null)}
         />
       )}
-
-      {/* Snackbar for undo task completion */}
       {snackbarVisible && <Snackbar onUndo={handleUndoComplete} />}
     </div>
   );

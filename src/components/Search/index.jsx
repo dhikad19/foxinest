@@ -5,7 +5,7 @@ const SearchBar = ({ query, setQuery }) => (
   <TextField
     fullWidth
     variant="outlined"
-    placeholder="Search title or category"
+    placeholder="Search sections"
     value={query}
     onChange={(e) => setQuery(e.target.value)}
     margin="dense"

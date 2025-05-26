@@ -1,6 +1,7 @@
 import { useParams, useNavigate, useLocation, replace } from "react-router-dom";
 import { useEffect, useState, useMemo, useRef } from "react";
-
+import AddIcon from "@mui/icons-material/Add";
+import AddIconFilled from "@mui/icons-material/AddCircle";
 import {
   Box,
   Typography,
@@ -16,6 +17,8 @@ import CustomSnackbar from "../../Snackbar";
 import EditModal from "../../Modal/Edit";
 import DeleteProjectDialog from "../../Modal/Project/Delete";
 import EditProjectDialog from "../../Modal/Project/Edit";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa";
@@ -56,9 +59,12 @@ const ProjectDetail = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const isFirstRender = useRef(true);
   const [project, setProject] = useState(null);
+  const [showForm, setShowForm] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState(null);
   const fromEdit = location.state?.fromEdit;
+  const [searchQuery, setSearchQuery] = useState(""); // Add state for search query
   const [loading, setLoading] = useState(true);
+  const [hoveredSection, setHoveredSection] = useState(null);
   const [editProjectData, setEditProjectData] = useState({
     name: "",
     color: "default",
@@ -236,7 +242,10 @@ const ProjectDetail = () => {
     setAnchorEl(null);
   };
 
-  const handleAddSection = () => {
+  const handleAddSection = (event) => {
+    // Prevent the default form submission (page refresh)
+    event.preventDefault();
+
     const trimmed = newSection.trim();
     if (trimmed && !projectData.sections.includes(trimmed)) {
       const updatedData = {
@@ -251,7 +260,8 @@ const ProjectDetail = () => {
       storedData[normalizedId] = updatedData;
       localStorage.setItem("projects_data", JSON.stringify(storedData));
 
-      setNewSection("");
+      setNewSection(""); // Clear the input after adding the section
+      setShowForm(false); // Close the form after adding the section
     }
   };
 
@@ -378,6 +388,31 @@ const ProjectDetail = () => {
     }));
   };
 
+  const handleDeleteSection = (sectionName) => {
+    const updatedSections = projectData.sections.filter(
+      (sec) => sec !== sectionName
+    );
+    const updatedTasks = projectData.tasks.filter(
+      (task) => task.category !== sectionName
+    );
+
+    setProjectData((prev) => ({
+      ...prev,
+      sections: updatedSections,
+      tasks: updatedTasks,
+    }));
+
+    // Update localStorage
+    const normalizedId = normalize(projectId);
+    const storedData = JSON.parse(localStorage.getItem("projects_data")) || {};
+    storedData[normalizedId] = {
+      ...storedData[normalizedId],
+      sections: updatedSections,
+      tasks: updatedTasks,
+    };
+    localStorage.setItem("projects_data", JSON.stringify(storedData));
+  };
+
   const LiveSectionEditor = ({ initialContent, onChange }) => {
     const [currentText, setCurrentText] = useState(initialContent);
 
@@ -415,6 +450,20 @@ const ProjectDetail = () => {
     if (!editor) return null;
     return <EditorContent editor={editor} />;
   };
+
+  function capitalizeEachWord(str) {
+    return str.replace(/\b\w/g, (char) => char.toUpperCase());
+  }
+
+  const filteredSections = useMemo(() => {
+    return projectData.sections.filter((section) =>
+      section.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [projectData.sections, searchQuery]);
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
   if (loading) return null;
   return (
     <div
@@ -425,23 +474,185 @@ const ProjectDetail = () => {
         margin: "0 auto",
         overflow: "visible",
         position: "relative",
-      }}>
-      <Typography variant="h4" mb={2}>
-        Project: {projectId}
-      </Typography>
+      }}
+    >
+      <div style={{ paddingLeft: "3px", paddingRight: "3px" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <h2 style={{ marginBottom: "0px", marginTop: "10px" }}>
+            {capitalizeEachWord(projectId.replaceAll("-", " "))}
+          </h2>
 
-      <Box display="flex" mb={3}>
+          <div style={{ display: "flex" }}>
+            <div
+              style={{
+                padding: 5,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "#ff7800",
+                marginRight: 6,
+                color: "white",
+                borderRadius: 4,
+              }}
+              onClick={() => setEditDialogOpen(true)}
+            >
+              <EditOutlinedIcon style={{ fontSize: 18 }} />
+            </div>
+            <div
+              style={{
+                padding: 4,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "#ec2b38",
+                color: "white",
+                borderRadius: 4,
+              }}
+              onClick={() => setDeleteDialogOpen(true)}
+            >
+              <DeleteOutlinedIcon style={{ fontSize: 18 }} />
+            </div>
+          </div>
+        </div>
         <TextField
-          label="Add Section"
-          value={newSection}
-          onChange={(e) => setNewSection(e.target.value)}
+          fullWidth
+          style={{ marginTop: 8, marginBottom: 14 }}
           size="small"
-          sx={{ mr: 2 }}
+          placeholder="Search sections"
+          value={searchQuery}
+          onChange={handleSearchChange}
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": {
+                borderColor: "#ccc",
+              },
+              "&:hover fieldset": {
+                borderColor: "#ff7800",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "#ff7800",
+              },
+            },
+          }}
         />
-        <Button variant="contained" onClick={handleAddSection}>
-          Add Section
-        </Button>
-      </Box>
+      </div>
+
+      {!showForm ? (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            cursor: "pointer",
+            userSelect: "none",
+            marginBottom: 16,
+            padding: 4,
+            marginTop: 18,
+          }}
+          onClick={() => setShowForm(true)}
+        >
+          <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
+          <span
+            style={{ fontWeight: "bold", color: "#ff7800", fontSize: "15px" }}
+          >
+            Add Section
+          </span>
+          <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
+        </div>
+      ) : (
+        <form
+          onSubmit={handleAddSection}
+          style={{ gap: 8, marginTop: 10, marginBottom: 30, padding: 3 }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              userSelect: "none",
+              marginBottom: 16,
+              marginTop: 7,
+            }}
+          >
+            <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
+            <span
+              style={{ fontWeight: "bold", color: "#ff7800", fontSize: "15px" }}
+            >
+              Add new section
+            </span>
+            <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
+          </div>
+          <TextField
+            fullWidth
+            id="section"
+            name="section"
+            size="small"
+            placeholder="New section name"
+            value={newSection}
+            onChange={(e) => setNewSection(e.target.value)}
+            sx={{
+              mb: 2,
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: "#ccc",
+                },
+                "&:hover fieldset": {
+                  borderColor: "#ff7800",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#ff7800",
+                },
+              },
+            }}
+          />
+          <div>
+            <Button
+              type="submit"
+              variant="contained"
+              sx={{
+                backgroundColor: "#ff7800",
+                "&:hover": { backgroundColor: "#ff871f" },
+              }}
+              disableElevation
+              size="small"
+              style={{
+                textTransform: "capitalize",
+                fontWeight: "bold",
+                fontSize: "12px",
+                marginRight: "6px",
+              }}
+              disabled={!newSection.trim()}
+            >
+              Add Section
+            </Button>
+            <Button
+              variant="text"
+              size="small"
+              sx={{
+                color: "#000000",
+                "&:hover": { backgroundColor: "#f0f0f0" },
+              }}
+              style={{
+                textTransform: "capitalize",
+                fontWeight: "bold",
+                fontSize: "12px",
+              }}
+              onClick={() => {
+                setShowForm(false);
+                setNewSection("");
+              }}
+            >
+              Cancel
+            </Button>
+          </div>
+        </form>
+      )}
 
       {overdueTasks.length > 0 && (
         <div style={{ marginBottom: "1rem", borderRadius: 8, padding: 4 }}>
@@ -451,7 +662,8 @@ const ProjectDetail = () => {
               justifyContent: "space-between",
               alignItems: "center",
               marginBottom: 10,
-            }}>
+            }}
+          >
             <div style={{ display: "flex", alignItems: "center" }}>
               <div
                 onClick={() => setShowOverdue((prev) => !prev)}
@@ -466,7 +678,8 @@ const ProjectDetail = () => {
                   width: 22,
                   marginLeft: "-30px",
                   backgroundColor: "#fafafa",
-                }}>
+                }}
+              >
                 {showOverdue ? (
                   <FaChevronDown size={10} color="grey" />
                 ) : (
@@ -486,7 +699,8 @@ const ProjectDetail = () => {
                   borderRadius: 4,
                   backgroundColor: "#f5f5f5",
                   fontSize: 13,
-                }}>
+                }}
+              >
                 {selectedDate
                   ? selectedDate.format("MMM D, YYYY")
                   : "Select Date 📅"}
@@ -495,19 +709,22 @@ const ProjectDetail = () => {
                 open={Boolean(anchorEl)}
                 anchorEl={anchorEl}
                 onClose={() => setAnchorEl(null)}
-                anchorOrigin={{ vertical: "bottom", horizontal: "left" }}>
+                anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+              >
                 <Box p={1}>
                   <Stack direction="row" spacing={1} padding={2}>
                     <Button
                       size="small"
                       variant="outlined"
-                      onClick={() => handleDateChange(dayjs())}>
+                      onClick={() => handleDateChange(dayjs())}
+                    >
                       Today
                     </Button>
                     <Button
                       size="small"
                       variant="outlined"
-                      onClick={() => handleDateChange(dayjs().add(1, "day"))}>
+                      onClick={() => handleDateChange(dayjs().add(1, "day"))}
+                    >
                       Tomorrow
                     </Button>
                   </Stack>
@@ -557,111 +774,136 @@ const ProjectDetail = () => {
         </div>
       )}
 
-      {projectData.sections.map((section) => (
-        <div
-          key={section}
-          style={{ marginBottom: "1rem", borderRadius: 8, padding: 4 }}>
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <div
-              onClick={() => toggleExpand(section)}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                marginRight: 8,
-                borderRadius: 4,
-                height: 22,
-                width: 22,
-                marginLeft: "-30px",
-                backgroundColor: "#fafafa",
-              }}>
-              {expandedSections[section] !== false ? (
-                <FaChevronDown size={10} color="grey" />
-              ) : (
-                <FaChevronRight size={10} color="grey" />
-              )}
-            </div>
-            <LiveSectionEditor
-              initialContent={section}
-              onChange={(newName) => handleEditSection(section, newName)}
-            />
-          </div>
-
-          <DndContext
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-            sensors={sensors}>
-            {expandedSections[section] !== false && (
-              <>
-                <SortableContext
-                  items={tasksByCategory[section]?.map((t) => t.id)}
-                  strategy={verticalListSortingStrategy}>
-                  {tasksByCategory[section]?.map((task) =>
-                    editingTaskId === task.id ? (
-                      <EditModal
-                        key={task.id}
-                        task={task}
-                        onSave={(updatedTask) => {
-                          setProjectData((prev) => ({
-                            ...prev,
-                            tasks: prev.tasks.map((t) =>
-                              t.id === updatedTask.id ? updatedTask : t
-                            ),
-                          }));
-                          setEditingTaskId(null);
-                        }}
-                        onCancel={() => onClose()}
-                        onClose={() => setEditingTaskId(null)}
-                      />
-                    ) : (
-                      <TaskItem
-                        key={task.id}
-                        task={task}
-                        onDelete={handleDeleteTask}
-                        onComplete={handleCompleteTask}
-                        onEdit={() => setEditingTaskId(task.id)}
-                      />
-                    )
-                  )}
-                </SortableContext>
-
-                {openFormSection === section ? (
-                  <TaskForm
-                    defaultCategory={section}
-                    onAdd={(task) => {
-                      handleAddTask(task);
-                      setOpenFormSection(null);
-                    }}
-                    onCancel={() => setOpenFormSection(null)}
-                  />
+      {filteredSections.length > 0 ? (
+        filteredSections.map((section) => (
+          <div
+            key={section}
+            style={{ marginBottom: "1rem", borderRadius: 8, padding: 4 }}
+          >
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <div
+                onClick={() => toggleExpand(section)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  marginRight: 8,
+                  borderRadius: 4,
+                  height: 22,
+                  width: 22,
+                  marginLeft: "-30px",
+                  backgroundColor: "#fafafa",
+                }}
+              >
+                {expandedSections[section] !== false ? (
+                  <FaChevronDown size={10} color="grey" />
                 ) : (
-                  <Button
-                    onClick={() => setOpenFormSection(section)}
-                    sx={{ mt: 2, fontSize: "12px" }}
-                    size="small"
-                    variant="outlined">
-                    + Add Task
-                  </Button>
+                  <FaChevronRight size={10} color="grey" />
                 )}
-              </>
-            )}
-          </DndContext>
-        </div>
-      ))}
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  width: "100%",
+                  justifyContent: "space-between",
+                }}
+              >
+                <LiveSectionEditor
+                  initialContent={section}
+                  onChange={(newName) => handleEditSection(section, newName)}
+                />
 
-      <Box mt={3}>
-        <Button
-          variant="outlined"
-          color="error"
-          onClick={() => setDeleteDialogOpen(true)}
-          sx={{ mr: 2 }}>
-          Delete Project
-        </Button>
-        <Button variant="contained" onClick={() => setEditDialogOpen(true)}>
-          Edit Project
-        </Button>
-      </Box>
+                <Button
+                  variant="contained"
+                  onClick={() => handleDeleteSection(section)}
+                  sx={{
+                    backgroundColor: "#ff7800",
+                    boxShadow: "none",
+                    "&:hover": {
+                      backgroundColor: "#e06600", // Adjust hover color if needed
+                      boxShadow: "none",
+                    },
+                    textTransform: "capitalize",
+                  }}
+                  size="small"
+                >
+                  Delete
+                </Button>
+              </div>
+            </div>
+
+            <DndContext
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+              sensors={sensors}
+            >
+              {expandedSections[section] !== false && (
+                <>
+                  <SortableContext
+                    items={tasksByCategory[section]?.map((t) => t.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    {tasksByCategory[section]?.map((task) =>
+                      editingTaskId === task.id ? (
+                        <EditModal
+                          key={task.id}
+                          task={task}
+                          onSave={(updatedTask) => {
+                            setProjectData((prev) => ({
+                              ...prev,
+                              tasks: prev.tasks.map((t) =>
+                                t.id === updatedTask.id ? updatedTask : t
+                              ),
+                            }));
+                            setEditingTaskId(null);
+                          }}
+                          onCancel={() => onClose()}
+                          onClose={() => setEditingTaskId(null)}
+                        />
+                      ) : (
+                        <TaskItem
+                          key={task.id}
+                          task={task}
+                          onDelete={handleDeleteTask}
+                          onEdit={() => setEditingTaskId(task.id)}
+                          onComplete={handleCompleteTask}
+                        />
+                      )
+                    )}
+                  </SortableContext>
+                  {!openFormSection && (
+                    <div
+                      onClick={() => setOpenFormSection(section)}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        cursor: "pointer",
+                        marginTop: 10,
+                      }}
+                    >
+                      <AddIcon style={{ marginRight: "8px", fontSize: 20 }} />
+                      <p style={{ fontSize: 14, fontWeight: 500 }}>Add Task</p>
+                    </div>
+                  )}
+                  {openFormSection === section && (
+                    <TaskForm
+                      defaultCategory={section}
+                      onAdd={handleAddTask}
+                      onCancel={() => setOpenFormSection(null)}
+                    />
+                  )}
+                </>
+              )}
+            </DndContext>
+          </div>
+        ))
+      ) : (
+        <Typography variant="h6" color="textSecondary" align="center">
+          No sections match your search.
+        </Typography>
+      )}
 
       {editTask && (
         <EditModal
