@@ -11,23 +11,27 @@ import ProjectModal from "../Modal/Project/Add";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useNavigate } from "react-router-dom";
 
-const Projects = ({ projects, onSave, onDelete }) => {
-  const [projectList, setProjectList] = useState(projects);
+const Projects = () => {
+  const navigate = useNavigate();
+  const [projects, setProjects] = useState(() => {
+    const stored = localStorage.getItem("projects");
+    return stored ? JSON.parse(stored) : [];
+  });
+
   const [openModal, setOpenModal] = useState(false);
   const [editProject, setEditProject] = useState(null);
   const [projectName, setProjectName] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const [isFavorite, setIsFavorite] = useState(false);
 
-  useEffect(() => {
-    setProjectList(projects);
-  }, [projects]);
+  const normalizeName = (str) => str.trim().toLowerCase().replace(/\s+/g, "-");
 
   const handleModalOpen = (project = null) => {
     if (project) {
       setEditProject(project);
-      setProjectName(project.name);
+      setProjectName(project.name.replaceAll("-", " "));
       setSelectedColor(project.color);
       setIsFavorite(project.isFavorite);
     } else {
@@ -44,18 +48,76 @@ const Projects = ({ projects, onSave, onDelete }) => {
     setEditProject(null);
   };
 
+  const triggerProjectChange = () => {
+    const event = new Event("projectChange");
+    window.dispatchEvent(event);
+  };
+
   const handleSave = () => {
+    const trimmedName = projectName.trim();
+    if (!trimmedName) return;
+
+    const normalizedName = normalizeName(trimmedName);
+
+    const projectExists = projects.some(
+      (project) =>
+        normalizeName(project.name) === normalizedName &&
+        project.id !== editProject?.id
+    );
+
+    if (projectExists) {
+      alert("A project with this name already exists.");
+      return;
+    }
+
     const newProject = {
       id: editProject?.id || Date.now(),
-      name: projectName,
+      name: normalizedName,
       color: selectedColor || "default",
       isFavorite,
     };
-    onSave(newProject, !!editProject);
-    const event = new Event("projectChange");
-    window.dispatchEvent(event);
 
-    handleModalClose();
+    let updatedProjects;
+    if (editProject) {
+      updatedProjects = projects.map((project) =>
+        project.id === editProject.id ? newProject : project
+      );
+    } else {
+      updatedProjects = [...projects, newProject];
+    }
+
+    setProjects(updatedProjects);
+    localStorage.setItem("projects", JSON.stringify(updatedProjects));
+
+    const projectsData =
+      JSON.parse(localStorage.getItem("projects_data")) || {};
+
+    if (!editProject && !projectsData[normalizedName]) {
+      projectsData[normalizedName] = {
+        sections: [],
+        tasks: [],
+      };
+      localStorage.setItem("projects_data", JSON.stringify(projectsData));
+    }
+
+    setProjectName("");
+    setSelectedColor("");
+    setIsFavorite(false);
+    setOpenModal(false);
+    setEditProject(null);
+
+    if (!editProject) {
+      navigate(`/project/${normalizedName}`);
+    }
+
+    triggerProjectChange();
+  };
+
+  const handleDelete = (id) => {
+    const updated = projects.filter((project) => project.id !== id);
+    setProjects(updated);
+    localStorage.setItem("projects", JSON.stringify(updated));
+    triggerProjectChange();
   };
 
   return (
@@ -65,15 +127,14 @@ const Projects = ({ projects, onSave, onDelete }) => {
         <Button
           variant="contained"
           startIcon={<AddIcon />}
-          onClick={() => handleModalOpen()}
-        >
+          onClick={() => handleModalOpen()}>
           Add Project
         </Button>
       </Box>
 
       <List>
-        {projectList.length > 0 ? (
-          projectList.map((project) => (
+        {projects.length > 0 ? (
+          projects.map((project) => (
             <ListItem
               key={project.id}
               sx={{
@@ -84,23 +145,28 @@ const Projects = ({ projects, onSave, onDelete }) => {
                 border: "1px solid #ddd",
                 borderRadius: 1,
                 p: 2,
-              }}
-            >
+              }}>
               <Box>
-                <Typography variant="h6">{project.name}</Typography>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                >{`Color: ${project.color}`}</Typography>
+                <Typography variant="h6">
+                  {project.name
+                    .replaceAll("-", " ")
+                    .split(" ")
+                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(" ")}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {`Color: ${project.color}`}
+                </Typography>
               </Box>
               <Box>
                 <IconButton
                   color="primary"
-                  onClick={() => handleModalOpen(project)}
-                >
+                  onClick={() => handleModalOpen(project)}>
                   <EditIcon />
                 </IconButton>
-                <IconButton color="error" onClick={() => onDelete(project.id)}>
+                <IconButton
+                  color="error"
+                  onClick={() => handleDelete(project.id)}>
                   <DeleteIcon />
                 </IconButton>
               </Box>

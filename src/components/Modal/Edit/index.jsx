@@ -383,7 +383,7 @@ const placeholderStyleDescription = {
   top: 2,
   left: 0,
   color: "#aaa",
-  fontSize: "15px",
+  fontSize: "14px",
   pointerEvents: "none",
 };
 

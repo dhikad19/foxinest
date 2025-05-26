@@ -81,7 +81,8 @@ const CompletedSection = () => {
       }
     }
 
-    setProjectList(tempProjects);
+    setProjectList([...new Set(tempProjects)].sort());
+
     let sorted = sortTasks([...combinedCompletedTasks]);
 
     if (searchQuery.trim()) {
@@ -218,14 +219,12 @@ const CompletedSection = () => {
         paddingRight: "16px",
         maxWidth: "700px",
         margin: "0 auto",
-      }}
-    >
+      }}>
       <h2
         style={{
           marginBottom: 10,
           marginTop: "10px",
-        }}
-      >
+        }}>
         Completed
       </h2>
 
@@ -258,16 +257,14 @@ const CompletedSection = () => {
           alignItems: "center",
           marginTop: 10,
           marginBottom: 30,
-        }}
-      >
+        }}>
         <div
           style={{
             display: "flex",
             fontSize: 14,
             alignItems: "center",
             marginRight: 15,
-          }}
-        >
+          }}>
           <p style={{ fontWeight: "bold" }}>Activity:</p>
           <div
             onClick={handleProjectClick}
@@ -276,16 +273,14 @@ const CompletedSection = () => {
               cursor: "pointer",
               marginLeft: 6,
               alignItems: "center",
-            }}
-          >
+            }}>
             <p
               style={{
                 maxWidth: 110,
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 whiteSpace: "nowrap",
-              }}
-            >
+              }}>
               {selectedProject === "all" ? "All Projects" : selectedProject}
             </p>
             <FaChevronDown style={{ marginLeft: 6, color: "grey" }} size={15} />
@@ -302,8 +297,7 @@ const CompletedSection = () => {
                 padding: 1,
                 minWidth: 250,
               },
-            }}
-          >
+            }}>
             <TextField
               placeholder="Search project..."
               size="small"
@@ -330,8 +324,7 @@ const CompletedSection = () => {
                 }
                 onMouseLeave={(e) =>
                   (e.currentTarget.style.backgroundColor = "transparent")
-                }
-              >
+                }>
                 <span style={nameTextStyle}>All Projects</span>
                 {selectedProject === "all" && (
                   <CheckIcon style={{ fontSize: "16px", color: "grey" }} />
@@ -350,8 +343,7 @@ const CompletedSection = () => {
                   }
                   onMouseLeave={(e) =>
                     (e.currentTarget.style.backgroundColor = "transparent")
-                  }
-                >
+                  }>
                   <span style={nameTextStyle}>{name}</span>
                   {selectedProject === name && (
                     <CheckIcon style={{ fontSize: "16px", color: "grey" }} />
@@ -374,13 +366,11 @@ const CompletedSection = () => {
                 alignItems: "center",
                 cursor: "pointer",
               }}
-              onClick={handleClick}
-            >
+              onClick={handleClick}>
               <p
                 style={{
                   textTransform: "capitalize",
-                }}
-              >
+                }}>
                 {text}
               </p>
               <FaChevronDown
@@ -399,8 +389,7 @@ const CompletedSection = () => {
                 padding: 1,
                 minWidth: 160,
               },
-            }}
-          >
+            }}>
             {[
               { value: "newest", label: "Newest First" },
               { value: "alphabetical", label: "Alphabetical" },
@@ -426,8 +415,7 @@ const CompletedSection = () => {
                 }
                 onMouseLeave={(e) =>
                   (e.currentTarget.style.backgroundColor = "transparent")
-                }
-              >
+                }>
                 <span
                   style={{
                     overflow: "hidden",
@@ -435,8 +423,7 @@ const CompletedSection = () => {
                     whiteSpace: "nowrap",
                     flexGrow: 1,
                     marginRight: 8,
-                  }}
-                >
+                  }}>
                   {option.label}
                 </span>
                 {selectedSort === option.value && (

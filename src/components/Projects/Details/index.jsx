@@ -56,6 +56,7 @@ const ProjectDetail = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const isFirstRender = useRef(true);
   const [project, setProject] = useState(null);
+  const [editingTaskId, setEditingTaskId] = useState(null);
   const fromEdit = location.state?.fromEdit;
   const [loading, setLoading] = useState(true);
   const [editProjectData, setEditProjectData] = useState({
@@ -63,7 +64,7 @@ const ProjectDetail = () => {
     color: "default",
     isFavorite: false,
   });
-  const normalize = (str) => str.replaceAll(" ", "-").toLowerCase();
+  const normalize = (str) => str.trim().toLowerCase().replace(/\s+/g, "-");
 
   const isValidProjectId = projects.some(
     (p) => normalize(p.name) === normalize(projectId)
@@ -290,6 +291,10 @@ const ProjectDetail = () => {
     setShowSnackbar(false);
   };
 
+  const onClose = () => {
+    setEditingTaskId(null);
+  };
+
   const handleDragEnd = ({ active, over }) => {
     if (!over || active.id === over.id) return;
     const oldIndex = projectData.tasks.findIndex((t) => t.id === active.id);
@@ -319,10 +324,14 @@ const ProjectDetail = () => {
 
     const newKey = editProjectData.name;
 
-    if (oldKey && oldKey !== newKey) {
+    if (oldKey && normalize(oldKey) !== normalize(newKey)) {
       const data = JSON.parse(localStorage.getItem("projects_data")) || {};
-      data[newKey] = data[oldKey];
-      delete data[oldKey];
+      const normalizedOldKey = normalize(oldKey);
+      const normalizedNewKey = normalize(newKey);
+
+      data[normalizedNewKey] = data[normalizedOldKey];
+      delete data[normalizedOldKey];
+
       localStorage.setItem("projects_data", JSON.stringify(data));
     }
 
@@ -416,8 +425,7 @@ const ProjectDetail = () => {
         margin: "0 auto",
         overflow: "visible",
         position: "relative",
-      }}
-    >
+      }}>
       <Typography variant="h4" mb={2}>
         Project: {projectId}
       </Typography>
@@ -443,8 +451,7 @@ const ProjectDetail = () => {
               justifyContent: "space-between",
               alignItems: "center",
               marginBottom: 10,
-            }}
-          >
+            }}>
             <div style={{ display: "flex", alignItems: "center" }}>
               <div
                 onClick={() => setShowOverdue((prev) => !prev)}
@@ -459,8 +466,7 @@ const ProjectDetail = () => {
                   width: 22,
                   marginLeft: "-30px",
                   backgroundColor: "#fafafa",
-                }}
-              >
+                }}>
                 {showOverdue ? (
                   <FaChevronDown size={10} color="grey" />
                 ) : (
@@ -480,8 +486,7 @@ const ProjectDetail = () => {
                   borderRadius: 4,
                   backgroundColor: "#f5f5f5",
                   fontSize: 13,
-                }}
-              >
+                }}>
                 {selectedDate
                   ? selectedDate.format("MMM D, YYYY")
                   : "Select Date 📅"}
@@ -490,22 +495,19 @@ const ProjectDetail = () => {
                 open={Boolean(anchorEl)}
                 anchorEl={anchorEl}
                 onClose={() => setAnchorEl(null)}
-                anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-              >
+                anchorOrigin={{ vertical: "bottom", horizontal: "left" }}>
                 <Box p={1}>
                   <Stack direction="row" spacing={1} padding={2}>
                     <Button
                       size="small"
                       variant="outlined"
-                      onClick={() => handleDateChange(dayjs())}
-                    >
+                      onClick={() => handleDateChange(dayjs())}>
                       Today
                     </Button>
                     <Button
                       size="small"
                       variant="outlined"
-                      onClick={() => handleDateChange(dayjs().add(1, "day"))}
-                    >
+                      onClick={() => handleDateChange(dayjs().add(1, "day"))}>
                       Tomorrow
                     </Button>
                   </Stack>
@@ -521,24 +523,44 @@ const ProjectDetail = () => {
 
           <Divider sx={{ my: 1 }} />
 
-          {showOverdue &&
-            overdueTasks.map((task) => (
-              <TaskItem
-                key={task.id}
-                task={task}
-                onDelete={handleDeleteTask}
-                onEdit={() => setEditTask(task)}
-                onComplete={handleCompleteTask}
-              />
-            ))}
+          {showOverdue && (
+            <div style={{ padding: 4 }}>
+              {overdueTasks.map((task) =>
+                editingTaskId === task.id ? (
+                  <EditModal
+                    key={task.id}
+                    task={task}
+                    onSave={(updatedTask) => {
+                      setProjectData((prev) => ({
+                        ...prev,
+                        tasks: prev.tasks.map((t) =>
+                          t.id === updatedTask.id ? updatedTask : t
+                        ),
+                      }));
+                      setEditingTaskId(null);
+                    }}
+                    onCancel={() => onClose()}
+                    onClose={() => setEditingTaskId(null)}
+                  />
+                ) : (
+                  <TaskItem
+                    key={task.id}
+                    task={task}
+                    onDelete={handleDeleteTask}
+                    onEdit={() => setEditingTaskId(task.id)}
+                    onComplete={handleCompleteTask}
+                  />
+                )
+              )}
+            </div>
+          )}
         </div>
       )}
 
       {projectData.sections.map((section) => (
         <div
           key={section}
-          style={{ marginBottom: "1rem", borderRadius: 8, padding: 4 }}
-        >
+          style={{ marginBottom: "1rem", borderRadius: 8, padding: 4 }}>
           <div style={{ display: "flex", alignItems: "center" }}>
             <div
               onClick={() => toggleExpand(section)}
@@ -553,8 +575,7 @@ const ProjectDetail = () => {
                 width: 22,
                 marginLeft: "-30px",
                 backgroundColor: "#fafafa",
-              }}
-            >
+              }}>
               {expandedSections[section] !== false ? (
                 <FaChevronDown size={10} color="grey" />
               ) : (
@@ -570,23 +591,39 @@ const ProjectDetail = () => {
           <DndContext
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
-            sensors={sensors}
-          >
+            sensors={sensors}>
             {expandedSections[section] !== false && (
               <>
                 <SortableContext
                   items={tasksByCategory[section]?.map((t) => t.id)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  {tasksByCategory[section]?.map((task) => (
-                    <TaskItem
-                      key={task.id}
-                      task={task}
-                      onDelete={handleDeleteTask}
-                      onComplete={handleCompleteTask}
-                      onEdit={() => setEditTask(task)}
-                    />
-                  ))}
+                  strategy={verticalListSortingStrategy}>
+                  {tasksByCategory[section]?.map((task) =>
+                    editingTaskId === task.id ? (
+                      <EditModal
+                        key={task.id}
+                        task={task}
+                        onSave={(updatedTask) => {
+                          setProjectData((prev) => ({
+                            ...prev,
+                            tasks: prev.tasks.map((t) =>
+                              t.id === updatedTask.id ? updatedTask : t
+                            ),
+                          }));
+                          setEditingTaskId(null);
+                        }}
+                        onCancel={() => onClose()}
+                        onClose={() => setEditingTaskId(null)}
+                      />
+                    ) : (
+                      <TaskItem
+                        key={task.id}
+                        task={task}
+                        onDelete={handleDeleteTask}
+                        onComplete={handleCompleteTask}
+                        onEdit={() => setEditingTaskId(task.id)}
+                      />
+                    )
+                  )}
                 </SortableContext>
 
                 {openFormSection === section ? (
@@ -603,8 +640,7 @@ const ProjectDetail = () => {
                     onClick={() => setOpenFormSection(section)}
                     sx={{ mt: 2, fontSize: "12px" }}
                     size="small"
-                    variant="outlined"
-                  >
+                    variant="outlined">
                     + Add Task
                   </Button>
                 )}
@@ -619,8 +655,7 @@ const ProjectDetail = () => {
           variant="outlined"
           color="error"
           onClick={() => setDeleteDialogOpen(true)}
-          sx={{ mr: 2 }}
-        >
+          sx={{ mr: 2 }}>
           Delete Project
         </Button>
         <Button variant="contained" onClick={() => setEditDialogOpen(true)}>

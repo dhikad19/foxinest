@@ -1,112 +1,34 @@
+// REFACTORED TaskForm based on EditModal structure
+
 import React, { useState, useEffect, useMemo } from "react";
+import {
+  Box,
+  Button,
+  Typography,
+  Popover,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+  List,
+  ListItem,
+  ListItemButton,
+  Divider,
+} from "@mui/material";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import Bold from "@tiptap/extension-bold";
-import {
-  Divider,
-  Button,
-  Popover,
-  Menu,
-  Box,
-  Stack,
-  MenuItem,
-  ListItemIcon,
-  ListItemText,
-} from "@mui/material";
-import FlagIcon from "@mui/icons-material/Flag";
-import CheckIcon from "@mui/icons-material/Check";
-import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import dayjs from "dayjs";
 
-const buttonMenu = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  paddingLeft: 8,
-  paddingRight: 8,
-  paddingBottom: 2,
-  cursor: "pointer",
-  paddingTop: 2,
-  border: "1px solid #e0e0e0",
-  marginRight: 6,
-  borderRadius: 4,
-  fontSize: 13,
-  color: "#4f4f4f",
-};
-
-const DueDateMenuPicker = ({ form, setForm }) => {
-  const [anchorEl, setAnchorEl] = useState(null);
-
-  const handleOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => setAnchorEl(null);
-
-  const handleDateChange = (date) => {
-    if (date) {
-      setForm((prev) => ({
-        ...prev,
-        dueDate: date.format("YYYY-MM-DD"),
-      }));
-      handleClose();
-    }
-  };
-
-  const open = Boolean(anchorEl);
-  const selectedDate = form.dueDate ? dayjs(form.dueDate) : null;
-
-  const today = dayjs();
-  const tomorrow = dayjs().add(1, "day");
-
-  return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <div onClick={handleOpen} style={buttonMenu}>
-        <span>
-          {selectedDate ? selectedDate.format("MMM D, YYYY") : "Select Date 📅"}
-        </span>
-      </div>
-
-      <Popover
-        open={open}
-        anchorEl={anchorEl}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
-        }}>
-        <Box p={1}>
-          {/* Quick Action Buttons */}
-          <Stack direction="row" spacing={1} padding={3}>
-            <Button
-              size="small"
-              variant="outlined"
-              onClick={() => handleDateChange(today)}>
-              Today
-            </Button>
-            <Button
-              size="small"
-              variant="outlined"
-              onClick={() => handleDateChange(tomorrow)}>
-              Tomorrow
-            </Button>
-          </Stack>
-
-          {/* Calendar */}
-          <DateCalendar
-            disablePast
-            value={selectedDate}
-            onChange={handleDateChange}
-          />
-        </Box>
-      </Popover>
-    </LocalizationProvider>
-  );
-};
+import FlagIcon from "@mui/icons-material/Flag";
+import EventIcon from "@mui/icons-material/Event";
+import TodayIcon from "@mui/icons-material/Today";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import WeekendIcon from "@mui/icons-material/Weekend";
 
 const priorities = [
   { label: "High", value: "High", color: "#ff77009d" },
@@ -114,134 +36,87 @@ const priorities = [
   { label: "Low", value: "Low", color: "#1f50ff93" },
 ];
 
-const PrioritySelector = ({ form, setForm }) => {
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
+const quickDates = [
+  {
+    label: "Today",
+    date: dayjs(),
+    icon: <TodayIcon fontSize="small" />,
+    display: (d) => d.format("ddd"),
+  },
+  {
+    label: "Tomorrow",
+    date: dayjs().add(1, "day"),
+    icon: <CalendarTodayIcon fontSize="small" />,
+    display: (d) => d.format("ddd"),
+  },
+  {
+    label: "This Weekend",
+    date: dayjs().day(6),
+    icon: <WeekendIcon fontSize="small" />,
+    display: (d) => d.format("ddd"),
+  },
+  {
+    label: "Next Week",
+    date: dayjs().add(1, "week").startOf("week").add(1, "day"),
+    icon: <EventIcon fontSize="small" />,
+    display: (d) => `${d.format("ddd")}, ${d.format("D MMM")}`,
+  },
+];
 
-  // Default to "Low" if none is selected
-  const selectedPriority = form.priority || "Low";
-
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = (priority) => {
-    if (priority) {
-      setForm((prev) => ({ ...prev, priority }));
-    }
-    setAnchorEl(null);
-  };
-
-  const selected = priorities.find((p) => p.value === selectedPriority);
-
-  return (
-    <>
-      <div onClick={handleClick} style={buttonMenu}>
-        <FlagIcon
-          style={{ color: selected.color, fontSize: 16, marginRight: 5 }}
-        />
-        <span>{selected.label}</span>
-      </div>
-      <Menu
-        MenuListProps={{ sx: { py: 0 } }}
-        anchorEl={anchorEl}
-        open={open}
-        onClose={() => handleClose()}>
-        {/* <span
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: 14,
-            color: "#4f4f4f",
-            fontWeight: "bold",
-            marginTop: 5,
-            marginBottom: 5,
-          }}>
-          Priority
-        </span>
-        <Divider></Divider> */}
-        {priorities.map((p) => {
-          const isSelected = selectedPriority === p.value;
-          const iconColor = isSelected ? p.color : "#bdbdbd";
-          const textColor = isSelected ? p.color : "#4f4f4f";
-
-          return (
-            <MenuItem key={p.value} onClick={() => handleClose(p.value)}>
-              <ListItemText>
-                <span
-                  style={{
-                    fontSize: 13,
-                    color: textColor,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 6,
-                  }}>
-                  <FlagIcon style={{ color: iconColor, fontSize: 16 }} />
-                  <p>Priority {p.label}</p>
-                </span>
-              </ListItemText>
-            </MenuItem>
-          );
-        })}
-      </Menu>
-    </>
-  );
+const buttonMenu = {
+  display: "flex",
+  alignItems: "center",
+  padding: "4px 8px",
+  border: "1px solid #e0e0e0",
+  borderRadius: 4,
+  fontSize: 13,
+  color: "#4f4f4f",
+  cursor: "pointer",
+  marginRight: 6,
 };
 
 const TaskForm = ({ onAdd, defaultCategory = "", onCancel }) => {
   const [form, setForm] = useState({
     title: "",
+    description: "",
     dueDate: "",
     priority: "Medium",
-    description: "",
     category: defaultCategory,
   });
 
-  // Random placeholder list for title
-  const randomPlaceholders = [
-    "Write blog post",
-    "Buy groceries",
-    "Fix the bug",
-    "Water the plants",
-    "Call mom",
-    "Finish side project",
-    "Plan weekend trip",
-  ];
+  const [sections, setSections] = useState([]);
+  const [dueAnchor, setDueAnchor] = useState(null);
+  const [priorityAnchor, setPriorityAnchor] = useState(null);
+  const [categoryAnchor, setCategoryAnchor] = useState(null);
 
-  const randomTitlePlaceholder = useMemo(() => {
-    const index = Math.floor(Math.random() * randomPlaceholders.length);
-    return randomPlaceholders[index];
+  const randomPlaceholder = useMemo(() => {
+    const items = [
+      "Write blog post",
+      "Buy groceries",
+      "Fix the bug",
+      "Water the plants",
+      "Call mom",
+      "Finish side project",
+    ];
+    return items[Math.floor(Math.random() * items.length)];
   }, []);
 
-  // Tiptap for title (light setup, single-line feel)
   const titleEditor = useEditor({
-    extensions: [StarterKit, Bold], // DON'T disable paragraph
+    extensions: [StarterKit, Bold],
     content: "",
-    editorProps: {
-      attributes: {
-        class: "title-editor",
-      },
-    },
-    onCreate: ({ editor }) => {
-      editor.chain().focus().setMark("bold").run();
-    },
+    editorProps: { attributes: { class: "title-editor" } },
     onUpdate: ({ editor }) => {
-      editor.chain().focus().setMark("bold").run();
-      const text = editor.getText().trim();
-      setForm((prev) => ({ ...prev, title: text }));
+      setForm((prev) => ({ ...prev, title: editor.getText().trim() }));
     },
   });
 
-  // Tiptap for description
   const descriptionEditor = useEditor({
     extensions: [
       StarterKit,
-      Placeholder.configure({
-        placeholder: "Description",
-      }),
+      Placeholder.configure({ placeholder: "Description" }),
     ],
-    content: "", // or "<p></p>" to make it valid
+    content: "",
+    editorProps: { attributes: { class: "description-editor" } },
     onUpdate: ({ editor }) => {
       setForm((prev) => ({ ...prev, description: editor.getHTML() }));
     },
@@ -249,31 +124,24 @@ const TaskForm = ({ onAdd, defaultCategory = "", onCancel }) => {
 
   useEffect(() => {
     setForm((prev) => ({ ...prev, category: defaultCategory }));
+    const stored = JSON.parse(localStorage.getItem("home_projects_data"));
+    if (stored?.sections) setSections(stored.sections);
   }, [defaultCategory]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     if (!form.title.trim()) return;
 
-    const newTask = {
+    onAdd({
       ...form,
       id: Date.now().toString(),
-    };
+    });
 
-    onAdd(newTask);
-
-    // Reset form and editors
     setForm({
       title: "",
+      description: "",
       dueDate: "",
       priority: "Medium",
-      description: "",
       category: defaultCategory,
     });
 
@@ -283,114 +151,198 @@ const TaskForm = ({ onAdd, defaultCategory = "", onCancel }) => {
     if (onCancel) onCancel();
   };
 
-  return (
-    <form onSubmit={handleSubmit} style={formStyles}>
-      {/* Title (Tiptap) */}
-      <div>
-        <div style={editorBoxStyle}>
-          <EditorContent
-            className="tiptap-editor title-editor"
-            editor={titleEditor}
-          />
-          {form.title === "" && (
-            <div style={placeholderStyle}>{randomTitlePlaceholder}</div>
-          )}
-        </div>
-      </div>
+  const selectedPriority = priorities.find((p) => p.value === form.priority);
 
-      {/* Description (Tiptap) */}
-      <div style={{ marginBottom: "15px", marginTop: "3px" }}>
-        <div style={editorBoxStyle}>
-          <EditorContent
-            className="tiptap-editor title-editor"
-            editor={descriptionEditor}
-          />
+  return (
+    <Box component="form" sx={modalStyle} onSubmit={handleSubmit}>
+      <Box sx={{ padding: 1 }}>
+        {/* Title */}
+        <Box sx={editorBoxStyle}>
+          <EditorContent editor={titleEditor} />
+          {form.title === "" && (
+            <div style={placeholderStyle}>{randomPlaceholder}</div>
+          )}
+        </Box>
+
+        {/* Description */}
+        <Box sx={editorBoxStyle}>
+          <EditorContent editor={descriptionEditor} />
           {form.description === "" && (
             <div style={placeholderStyleDescription}>Description</div>
           )}
-        </div>
-      </div>
+        </Box>
 
-      <div style={{ display: "flex", alignItems: "center", marginBottom: 10 }}>
-        <DueDateMenuPicker form={form} setForm={setForm} />
-        <PrioritySelector form={form} setForm={setForm} />
-        {/* <input
-          type="text"
-          name="category"
-          placeholder="Category"
-          value={form.category}
-          onChange={handleChange}
-        /> */}
-      </div>
+        {/* Menus */}
+        <Box display="flex" mt={2}>
+          {/* Due Date */}
+          <div
+            style={buttonMenu}
+            onClick={(e) => setDueAnchor(e.currentTarget)}>
+            <EventIcon style={{ fontSize: 16, marginRight: 4 }} />
+            {form.dueDate
+              ? dayjs(form.dueDate).format("MMM D, YYYY")
+              : "Select Date"}
+          </div>
+          <Popover
+            open={Boolean(dueAnchor)}
+            anchorEl={dueAnchor}
+            onClose={() => setDueAnchor(null)}
+            anchorOrigin={{ vertical: "bottom", horizontal: "left" }}>
+            <Box>
+              <List dense sx={{ mt: 1 }}>
+                {quickDates.map((item) => (
+                  <ListItem disablePadding key={item.label}>
+                    <ListItemButton
+                      onClick={() => {
+                        setForm((prev) => ({
+                          ...prev,
+                          dueDate: item.date.format("YYYY-MM-DD"),
+                        }));
+                        setDueAnchor(null);
+                      }}>
+                      <ListItemIcon sx={{ minWidth: 30 }}>
+                        {item.icon}
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={
+                          <Typography sx={{ fontSize: 13 }}>
+                            {item.label}
+                          </Typography>
+                        }
+                      />
+                      <Typography sx={{ fontSize: 13, mr: 1 }}>
+                        {item.display(item.date)}
+                      </Typography>
+                    </ListItemButton>
+                  </ListItem>
+                ))}
+              </List>
 
-      {/* Buttons */}
-      <Divider></Divider>
-      <div
-        style={{
-          display: "flex",
-          marginTop: 10,
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}>
-        <span style={{ fontSize: 14, fontWeight: "bold", color: "#4f4f4f" }}>
-          # {form.category}
-        </span>
-        <div style={{ display: "flex", gap: 6 }}>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DateCalendar
+                  disablePast
+                  value={form.dueDate ? dayjs(form.dueDate) : null}
+                  onChange={(date) => {
+                    if (date) {
+                      setForm((prev) => ({
+                        ...prev,
+                        dueDate: date.format("YYYY-MM-DD"),
+                      }));
+                      setDueAnchor(null);
+                    }
+                  }}
+                />
+              </LocalizationProvider>
+            </Box>
+          </Popover>
+
+          {/* Priority */}
+          <div
+            style={buttonMenu}
+            onClick={(e) => setPriorityAnchor(e.currentTarget)}>
+            <FlagIcon
+              style={{
+                color: selectedPriority?.color,
+                fontSize: 16,
+                marginRight: 4,
+              }}
+            />
+            {selectedPriority?.label || "Priority"}
+          </div>
+          <Menu
+            anchorEl={priorityAnchor}
+            open={Boolean(priorityAnchor)}
+            onClose={() => setPriorityAnchor(null)}>
+            {priorities.map((p) => (
+              <MenuItem
+                key={p.value}
+                onClick={() => {
+                  setForm((prev) => ({ ...prev, priority: p.value }));
+                  setPriorityAnchor(null);
+                }}>
+                <FlagIcon
+                  style={{
+                    fontSize: 16,
+                    marginRight: 6,
+                    color: form.priority === p.value ? p.color : "#bdbdbd",
+                  }}
+                />
+                <Typography sx={{ fontSize: 13 }}>
+                  Priority {p.label}
+                </Typography>
+              </MenuItem>
+            ))}
+          </Menu>
+
+          {/* Category */}
+          <div
+            style={buttonMenu}
+            onClick={(e) => setCategoryAnchor(e.currentTarget)}>
+            {form.category || "Category 🏷️"}
+          </div>
+          <Menu
+            anchorEl={categoryAnchor}
+            open={Boolean(categoryAnchor)}
+            onClose={() => setCategoryAnchor(null)}>
+            {sections.map((section) => (
+              <MenuItem
+                key={section}
+                onClick={() => {
+                  setForm((prev) => ({ ...prev, category: section }));
+                  setCategoryAnchor(null);
+                }}>
+                {section}
+              </MenuItem>
+            ))}
+          </Menu>
+        </Box>
+
+        {/* Footer Buttons */}
+        <Divider sx={{ my: 2 }} />
+        <Box display="flex" justifyContent="flex-end">
           {onCancel && (
             <Button
-              variant="contained"
               size="small"
+              variant="contained"
               disableElevation
+              onClick={onCancel}
               sx={{
-                color: "#000000",
                 backgroundColor: "#f0f0f0",
-              }}
-              style={{
+                color: "#000",
                 textTransform: "capitalize",
-                fontWeight: "bold",
-                fontSize: "12px",
-              }}
-              onClick={onCancel}>
+                mr: 1,
+              }}>
               Cancel
             </Button>
           )}
-
           <Button
+            size="small"
+            type="submit"
             variant="contained"
+            disableElevation
             sx={{
               backgroundColor: "#ff7800",
-              "&:hover": { backgroundColor: "#ff871f" },
-            }}
-            disableElevation
-            size="small"
-            disabled={form.title === ""}
-            style={{
+              "&:hover": { backgroundColor: "#e06f00" },
               textTransform: "capitalize",
-              fontWeight: "bold",
-              fontSize: "12px",
-              marginRight: "6px",
             }}
-            type="submit">
+            disabled={!form.title.trim()}>
             Add Task
           </Button>
-        </div>
-      </div>
-    </form>
+        </Box>
+      </Box>
+    </Box>
   );
 };
 
 // Styles
-const formStyles = {
-  display: "flex",
-  marginTop: "10px",
-  flexDirection: "column",
-  border: "1px solid #e0e0e0",
-  padding: 10,
-  borderRadius: 6,
+const modalStyle = {
+  width: "100%",
+  bgcolor: "background.paper",
+  borderRadius: 2,
 };
 
 const editorBoxStyle = {
-  minHeight: "20px",
+  minHeight: 24,
   position: "relative",
 };
 
@@ -399,17 +351,16 @@ const placeholderStyle = {
   top: 0,
   left: 0,
   color: "#aaa",
-  fontSize: "17px",
-  fontWeight: 600,
+  fontWeight: 500,
   pointerEvents: "none",
 };
 
 const placeholderStyleDescription = {
   position: "absolute",
-  top: 0,
+  top: 2,
   left: 0,
   color: "#aaa",
-  fontSize: "15px",
+  fontSize: "14px",
   pointerEvents: "none",
 };
 

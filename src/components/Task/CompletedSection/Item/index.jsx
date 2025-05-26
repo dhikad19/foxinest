@@ -7,9 +7,9 @@ const CompletedTaskItem = ({ task, onDelete }) => {
   // Get project name by task.id from localStorage
   const projectName = useMemo(() => {
     const projects = JSON.parse(localStorage.getItem("projects")) || [];
-    const match = projects.find((p) => p.id === task.id);
-    return match ? match.name : "Unknown Project";
-  }, [task.id]);
+    const match = projects.find((p) => p.id === task.projectId);
+    return match ? match.name : task.projectId;
+  }, [task.projectId]);
 
   return (
     <div>
@@ -21,7 +21,9 @@ const CompletedTaskItem = ({ task, onDelete }) => {
           <p>
             {task.source === "home_projects_data"
               ? `Home/${task.category}`
-              : `My Projects/${projectName}/${task.category}`}
+              : `My Projects/${projectName.replaceAll("-", " ").to}/${
+                  task.category
+                }`}
           </p>
           {/* Due date and priority */}
           {task.dueDate && (
@@ -30,16 +32,14 @@ const CompletedTaskItem = ({ task, onDelete }) => {
                 display: "flex",
                 alignItems: "center",
                 marginTop: 5,
-              }}
-            >
+              }}>
               <DateIcon style={{ fontSize: "14px", color: "grey" }} />
               <p
                 style={{
                   fontSize: "13px",
                   color: "grey",
                   marginLeft: "5px",
-                }}
-              >
+                }}>
                 {(() => {
                   const currentYear = new Date().getFullYear();
                   const dueDate = new Date(task.dueDate);
@@ -75,8 +75,7 @@ const CompletedTaskItem = ({ task, onDelete }) => {
             fontWeight: "bold",
             fontSize: "12px",
             marginRight: "6px",
-          }}
-        >
+          }}>
           Delete
         </Button>
       </div>

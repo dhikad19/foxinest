@@ -44,6 +44,7 @@ const ResponsiveLayout = ({ children }) => {
   const [editProject, setEditProject] = useState(null);
   const [showBorder, setShowBorder] = useState(false);
   const [showTitle, setShowTitle] = useState(false);
+  const normalizeName = (str) => str.trim().toLowerCase().replace(/\s+/g, "-");
 
   const getTitle = () => {
     switch (location.pathname) {
@@ -129,8 +130,10 @@ const ResponsiveLayout = ({ children }) => {
     const trimmedName = projectName.trim();
     if (!trimmedName) return;
 
+    const normalizedName = normalizeName(trimmedName);
+
     const projectExists = projects.some(
-      (project) => project.name.toLowerCase() === trimmedName.toLowerCase()
+      (project) => normalizeName(project.name) === normalizedName
     );
 
     if (projectExists) {
@@ -140,7 +143,7 @@ const ResponsiveLayout = ({ children }) => {
 
     const newProject = {
       id: Date.now(),
-      name: trimmedName,
+      name: normalizedName, // simpan dalam bentuk normalized
       color: selectedColor || "default",
       isFavorite,
     };
@@ -152,7 +155,7 @@ const ResponsiveLayout = ({ children }) => {
     const projectsData =
       JSON.parse(localStorage.getItem("projects_data")) || {};
 
-    projectsData[newProject.name] = {
+    projectsData[normalizedName] = {
       sections: [],
       tasks: [],
     };
@@ -165,7 +168,7 @@ const ResponsiveLayout = ({ children }) => {
     setIsFavorite(false);
     setOpenModal(false);
 
-    navigate(`/project/${newProject.name.replaceAll(" ", "-").toLowerCase()}`);
+    navigate(`/project/${normalizedName}`);
 
     triggerProjectChange();
   };
@@ -181,8 +184,7 @@ const ResponsiveLayout = ({ children }) => {
           alignItems: "center",
           marginTop: "-48px",
           marginBottom: "10px",
-        }}
-      >
+        }}>
         <div
           style={{
             display: "flex",
@@ -195,8 +197,7 @@ const ResponsiveLayout = ({ children }) => {
             color: "#ffffff",
             marginRight: "10px",
             marginLeft: "10px",
-          }}
-        >
+          }}>
           D
         </div>
         <div>
@@ -205,8 +206,7 @@ const ResponsiveLayout = ({ children }) => {
               marginBottom: "0px",
               lineHeight: "normal",
               fontWeight: "500",
-            }}
-          >
+            }}>
             Dwi Andika
           </p>
         </div>
@@ -221,8 +221,7 @@ const ResponsiveLayout = ({ children }) => {
           scrollbarWidth: "thin",
           scrollbarColor: "#c0c0c0 transparent",
           WebkitScrollbarWidth: "thin",
-        }}
-      >
+        }}>
         <style>
           {`
             ::-webkit-scrollbar {
@@ -273,8 +272,7 @@ const ResponsiveLayout = ({ children }) => {
                   },
                 },
               }}
-              style={{ padding: "0px 8px 0px 8px" }}
-            >
+              style={{ padding: "0px 8px 0px 8px" }}>
               <NavLink
                 to={path}
                 className={({ isActive }) =>
@@ -287,8 +285,7 @@ const ResponsiveLayout = ({ children }) => {
                   color: "inherit",
                   display: "flex",
                   alignItems: "center",
-                }}
-              >
+                }}>
                 <ListItemIcon sx={{ minWidth: "36px", color: "inherit" }}>
                   {icon}
                 </ListItemIcon>
@@ -296,8 +293,7 @@ const ResponsiveLayout = ({ children }) => {
                   variant="body1"
                   sx={{
                     fontSize: "14px",
-                  }}
-                >
+                  }}>
                   {label}
                 </Typography>
               </NavLink>
@@ -320,16 +316,14 @@ const ResponsiveLayout = ({ children }) => {
                       borderRadius: "4px",
                     },
                   },
-                }}
-              >
+                }}>
                 <ListItemText
                   primary={
                     <span
                       style={{
                         fontSize: "15px",
                         fontWeight: "bold",
-                      }}
-                    >
+                      }}>
                       Favorites
                     </span>
                   }
@@ -348,10 +342,9 @@ const ResponsiveLayout = ({ children }) => {
                         borderRadius: "4px",
                       },
                     },
-                  }}
-                >
+                  }}>
                   <NavLink
-                    to={`/project/${project.name.replaceAll(" ", "-")}`}
+                    to={`/project/${normalizeName(project.name)}`}
                     className={({ isActive }) =>
                       isActive ? "active-link" : "not-active"
                     }
@@ -362,8 +355,7 @@ const ResponsiveLayout = ({ children }) => {
                       color: "inherit",
                       display: "flex",
                       alignItems: "center",
-                    }}
-                  >
+                    }}>
                     <ListItemIcon sx={{ minWidth: "36px", color: "inherit" }}>
                       <TagIcon style={{ fontSize: "22px" }} />{" "}
                     </ListItemIcon>
@@ -376,9 +368,14 @@ const ResponsiveLayout = ({ children }) => {
                         whiteSpace: "nowrap",
                         textOverflow: "ellipsis",
                         fontWeight: "400",
-                      }}
-                    >
-                      {project.name}
+                      }}>
+                      {project.name
+                        .replaceAll("-", " ")
+                        .split(" ")
+                        .map(
+                          (word) => word.charAt(0).toUpperCase() + word.slice(1)
+                        )
+                        .join(" ")}
                     </Typography>
                   </NavLink>
                 </ListItem>
@@ -402,8 +399,7 @@ const ResponsiveLayout = ({ children }) => {
                 onClick={handleModalOpen}
                 style={{ color: "#000000", marginTop: "7px" }}
               />
-            }
-          >
+            }>
             <NavLink
               to="/project"
               className={({ isActive }) =>
@@ -417,15 +413,13 @@ const ResponsiveLayout = ({ children }) => {
                 alignItems: "center",
                 padding: "8px 10px 8px 10px",
               }}
-              end
-            >
+              end>
               <Typography
                 variant="body1"
                 sx={{
                   fontSize: "14px",
                   fontWeight: "bold",
-                }}
-              >
+                }}>
                 My Projects
               </Typography>
             </NavLink>
@@ -444,12 +438,9 @@ const ResponsiveLayout = ({ children }) => {
                     borderRadius: "4px",
                   },
                 },
-              }}
-            >
+              }}>
               <NavLink
-                to={`/project/${project.name
-                  .replaceAll(" ", "-")
-                  .toLowerCase()}`}
+                to={`/project/${normalizeName(project.name)}`}
                 className={({ isActive }) =>
                   isActive ? "active-link" : "not-active"
                 }
@@ -461,8 +452,7 @@ const ResponsiveLayout = ({ children }) => {
                   alignItems: "center",
                   justifyContent: "space-between",
                   padding: "8px 10px 8px 10px",
-                }}
-              >
+                }}>
                 <div style={{ display: "flex" }}>
                   <ListItemIcon sx={{ minWidth: "36px", color: "inherit" }}>
                     <TagIcon style={{ fontSize: "22px" }} />
@@ -477,9 +467,14 @@ const ResponsiveLayout = ({ children }) => {
                       whiteSpace: "nowrap",
                       textOverflow: "ellipsis",
                       fontWeight: "400",
-                    }}
-                  >
-                    {project.name}
+                    }}>
+                    {project.name
+                      .replaceAll("-", " ")
+                      .split(" ")
+                      .map(
+                        (word) => word.charAt(0).toUpperCase() + word.slice(1)
+                      )
+                      .join(" ")}
                   </Typography>
                 </div>
               </NavLink>
@@ -496,8 +491,7 @@ const ResponsiveLayout = ({ children }) => {
       <Box
         component="nav"
         sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
-        aria-label="sidebar"
-      >
+        aria-label="sidebar">
         <Drawer
           variant="temporary"
           open={mobileOpen}
@@ -512,8 +506,7 @@ const ResponsiveLayout = ({ children }) => {
               scrollbarWidth: "thin",
               overflowX: "hidden",
             },
-          }}
-        >
+          }}>
           {drawer}
         </Drawer>
 
@@ -534,8 +527,7 @@ const ResponsiveLayout = ({ children }) => {
               left: 0,
             },
           }}
-          open
-        >
+          open>
           {drawer}
         </Drawer>
       </Box>
@@ -548,16 +540,14 @@ const ResponsiveLayout = ({ children }) => {
             backgroundColor: "#fff",
             color: "#000",
             borderBottom: showBorder ? "1px solid rgba(0, 0, 0, 0.12)" : "none",
-          }}
-        >
+          }}>
           <Toolbar sx={{ position: "relative", alignItems: "center" }}>
             {isMobile && (
               <IconButton
                 color="inherit"
                 edge="start"
                 onClick={handleDrawerToggle}
-                sx={{ mr: 2 }}
-              >
+                sx={{ mr: 2 }}>
                 <MenuIcon />
               </IconButton>
             )}
@@ -585,8 +575,7 @@ const ResponsiveLayout = ({ children }) => {
                 fontSize: isMobile ? "16px" : "17px",
                 opacity: showTitle ? 1 : 0,
                 transition: "top 0.2s ease, opacity 0.1s ease",
-              }}
-            >
+              }}>
               {getTitle()}
             </Typography>
           </Toolbar>
