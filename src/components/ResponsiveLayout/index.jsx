@@ -14,6 +14,8 @@ import {
   useMediaQuery,
   IconButton as MuiIconButton,
 } from "@mui/material";
+import CommentsIcon from "@mui/icons-material/ChatBubbleOutline";
+import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import AddIcon from "@mui/icons-material/Add";
 import TagIcon from "@mui/icons-material/TagOutlined";
@@ -80,7 +82,9 @@ const ResponsiveLayout = ({ children }) => {
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
-
+  function capitalizeEachWord(str) {
+    return str.replace(/\b\w/g, (char) => char.toUpperCase());
+  }
   useEffect(() => {
     const updateProjects = () => {
       const stored = localStorage.getItem("projects");
@@ -184,7 +188,8 @@ const ResponsiveLayout = ({ children }) => {
           alignItems: "center",
           marginTop: "-48px",
           marginBottom: "10px",
-        }}>
+        }}
+      >
         <div
           style={{
             display: "flex",
@@ -197,7 +202,8 @@ const ResponsiveLayout = ({ children }) => {
             color: "#ffffff",
             marginRight: "10px",
             marginLeft: "10px",
-          }}>
+          }}
+        >
           D
         </div>
         <div>
@@ -206,7 +212,8 @@ const ResponsiveLayout = ({ children }) => {
               marginBottom: "0px",
               lineHeight: "normal",
               fontWeight: "500",
-            }}>
+            }}
+          >
             Dwi Andika
           </p>
         </div>
@@ -221,7 +228,8 @@ const ResponsiveLayout = ({ children }) => {
           scrollbarWidth: "thin",
           scrollbarColor: "#c0c0c0 transparent",
           WebkitScrollbarWidth: "thin",
-        }}>
+        }}
+      >
         <style>
           {`
             ::-webkit-scrollbar {
@@ -272,7 +280,8 @@ const ResponsiveLayout = ({ children }) => {
                   },
                 },
               }}
-              style={{ padding: "0px 8px 0px 8px" }}>
+              style={{ padding: "0px 8px 0px 8px" }}
+            >
               <NavLink
                 to={path}
                 className={({ isActive }) =>
@@ -285,7 +294,8 @@ const ResponsiveLayout = ({ children }) => {
                   color: "inherit",
                   display: "flex",
                   alignItems: "center",
-                }}>
+                }}
+              >
                 <ListItemIcon sx={{ minWidth: "36px", color: "inherit" }}>
                   {icon}
                 </ListItemIcon>
@@ -293,7 +303,8 @@ const ResponsiveLayout = ({ children }) => {
                   variant="body1"
                   sx={{
                     fontSize: "14px",
-                  }}>
+                  }}
+                >
                   {label}
                 </Typography>
               </NavLink>
@@ -316,14 +327,16 @@ const ResponsiveLayout = ({ children }) => {
                       borderRadius: "4px",
                     },
                   },
-                }}>
+                }}
+              >
                 <ListItemText
                   primary={
                     <span
                       style={{
                         fontSize: "15px",
                         fontWeight: "bold",
-                      }}>
+                      }}
+                    >
                       Favorites
                     </span>
                   }
@@ -342,7 +355,8 @@ const ResponsiveLayout = ({ children }) => {
                         borderRadius: "4px",
                       },
                     },
-                  }}>
+                  }}
+                >
                   <NavLink
                     to={`/project/${normalizeName(project.name)}`}
                     className={({ isActive }) =>
@@ -355,7 +369,8 @@ const ResponsiveLayout = ({ children }) => {
                       color: "inherit",
                       display: "flex",
                       alignItems: "center",
-                    }}>
+                    }}
+                  >
                     <ListItemIcon sx={{ minWidth: "36px", color: "inherit" }}>
                       <TagIcon style={{ fontSize: "22px" }} />{" "}
                     </ListItemIcon>
@@ -368,7 +383,8 @@ const ResponsiveLayout = ({ children }) => {
                         whiteSpace: "nowrap",
                         textOverflow: "ellipsis",
                         fontWeight: "400",
-                      }}>
+                      }}
+                    >
                       {project.name
                         .replaceAll("-", " ")
                         .split(" ")
@@ -399,7 +415,8 @@ const ResponsiveLayout = ({ children }) => {
                 onClick={handleModalOpen}
                 style={{ color: "#000000", marginTop: "7px" }}
               />
-            }>
+            }
+          >
             <NavLink
               to="/project"
               className={({ isActive }) =>
@@ -413,13 +430,15 @@ const ResponsiveLayout = ({ children }) => {
                 alignItems: "center",
                 padding: "8px 10px 8px 10px",
               }}
-              end>
+              end
+            >
               <Typography
                 variant="body1"
                 sx={{
                   fontSize: "14px",
                   fontWeight: "bold",
-                }}>
+                }}
+              >
                 My Projects
               </Typography>
             </NavLink>
@@ -438,7 +457,8 @@ const ResponsiveLayout = ({ children }) => {
                     borderRadius: "4px",
                   },
                 },
-              }}>
+              }}
+            >
               <NavLink
                 to={`/project/${normalizeName(project.name)}`}
                 className={({ isActive }) =>
@@ -452,7 +472,8 @@ const ResponsiveLayout = ({ children }) => {
                   alignItems: "center",
                   justifyContent: "space-between",
                   padding: "8px 10px 8px 10px",
-                }}>
+                }}
+              >
                 <div style={{ display: "flex" }}>
                   <ListItemIcon sx={{ minWidth: "36px", color: "inherit" }}>
                     <TagIcon style={{ fontSize: "22px" }} />
@@ -467,7 +488,8 @@ const ResponsiveLayout = ({ children }) => {
                       whiteSpace: "nowrap",
                       textOverflow: "ellipsis",
                       fontWeight: "400",
-                    }}>
+                    }}
+                  >
                     {project.name
                       .replaceAll("-", " ")
                       .split(" ")
@@ -491,7 +513,8 @@ const ResponsiveLayout = ({ children }) => {
       <Box
         component="nav"
         sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
-        aria-label="sidebar">
+        aria-label="sidebar"
+      >
         <Drawer
           variant="temporary"
           open={mobileOpen}
@@ -506,7 +529,8 @@ const ResponsiveLayout = ({ children }) => {
               scrollbarWidth: "thin",
               overflowX: "hidden",
             },
-          }}>
+          }}
+        >
           {drawer}
         </Drawer>
 
@@ -527,7 +551,8 @@ const ResponsiveLayout = ({ children }) => {
               left: 0,
             },
           }}
-          open>
+          open
+        >
           {drawer}
         </Drawer>
       </Box>
@@ -540,44 +565,84 @@ const ResponsiveLayout = ({ children }) => {
             backgroundColor: "#fff",
             color: "#000",
             borderBottom: showBorder ? "1px solid rgba(0, 0, 0, 0.12)" : "none",
-          }}>
+          }}
+        >
           <Toolbar sx={{ position: "relative", alignItems: "center" }}>
             {isMobile && (
               <IconButton
                 color="inherit"
                 edge="start"
+                style={{ marginRight: 3 }}
                 onClick={handleDrawerToggle}
-                sx={{ mr: 2 }}>
+              >
                 <MenuIcon />
               </IconButton>
             )}
-            {isMobile ? (
-              <img
-                src="/logo.png"
-                style={{ objectFit: "contain", maxWidth: 50 }}
-                alt="Logo"
-              />
-            ) : (
-              <img
-                src="/logo-todo.png"
-                style={{ objectFit: "contain", maxWidth: 120 }}
-                alt="Logo"
-              />
-            )}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
+            >
+              {isMobile ? (
+                <img
+                  src="/logo.png"
+                  style={{ objectFit: "contain", maxWidth: 50 }}
+                  alt="Logo"
+                />
+              ) : (
+                <img
+                  src="/logo-todo.png"
+                  style={{ objectFit: "contain", maxWidth: 120 }}
+                  alt="Logo"
+                />
+              )}
 
-            <Typography
-              variant="h6"
-              sx={{
-                position: "absolute",
-                top: showTitle ? "50%" : "80%",
-                left: isMobile ? "50%" : "50%",
-                transform: "translate(-50%, -50%)",
-                fontSize: isMobile ? "16px" : "17px",
-                opacity: showTitle ? 1 : 0,
-                transition: "top 0.2s ease, opacity 0.1s ease",
-              }}>
-              {getTitle()}
-            </Typography>
+              {location.pathname.split("/")[1] === "project" ? (
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      position: "absolute",
+                      top: showTitle ? "50%" : "80%",
+                      left: isMobile ? "50%" : "50%",
+                      transform: "translate(-50%, -50%)",
+                      fontSize: isMobile ? "16px" : "17px",
+                      opacity: showTitle ? 1 : 0,
+                      transition: "top 0.2s ease, opacity 0.1s ease",
+                    }}
+                  >
+                    {capitalizeEachWord(
+                      location.pathname.split("/")[2].replaceAll("-", " ")
+                    )}
+                  </Typography>
+                </div>
+              ) : (
+                <Typography
+                  variant="h6"
+                  sx={{
+                    position: "absolute",
+                    top: showTitle ? "50%" : "80%",
+                    left: isMobile ? "50%" : "50%",
+                    transform: "translate(-50%, -50%)",
+                    fontSize: isMobile ? "16px" : "17px",
+                    opacity: showTitle ? 1 : 0,
+                    transition: "top 0.2s ease, opacity 0.1s ease",
+                  }}
+                >
+                  {getTitle()}
+                </Typography>
+              )}
+
+              {location.pathname.split("/")[1] === "project" && (
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <CommentsIcon style={{ marginRight: 10 }} />
+                  <MoreHorizOutlinedIcon />
+                </div>
+              )}
+            </div>
           </Toolbar>
         </AppBar>
 
