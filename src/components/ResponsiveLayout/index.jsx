@@ -14,6 +14,7 @@ import {
   useMediaQuery,
   IconButton as MuiIconButton,
 } from "@mui/material";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import CommentsIcon from "@mui/icons-material/ChatBubbleOutline";
 import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
 import ListItemIcon from "@mui/material/ListItemIcon";
@@ -125,6 +126,17 @@ const ResponsiveLayout = ({ children }) => {
     setEditProject(null);
   };
 
+  const getCurrentDate = () => {
+    const today = new Date();
+    const day = today.getDate();
+    const dayOfWeek = today.toLocaleString("default", { weekday: "short" });
+    const month = today.toLocaleString("default", { month: "short" });
+
+    return `${dayOfWeek}, ${day} ${month}`;
+  };
+
+  const userData = JSON.parse(localStorage.getItem("user_data"));
+
   const triggerProjectChange = () => {
     const event = new Event("projectChange");
     window.dispatchEvent(event);
@@ -186,8 +198,8 @@ const ResponsiveLayout = ({ children }) => {
         style={{
           display: "flex",
           alignItems: "center",
-          marginTop: "-48px",
-          marginBottom: "10px",
+          marginTop: isMobile ? "-45px" : "-48px",
+          marginBottom: isMobile ? "15px" : "10px",
         }}
       >
         <div
@@ -204,7 +216,7 @@ const ResponsiveLayout = ({ children }) => {
             marginLeft: "10px",
           }}
         >
-          D
+          {userData.firstName.charAt(0)}
         </div>
         <div>
           <p
@@ -214,7 +226,7 @@ const ResponsiveLayout = ({ children }) => {
               fontWeight: "500",
             }}
           >
-            Dwi Andika
+            {userData.firstName} {userData.lastName}
           </p>
         </div>
       </div>
@@ -586,19 +598,25 @@ const ResponsiveLayout = ({ children }) => {
                 width: "100%",
               }}
             >
-              {isMobile ? (
-                <img
-                  src="/logo.png"
-                  style={{ objectFit: "contain", maxWidth: 50 }}
-                  alt="Logo"
-                />
-              ) : (
-                <img
-                  src="/logo-todo.png"
-                  style={{ objectFit: "contain", maxWidth: 120 }}
-                  alt="Logo"
-                />
-              )}
+              <NavLink to={"/"}>
+                {isMobile ? (
+                  <img
+                    src="/logo.png"
+                    style={{
+                      objectFit: "contain",
+                      maxWidth: 50,
+                      marginTop: 6,
+                    }}
+                    alt="Logo"
+                  />
+                ) : (
+                  <img
+                    src="/logo-todo.png"
+                    style={{ objectFit: "contain", maxWidth: 120 }}
+                    alt="Logo"
+                  />
+                )}
+              </NavLink>
 
               {location.pathname.split("/")[1] === "project" ? (
                 <div style={{ display: "flex", alignItems: "center" }}>
@@ -635,13 +653,37 @@ const ResponsiveLayout = ({ children }) => {
                   {getTitle()}
                 </Typography>
               )}
+              <NavLink
+                to={"/calendar"}
+                style={{ textDecoration: "none", color: "#000000" }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 5,
+                    padding: "2px 8px 2px 8px",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: "rgb(241 241 241)",
+                    marginRight: -2,
+                    borderRadius: 2,
+                  }}
+                >
+                  <CalendarTodayIcon style={{ fontSize: 15 }} />
+                  <p style={{ fontSize: 14, fontWeight: 500 }}>
+                    {getCurrentDate()}
+                  </p>
+                </div>
+              </NavLink>
 
-              {location.pathname.split("/")[1] === "project" && (
+              {/* {location.pathname.split("/")[1] === "project" && (
                 <div style={{ display: "flex", alignItems: "center" }}>
                   <CommentsIcon style={{ marginRight: 10 }} />
-                  <MoreHorizOutlinedIcon />
+                  <MoreHorizOutlinedIcon
+                    style={{ marginRight: isMobile ? -4 : 0 }}
+                  />
                 </div>
-              )}
+              )} */}
             </div>
           </Toolbar>
         </AppBar>

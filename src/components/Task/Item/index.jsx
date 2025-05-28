@@ -21,6 +21,7 @@ import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import EditIcon from "@mui/icons-material/EditOutlined";
 import DragIcon from "@mui/icons-material/DragIndicator";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
 import DateIcon from "@mui/icons-material/DateRangeOutlined";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -294,10 +295,12 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
   return (
     <div
       ref={setNodeRef}
-      style={containerStyle(isDragging, transform, transition)}>
+      style={containerStyle(isDragging, transform, transition)}
+    >
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <div
-          style={{ flex: 1, display: "flex", height: "100%", marginTop: 10 }}>
+          style={{ flex: 1, display: "flex", height: "100%", marginTop: 10 }}
+        >
           <div style={{ marginRight: 10 }}>
             <Checkbox
               checked={task.completed}
@@ -336,7 +339,8 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                 alignItems: "start",
                 display: "flex",
                 flexDirection: "column",
-              }}>
+              }}
+            >
               <span
                 style={{
                   fontWeight: "bold",
@@ -351,7 +355,8 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                   whiteSpace: "normal",
                   lineHeight: "normal",
                   marginBottom: "3px",
-                }}>
+                }}
+              >
                 {task.title}
               </span>
             </div>
@@ -369,13 +374,15 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                 whiteSpace: "normal",
                 wordBreak: "break-word",
               }}
-              dangerouslySetInnerHTML={{ __html: task.description }}></div>
+              dangerouslySetInnerHTML={{ __html: task.description }}
+            ></div>
 
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-              }}>
+              }}
+            >
               {(task.dueDate || comments.length > 0) && (
                 <div
                   style={{
@@ -383,21 +390,24 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                     alignItems: "center",
                     gap: "10px",
                     marginTop: "5px",
-                  }}>
+                  }}
+                >
                   {task.dueDate && (
                     <div
                       style={{
                         display: "flex",
                         alignItems: "center",
                         marginTop: 5,
-                      }}>
+                      }}
+                    >
                       <DateIcon style={{ fontSize: "14px", color: "grey" }} />
                       <p
                         style={{
                           fontSize: "13px",
                           color: "grey",
                           marginLeft: "5px",
-                        }}>
+                        }}
+                      >
                         {(() => {
                           const currentYear = new Date().getFullYear();
                           const dueDate = new Date(task.dueDate);
@@ -426,7 +436,8 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                         marginTop: 5,
                       }}
                       onClick={handleOpenDialog}
-                      title="View comments">
+                      title="View comments"
+                    >
                       <CommentsIcon
                         style={{
                           fontSize: "14px",
@@ -439,7 +450,8 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                           fontSize: "13px",
                           color: "grey",
                           marginLeft: "5px",
-                        }}>
+                        }}
+                      >
                         {comments.length}
                       </p>
                     </div>
@@ -450,7 +462,7 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
           </div>
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <MoreVertIcon
+          <MoreHorizOutlinedIcon
             style={{ fontSize: "20px", cursor: "pointer" }}
             onClick={handleMenuOpen}
           />
@@ -459,12 +471,14 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
             anchorEl={menuAnchor}
             open={Boolean(menuAnchor)}
             MenuListProps={{ sx: { py: 0 } }}
-            onClose={handleMenuClose}>
+            onClose={handleMenuClose}
+          >
             <MenuItem
               onClick={() => {
                 onEdit(task);
                 handleMenuClose();
-              }}>
+              }}
+            >
               <EditIcon style={{ fontSize: "19px", marginRight: 12 }} />{" "}
               <p style={{ fontSize: "13px" }}>Edit</p>
             </MenuItem>
@@ -472,7 +486,8 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
               onClick={() => {
                 onDelete(task.id);
                 handleMenuClose();
-              }}>
+              }}
+            >
               <DeleteIcon style={{ fontSize: "19px", marginRight: 12 }} />{" "}
               <p style={{ fontSize: "13px" }}>Delete</p>
             </MenuItem>
@@ -480,7 +495,8 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
               onClick={() => {
                 handleOpenDialog();
                 handleMenuClose();
-              }}>
+              }}
+            >
               <CommentsIcon
                 style={{ fontSize: "17px", marginRight: 12, marginLeft: 2 }}
               />{" "}
@@ -499,7 +515,8 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
               background: "#eee",
               borderRadius: 4,
             }}
-            aria-label="Drag task">
+            aria-label="Drag task"
+          >
             <DragIcon style={{ fontSize: "18px" }} />
           </div>
         </div>
@@ -511,7 +528,8 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
         open={openDialog}
         onClose={handleCloseDialog}
         fullWidth
-        maxWidth="sm">
+        maxWidth="sm"
+      >
         <DialogTitle>Comments</DialogTitle>
         <DialogContent
           style={{
@@ -519,16 +537,19 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
             flexDirection: "column",
             maxHeight: "500px",
             overflow: "hidden",
-          }}>
+          }}
+        >
           <div
             ref={commentContainerRef}
-            style={{ flexGrow: 1, overflowY: "auto", padding: "8px" }}>
+            style={{ flexGrow: 1, overflowY: "auto", padding: "8px" }}
+          >
             <div
               style={{
                 marginBottom: "16px",
                 display: "flex",
                 alignItems: "flex-start",
-              }}>
+              }}
+            >
               {/* Checkbox */}
               <Checkbox
                 checked={task.completed}
@@ -569,7 +590,8 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                     lineHeight: "normal",
                     marginBottom: 10,
                     marginTop: 0,
-                  }}>
+                  }}
+                >
                   {task.title}
                 </p>
                 <div
@@ -583,11 +605,13 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
               {comments.map((comment, index) => (
                 <ListItem
                   key={index}
-                  style={{ display: "flex", alignItems: "flex-start" }}>
+                  style={{ display: "flex", alignItems: "flex-start" }}
+                >
                   {commentToEdit === index ? (
                     <div style={{ flexGrow: 1 }}>
                       <div
-                        style={{ position: "relative", marginBottom: "8px" }}>
+                        style={{ position: "relative", marginBottom: "8px" }}
+                      >
                         {editingContent.trim() === "" && (
                           <div style={placeholderStyleDescription}>
                             Edit your comment here...
@@ -603,12 +627,14 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                             flexDirection: "column",
                             justifyContent: "space-between",
                             fontSize: "14px",
-                          }}>
+                          }}
+                        >
                           <div
                             style={{
                               position: "relative",
                               marginBottom: "8px",
-                            }}>
+                            }}
+                          >
                             {editCommentEditor?.isEmpty && (
                               <div style={placeholderStyleDescription}>
                                 Edit your comment here...
@@ -633,16 +659,19 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                               marginTop: 10,
                               alignItems: "center",
                               justifyContent: "space-between",
-                            }}>
+                            }}
+                          >
                             <div
                               style={{
                                 display: "flex",
                                 alignItems: "center",
                                 gap: "2px",
-                              }}>
+                              }}
+                            >
                               <IconButton
                                 onClick={handleOpenEmojiPicker}
-                                size="small">
+                                size="small"
+                              >
                                 <InsertEmoticonIcon
                                   style={{ fontSize: 20, color: "#4f4f4f" }}
                                 />
@@ -658,7 +687,8 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                               <Menu
                                 anchorEl={anchorElEmoji}
                                 open={Boolean(anchorElEmoji)}
-                                onClose={handleCloseEmojiPicker}>
+                                onClose={handleCloseEmojiPicker}
+                              >
                                 <EmojiPicker onEmojiClick={handleEmojiSelect} />
                               </Menu>
                             </div>
@@ -675,7 +705,8 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                                 sx={{
                                   color: "#000000",
                                   backgroundColor: "#f0f0f0",
-                                }}>
+                                }}
+                              >
                                 Cancel
                               </Button>
                               <Button
@@ -688,7 +719,8 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                                   boxShadow: "none",
                                   fontWeight: "bold",
                                   "&:hover": { backgroundColor: "#e06f00" },
-                                }}>
+                                }}
+                              >
                                 Save
                               </Button>
                             </div>
@@ -713,8 +745,9 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                         style={{ flexGrow: 1 }}
                       />
                       <IconButton
-                        onClick={(e) => handleOpenCommentMenu(e, index)}>
-                        <MoreVertIcon />
+                        onClick={(e) => handleOpenCommentMenu(e, index)}
+                      >
+                        <MoreHorizOutlinedIcon />
                       </IconButton>
                       <Menu
                         anchorEl={anchorElCommentMenu}
@@ -722,7 +755,8 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                           Boolean(anchorElCommentMenu) &&
                           commentMenuIndex === index
                         }
-                        onClose={handleCloseCommentMenu}>
+                        onClose={handleCloseCommentMenu}
+                      >
                         <MenuItem onClick={() => handleEditComment(index)}>
                           Edit
                         </MenuItem>
@@ -768,7 +802,8 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
               <Menu
                 anchorEl={anchorElEmoji}
                 open={Boolean(anchorElEmoji)}
-                onClose={handleCloseEmojiPicker}>
+                onClose={handleCloseEmojiPicker}
+              >
                 <EmojiPicker onEmojiClick={handleEmojiSelect} />
               </Menu>
             </div>

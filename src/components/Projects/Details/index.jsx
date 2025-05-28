@@ -697,13 +697,14 @@ const ProjectDetail = () => {
                   cursor: "pointer",
                   padding: "4px 10px",
                   borderRadius: 4,
-                  backgroundColor: "#f5f5f5",
-                  fontSize: 13,
+                  backgroundColor: "rgb(241, 241, 241)",
+                  fontWeight: 500,
+                  fontSize: 14,
                 }}
               >
                 {selectedDate
                   ? selectedDate.format("MMM D, YYYY")
-                  : "Select Date 📅"}
+                  : "Select Date"}
               </div>
               <Popover
                 open={Boolean(anchorEl)}

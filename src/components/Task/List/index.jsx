@@ -325,7 +325,6 @@ const TaskList = ({
                 <strong style={{ fontSize: 15 }}>Overdue</strong>
               </div>
 
-              {/* 📅 Date Picker Button */}
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <div
                   onClick={handleOpen}
@@ -334,13 +333,14 @@ const TaskList = ({
                     cursor: "pointer",
                     padding: "4px 10px",
                     borderRadius: 4,
-                    backgroundColor: "#f5f5f5",
-                    fontSize: 13,
+                    backgroundColor: "rgb(241, 241, 241)",
+                    fontWeight: 500,
+                    fontSize: 14,
                   }}
                 >
                   {selectedDate
                     ? selectedDate.format("MMM D, YYYY")
-                    : "Select Date 📅"}
+                    : "Select Date"}
                 </div>
 
                 <Popover
