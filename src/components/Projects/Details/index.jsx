@@ -10,6 +10,13 @@ import {
   Divider,
   Stack,
   Popover,
+  Menu,
+  MenuItem,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
 import TaskForm from "../../Task/Form";
 import TaskItem from "../../Task/Item";
@@ -26,6 +33,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import dayjs from "dayjs";
+import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
 
 import {
   DndContext,
@@ -70,6 +78,36 @@ const ProjectDetail = () => {
     color: "default",
     isFavorite: false,
   });
+  const [anchorEl2, setAnchorEl2] = useState(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedSection, setSelectedSection] = useState(null);
+
+  const handleMenuClick = (event, section) => {
+    setAnchorEl2(event.currentTarget);
+    setSelectedSection(section);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl2(null);
+  };
+
+  const handleDialogOpen = () => {
+    setDialogOpen(true);
+    setAnchorEl2(null); // Close menu
+  };
+
+  const handleDialogClose = () => {
+    setDialogOpen(false);
+    setSelectedSection(null);
+  };
+
+  const confirmDelete = () => {
+    if (selectedSection) {
+      handleDeleteSection(selectedSection);
+    }
+    handleDialogClose();
+  };
+
   const normalize = (str) => str.trim().toLowerCase().replace(/\s+/g, "-");
 
   const isValidProjectId = projects.some(
@@ -739,7 +777,7 @@ const ProjectDetail = () => {
             </LocalizationProvider>
           </div>
 
-          <Divider sx={{ my: 1 }} />
+          <Divider />
 
           {showOverdue && (
             <div style={{ padding: 4 }}>
@@ -781,7 +819,13 @@ const ProjectDetail = () => {
             key={section}
             style={{ marginBottom: "1rem", borderRadius: 8, padding: 4 }}
           >
-            <div style={{ display: "flex", alignItems: "center" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: 10,
+              }}
+            >
               <div
                 onClick={() => toggleExpand(section)}
                 style={{
@@ -816,25 +860,23 @@ const ProjectDetail = () => {
                   onChange={(newName) => handleEditSection(section, newName)}
                 />
 
-                <Button
-                  variant="contained"
-                  onClick={() => handleDeleteSection(section)}
-                  sx={{
-                    backgroundColor: "#ff7800",
-                    boxShadow: "none",
-                    "&:hover": {
-                      backgroundColor: "#e06600", // Adjust hover color if needed
-                      boxShadow: "none",
-                    },
-                    textTransform: "capitalize",
-                  }}
-                  size="small"
+                <MoreHorizOutlinedIcon
+                  style={{ fontSize: "20px", cursor: "pointer" }}
+                  onClick={(event) => handleMenuClick(event, section)}
+                />
+
+                <Menu
+                  anchorEl={anchorEl2}
+                  open={Boolean(anchorEl2)}
+                  onClose={handleMenuClose}
                 >
-                  Delete
-                </Button>
+                  <MenuItem style={{ fontSize: 14 }} onClick={handleDialogOpen}>
+                    Delete Section
+                  </MenuItem>
+                </Menu>
               </div>
             </div>
-
+            <Divider style={{ marginBottom: 6 }} />
             <DndContext
               collisionDetection={closestCenter}
               onDragEnd={handleDragEnd}
@@ -921,6 +963,18 @@ const ProjectDetail = () => {
           onClose={() => setEditTask(null)}
         />
       )}
+
+      <Dialog open={dialogOpen} onClose={handleDialogClose}>
+        <DialogTitle>Are you sure you want to delete this section?</DialogTitle>
+        <DialogActions>
+          <Button onClick={handleDialogClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={confirmDelete} color="error">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {showSnackbar && (
         <CustomSnackbar message="Task completed!" onUndo={handleUndo} />

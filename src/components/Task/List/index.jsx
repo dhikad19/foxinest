@@ -7,6 +7,11 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
+import { Menu, MenuItem, IconButton } from "@mui/material";
+import { Dialog, DialogTitle, DialogActions } from "@mui/material";
+
+import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
+
 import { Divider, Popover, Button, Stack, Box } from "@mui/material";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import {
@@ -102,6 +107,10 @@ const TaskList = ({
   const today = dayjs();
   const tomorrow = dayjs().add(1, "day");
   const [isDragging, setIsDragging] = useState(false);
+  const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+  const [menuCategory, setMenuCategory] = useState(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingDeleteCategory, setPendingDeleteCategory] = useState(null);
 
   // const startEditing = (taskId) => {
   //   setEditingTaskId(taskId);
@@ -134,12 +143,23 @@ const TaskList = ({
   //   }
   //   setActiveId(null);
   // };
+
   const handleOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleMenuOpen = (event, category) => {
+    setMenuAnchorEl(event.currentTarget);
+    setMenuCategory(category);
+  };
+
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null);
+    setMenuCategory(null);
   };
 
   const toggleForm = (category) => {
@@ -260,289 +280,315 @@ const TaskList = ({
   };
 
   return (
-    <DndContext
-      modifiers={[restrictToVerticalAxis]}
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragStart={handleDragStart} // Menangani drag start
-      onDragEnd={handleDragEnd} // Menangani drag end
-    >
-      <div>
-        <DragOverlay>
-          {draggedItem ? (
-            <div
-              style={{
-                padding: "10px 20px",
-                backgroundColor: "#fff",
-                borderRadius: "12px",
-                boxShadow: "0px 10px 20px rgba(0, 0, 0, 0.1)",
-                opacity: isDragging ? 0.7 : 0.9, // Adjust opacity dynamically
-                cursor: "move",
-                fontSize: "16px",
-                fontWeight: "500",
-                color: "#333",
-                // Disable transition during dragging for smooth behavior
-                transition: isDragging ? "none" : "all 0.3s ease",
-              }}
-            >
-              {draggedItem.name}
-            </div>
-          ) : null}
-        </DragOverlay>
-
-        {overdueTasks.length > 0 && (
-          <div style={{ marginBottom: "1rem", borderRadius: 8, padding: 4 }}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: 10,
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <div
-                  onClick={() => setShowOverdue((prev) => !prev)}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    cursor: "pointer",
-                    marginRight: 8,
-                    borderRadius: 4,
-                    height: 22,
-                    width: 22,
-                    marginLeft: "-30px",
-                    backgroundColor: "#fafafa",
-                  }}
-                >
-                  {showOverdue ? (
-                    <FaChevronDown size={10} color="grey" />
-                  ) : (
-                    <FaChevronRight size={10} color="grey" />
-                  )}
-                </div>
-                <strong style={{ fontSize: 15 }}>Overdue</strong>
-              </div>
-
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <div
-                  onClick={handleOpen}
-                  style={{
-                    marginLeft: "auto",
-                    cursor: "pointer",
-                    padding: "4px 10px",
-                    borderRadius: 4,
-                    backgroundColor: "rgb(241, 241, 241)",
-                    fontWeight: 500,
-                    fontSize: 14,
-                  }}
-                >
-                  {selectedDate
-                    ? selectedDate.format("MMM D, YYYY")
-                    : "Select Date"}
-                </div>
-
-                <Popover
-                  open={open}
-                  anchorEl={anchorEl}
-                  onClose={handleClose}
-                  anchorOrigin={{
-                    vertical: "bottom",
-                    horizontal: "left",
-                  }}
-                >
-                  <Box p={1}>
-                    <Stack direction="row" spacing={1} padding={2}>
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        onClick={() => handleDateChange(today)}
-                      >
-                        Today
-                      </Button>
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        onClick={() => handleDateChange(tomorrow)}
-                      >
-                        Tomorrow
-                      </Button>
-                    </Stack>
-                    <DateCalendar
-                      disablePast
-                      value={selectedDate}
-                      onChange={handleDateChange}
-                    />
-                  </Box>
-                </Popover>
-              </LocalizationProvider>
-            </div>
-            <Divider />
-            {showOverdue && (
-              <div style={{ padding: 4 }}>
-                {overdueTasks.map((task) =>
-                  editingTaskId === task.id ? (
-                    <EditTask
-                      key={task.id}
-                      task={task}
-                      onSave={(updatedTask) => {
-                        onEdit(updatedTask);
-                        setEditingTaskId(null);
-                      }}
-                      onCancel={() => onClose()} // Panggil onClose saat Cancel
-                      onClose={onClose} // Pass fungsi onClose ke EditTask
-                    />
-                  ) : (
-                    <TaskItem
-                      key={task.id}
-                      task={task}
-                      onDelete={onDelete} // Fungsi untuk menghapus task
-                      onEdit={() => setEditingTaskId(task.id)} // Masuk ke mode edit ketika tombol edit diklik
-                      onComplete={onComplete} // Fungsi untuk menyelesaikan task
-                    />
-                  )
-                )}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ✅ Regular Sections */}
-        {Object.entries(filteredTasksByCategory).map(([category, tasks]) => (
-          <div
-            key={category}
-            style={{ marginBottom: "1rem", borderRadius: 8, padding: 4 }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: 10,
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <div
-                  onClick={() => toggleExpand(category)}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    cursor: "pointer",
-                    marginRight: 8,
-                    borderRadius: 4,
-                    height: 22,
-                    width: 22,
-                    marginLeft: "-30px",
-                    backgroundColor: "#fafafa",
-                  }}
-                >
-                  {expandedSections[category] ? (
-                    <FaChevronDown size={10} color="grey" />
-                  ) : (
-                    <FaChevronRight size={10} color="grey" />
-                  )}
-                </div>
-                <LiveSectionEditor
-                  initialContent={category}
-                  onChange={(newName) => onEditSection(category, newName)}
-                />
-              </div>
-              <Button
-                variant="contained"
-                onClick={() => onDeleteSection(category)}
-                sx={{
-                  backgroundColor: "#ff7800",
-                  boxShadow: "none",
-                  "&:hover": {
-                    backgroundColor: "#e06600", // Adjust hover color if needed
-                    boxShadow: "none",
-                  },
-                  textTransform: "capitalize",
+    <>
+      <DndContext
+        modifiers={[restrictToVerticalAxis]}
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={handleDragStart} // Menangani drag start
+        onDragEnd={handleDragEnd} // Menangani drag end
+      >
+        <div>
+          <DragOverlay>
+            {draggedItem ? (
+              <div
+                style={{
+                  padding: "10px 20px",
+                  backgroundColor: "#fff",
+                  borderRadius: "12px",
+                  boxShadow: "0px 10px 20px rgba(0, 0, 0, 0.1)",
+                  opacity: isDragging ? 0.7 : 0.9, // Adjust opacity dynamically
+                  cursor: "move",
+                  fontSize: "16px",
+                  fontWeight: "500",
+                  color: "#333",
+                  // Disable transition during dragging for smooth behavior
+                  transition: isDragging ? "none" : "all 0.3s ease",
                 }}
-                size="small"
               >
-                Delete
-              </Button>
-            </div>
-            <Divider />
-            <div
-              style={{
-                overflow: "hidden",
-                paddingLeft: 4,
-                paddingRight: 4,
-                maxHeight: expandedSections[category] ? "100%" : "0",
-              }}
-            >
-              <SortableContext
-                items={tasks.map((t) => t.id)}
-                strategy={verticalListSortingStrategy}
-              >
-                {tasks.map((task) =>
-                  editingTaskId === task.id ? (
-                    <EditTask
-                      key={task.id}
-                      task={task}
-                      onSave={(updatedTask) => {
-                        onEdit(updatedTask);
-                        setEditingTaskId(null);
-                      }}
-                      onCancel={() => onClose()} // Panggil onClose saat Cancel
-                      onClose={onClose} // Pass fungsi onClose ke EditTask
-                    />
-                  ) : (
-                    <TaskItem
-                      key={task.id}
-                      task={task}
-                      onDelete={onDelete}
-                      onEdit={() => setEditingTaskId(task.id)}
-                      onComplete={onComplete}
-                    />
-                  )
-                )}
-              </SortableContext>
+                {draggedItem.name}
+              </div>
+            ) : null}
+          </DragOverlay>
 
-              {!openForms[category] && (
-                <div
-                  onClick={() => toggleForm(category)}
-                  onMouseEnter={() => setHoveredCategory(category)}
-                  onMouseLeave={() => setHoveredCategory(null)}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    color: hoveredCategory === category ? "#ff7800" : "inherit",
-                    cursor: "pointer",
-                    marginTop: 10,
-                  }}
-                >
-                  {hoveredCategory === category ? (
-                    <AddIconFilled
-                      style={{ marginRight: "8px", fontSize: 20 }}
-                    />
-                  ) : (
-                    <AddIcon style={{ marginRight: "8px", fontSize: 20 }} />
+          {overdueTasks.length > 0 && (
+            <div style={{ marginBottom: "1rem", borderRadius: 8, padding: 4 }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: 10,
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <div
+                    onClick={() => setShowOverdue((prev) => !prev)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: "pointer",
+                      marginRight: 8,
+                      borderRadius: 4,
+                      height: 22,
+                      width: 22,
+                      marginLeft: "-30px",
+                      backgroundColor: "#fafafa",
+                    }}
+                  >
+                    {showOverdue ? (
+                      <FaChevronDown size={10} color="grey" />
+                    ) : (
+                      <FaChevronRight size={10} color="grey" />
+                    )}
+                  </div>
+                  <strong style={{ fontSize: 15 }}>Overdue</strong>
+                </div>
+
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <div
+                    onClick={handleOpen}
+                    style={{
+                      marginLeft: "auto",
+                      cursor: "pointer",
+                      padding: "4px 10px",
+                      borderRadius: 4,
+                      backgroundColor: "rgb(241, 241, 241)",
+                      fontWeight: 500,
+                      fontSize: 14,
+                    }}
+                  >
+                    {selectedDate
+                      ? selectedDate.format("MMM D, YYYY")
+                      : "Select Date"}
+                  </div>
+
+                  <Popover
+                    open={open}
+                    anchorEl={anchorEl}
+                    onClose={handleClose}
+                    anchorOrigin={{
+                      vertical: "bottom",
+                      horizontal: "left",
+                    }}
+                  >
+                    <Box p={1}>
+                      <Stack direction="row" spacing={1} padding={2}>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          onClick={() => handleDateChange(today)}
+                        >
+                          Today
+                        </Button>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          onClick={() => handleDateChange(tomorrow)}
+                        >
+                          Tomorrow
+                        </Button>
+                      </Stack>
+                      <DateCalendar
+                        disablePast
+                        value={selectedDate}
+                        onChange={handleDateChange}
+                      />
+                    </Box>
+                  </Popover>
+                </LocalizationProvider>
+              </div>
+              <Divider />
+              {showOverdue && (
+                <div style={{ padding: 4 }}>
+                  {overdueTasks.map((task) =>
+                    editingTaskId === task.id ? (
+                      <EditTask
+                        key={task.id}
+                        task={task}
+                        onSave={(updatedTask) => {
+                          onEdit(updatedTask);
+                          setEditingTaskId(null);
+                        }}
+                        onCancel={() => onClose()} // Panggil onClose saat Cancel
+                        onClose={onClose} // Pass fungsi onClose ke EditTask
+                      />
+                    ) : (
+                      <TaskItem
+                        key={task.id}
+                        task={task}
+                        onDelete={onDelete} // Fungsi untuk menghapus task
+                        onEdit={() => setEditingTaskId(task.id)} // Masuk ke mode edit ketika tombol edit diklik
+                        onComplete={onComplete} // Fungsi untuk menyelesaikan task
+                      />
+                    )
                   )}
-
-                  <p style={{ fontSize: 14, fontWeight: 500 }}>Add Task</p>
                 </div>
               )}
-
-              {openForms[category] && (
-                <TaskForm
-                  onAdd={(task) => {
-                    onAdd(task);
-                    toggleForm(category);
-                  }}
-                  defaultCategory={category}
-                  onCancel={() => toggleForm(category)}
-                />
-              )}
             </div>
-          </div>
-        ))}
-      </div>
-    </DndContext>
+          )}
+
+          {/* ✅ Regular Sections */}
+          {Object.entries(filteredTasksByCategory).map(([category, tasks]) => (
+            <div
+              key={category}
+              style={{ marginBottom: "1rem", borderRadius: 8, padding: 4 }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: 10,
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <div
+                    onClick={() => toggleExpand(category)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: "pointer",
+                      marginRight: 8,
+                      borderRadius: 4,
+                      height: 22,
+                      width: 22,
+                      marginLeft: "-30px",
+                      backgroundColor: "#fafafa",
+                    }}
+                  >
+                    {expandedSections[category] ? (
+                      <FaChevronDown size={10} color="grey" />
+                    ) : (
+                      <FaChevronRight size={10} color="grey" />
+                    )}
+                  </div>
+                  <LiveSectionEditor
+                    initialContent={category}
+                    onChange={(newName) => onEditSection(category, newName)}
+                  />
+                </div>
+                <MoreHorizOutlinedIcon
+                  style={{ fontSize: "20px", cursor: "pointer" }}
+                  onClick={(e) => handleMenuOpen(e, category)}
+                />
+
+                <Menu
+                  anchorEl={menuAnchorEl}
+                  open={Boolean(menuAnchorEl) && menuCategory === category}
+                  onClose={handleMenuClose}
+                >
+                  <MenuItem
+                    onClick={() => {
+                      setPendingDeleteCategory(category);
+                      setConfirmOpen(true);
+                      handleMenuClose();
+                    }}
+                    style={{ fontSize: 14 }}
+                  >
+                    Delete Section
+                  </MenuItem>
+                </Menu>
+              </div>
+
+              <Divider style={{ marginBottom: 6 }} />
+              <div
+                style={{
+                  overflow: "hidden",
+                  paddingLeft: 4,
+                  paddingRight: 4,
+                  maxHeight: expandedSections[category] ? "100%" : "0",
+                }}
+              >
+                <SortableContext
+                  items={tasks.map((t) => t.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  {tasks.map((task) =>
+                    editingTaskId === task.id ? (
+                      <EditTask
+                        key={task.id}
+                        task={task}
+                        onSave={(updatedTask) => {
+                          onEdit(updatedTask);
+                          setEditingTaskId(null);
+                        }}
+                        onCancel={() => onClose()} // Panggil onClose saat Cancel
+                        onClose={onClose} // Pass fungsi onClose ke EditTask
+                      />
+                    ) : (
+                      <TaskItem
+                        key={task.id}
+                        task={task}
+                        onDelete={onDelete}
+                        onEdit={() => setEditingTaskId(task.id)}
+                        onComplete={onComplete}
+                      />
+                    )
+                  )}
+                </SortableContext>
+
+                {!openForms[category] && (
+                  <div
+                    onClick={() => toggleForm(category)}
+                    onMouseEnter={() => setHoveredCategory(category)}
+                    onMouseLeave={() => setHoveredCategory(null)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      color:
+                        hoveredCategory === category ? "#ff7800" : "inherit",
+                      cursor: "pointer",
+                      marginTop: 10,
+                    }}
+                  >
+                    {hoveredCategory === category ? (
+                      <AddIconFilled
+                        style={{ marginRight: "8px", fontSize: 20 }}
+                      />
+                    ) : (
+                      <AddIcon style={{ marginRight: "8px", fontSize: 20 }} />
+                    )}
+
+                    <p style={{ fontSize: 14, fontWeight: 500 }}>Add Task</p>
+                  </div>
+                )}
+
+                {openForms[category] && (
+                  <TaskForm
+                    onAdd={(task) => {
+                      onAdd(task);
+                      toggleForm(category);
+                    }}
+                    defaultCategory={category}
+                    onCancel={() => toggleForm(category)}
+                  />
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </DndContext>
+      <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
+        <DialogTitle>Are you sure you want to delete this section?</DialogTitle>
+        <DialogActions>
+          <Button onClick={() => setConfirmOpen(false)} color="primary">
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              onDeleteSection(pendingDeleteCategory);
+              setConfirmOpen(false);
+            }}
+            color="error"
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
 

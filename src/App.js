@@ -11,6 +11,8 @@ import WelcomePage from "./pages/Welcome";
 import Calendar from "./pages/Calendar";
 import NotFoundPage from "./components/404";
 import { CircularProgress, Box, Typography } from "@mui/material";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -53,77 +55,92 @@ const App = () => {
   }
 
   return (
-    <Router>
-      <Routes>
-        <Route
-          path="/welcome"
-          element={<WelcomePage onSubmit={handleUserSubmit} />}
-        />
+    <>
+      <ToastContainer position="top-right" autoClose={6000} />
+      <Router>
+        <Routes>
+          <Route
+            path="/welcome"
+            element={<WelcomePage onSubmit={handleUserSubmit} />}
+          />
 
-        {/* Main layout routes */}
-        <Route
-          path="/"
-          element={
-            userData ? <Layout /> : <WelcomePage onSubmit={handleUserSubmit} />
-          }
-        >
+          {/* Main layout routes */}
           <Route
-            index
-            element={
-              userData ? <Home /> : <WelcomePage onSubmit={handleUserSubmit} />
-            }
-          />
-          <Route
-            path="about"
-            element={
-              userData ? <About /> : <WelcomePage onSubmit={handleUserSubmit} />
-            }
-          />
-          <Route
-            path="calendar"
+            path="/"
             element={
               userData ? (
-                <Calendar />
+                <Layout />
               ) : (
                 <WelcomePage onSubmit={handleUserSubmit} />
               )
             }
-          />
-          <Route
-            path="completed"
-            element={
-              userData ? (
-                <Completed />
-              ) : (
-                <WelcomePage onSubmit={handleUserSubmit} />
-              )
-            }
-          />
-          <Route
-            path="project"
-            element={
-              userData ? (
-                <Project />
-              ) : (
-                <WelcomePage onSubmit={handleUserSubmit} />
-              )
-            }
-          />
-          <Route
-            path="project/:projectId"
-            element={
-              userData ? (
-                <ProjectDetail />
-              ) : (
-                <WelcomePage onSubmit={handleUserSubmit} />
-              )
-            }
-          />
+          >
+            <Route
+              index
+              element={
+                userData ? (
+                  <Home />
+                ) : (
+                  <WelcomePage onSubmit={handleUserSubmit} />
+                )
+              }
+            />
+            <Route
+              path="about"
+              element={
+                userData ? (
+                  <About />
+                ) : (
+                  <WelcomePage onSubmit={handleUserSubmit} />
+                )
+              }
+            />
+            <Route
+              path="calendar"
+              element={
+                userData ? (
+                  <Calendar />
+                ) : (
+                  <WelcomePage onSubmit={handleUserSubmit} />
+                )
+              }
+            />
+            <Route
+              path="completed"
+              element={
+                userData ? (
+                  <Completed />
+                ) : (
+                  <WelcomePage onSubmit={handleUserSubmit} />
+                )
+              }
+            />
+            <Route
+              path="project"
+              element={
+                userData ? (
+                  <Project />
+                ) : (
+                  <WelcomePage onSubmit={handleUserSubmit} />
+                )
+              }
+            />
+            <Route
+              path="project/:projectId"
+              element={
+                userData ? (
+                  <ProjectDetail />
+                ) : (
+                  <WelcomePage onSubmit={handleUserSubmit} />
+                )
+              }
+            />
+            <Route path="*" element={<NotFoundPage />} />
+          </Route>
           <Route path="*" element={<NotFoundPage />} />
-        </Route>
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
-    </Router>
+        </Routes>
+      </Router>
+    </>
   );
 };
 

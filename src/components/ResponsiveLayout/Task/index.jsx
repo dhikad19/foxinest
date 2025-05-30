@@ -1,8 +1,6 @@
-// App.jsx
 import React, { useEffect, useState } from "react";
-import ListAltIcon from "@mui/icons-material/ListAlt";
+import PendingActionsOutlinedIcon from "@mui/icons-material/PendingActionsOutlined";
 import {
-  Button,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -10,20 +8,34 @@ import {
   ListItem,
   ListItemText,
   Typography,
-  Badge,
+  Snackbar,
+  Alert,
 } from "@mui/material";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import NotificationImportantIcon from "@mui/icons-material/NotificationImportant";
+import RunningWithErrorsOutlinedIcon from "@mui/icons-material/RunningWithErrorsOutlined";
+import TimerOutlinedIcon from "@mui/icons-material/TimerOutlined";
+import { toast } from "react-toastify";
 
 function TodayTasksButton() {
   const [todayTasks, setTodayTasks] = useState([]);
   const [open, setOpen] = useState(false);
+  const [toastOpen, setToastOpen] = useState(false);
 
   const getTodayDateString = () => {
     const today = new Date();
     return today.toISOString().split("T")[0];
   };
 
+  const getTomorrowDateString = () => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().split("T")[0];
+  };
+
   const loadTasksFromLocalStorage = () => {
     const todayDate = getTodayDateString();
+    const tomorrowDate = getTomorrowDateString();
     let allTasks = [];
 
     const homeDataRaw = localStorage.getItem("home_projects_data");
@@ -52,40 +64,78 @@ function TodayTasksButton() {
       }
     }
 
-    const todayTasks = allTasks.filter((task) => task.dueDate === todayDate);
-    setTodayTasks(todayTasks);
+    const filteredTasks = allTasks.filter(
+      (task) => task.dueDate === todayDate || task.dueDate === tomorrowDate
+    );
+
+    setTodayTasks(filteredTasks);
+    const lastToastTime = localStorage.getItem("lastToastTime");
+    const currentTime = Date.now();
+
+    if (filteredTasks.length > 0) {
+      if (!lastToastTime || currentTime - lastToastTime > 3600000) {
+        toast.info(
+          `You have ${filteredTasks.length} tasks with deadline today or tomorrow!`,
+          {
+            className: "custom-toast",
+            progressClassName: "custom-toast-progress",
+            icon: (
+              <div>
+                <InfoOutlinedIcon
+                  color="#ff7800"
+                  style={{ color: "#ff7800" }}
+                />
+              </div>
+            ),
+          }
+        );
+        setTimeout(() => {
+          localStorage.setItem("lastToastTime", currentTime.toString());
+        }, 100);
+      }
+    }
   };
 
   useEffect(() => {
+    // Load tasks from localStorage and check for toast on mount
     loadTasksFromLocalStorage();
-  }, []);
+  }, []); // Empty dependency array ensures this only runs once on mount
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  // ⛔ Jangan render tombol jika tidak ada task
+  const handleToastClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setToastOpen(false);
+  };
+
+  // Tidak render tombol jika tidak ada tugas
   if (todayTasks.length === 0) {
     return null;
   }
 
   return (
-    <div style={{ padding: 16 }}>
-      <Badge badgeContent={todayTasks.length} color="primary">
-        <div
-          onClick={handleOpen}
-          style={{
-            display: "flex",
-            gap: 5,
-            padding: "2px 8px 2px 8px",
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: "rgb(241 241 241)",
-
-            borderRadius: 2,
-          }}>
-          <ListAltIcon style={{ fontSize: 15 }} />
-        </div>
-      </Badge>
+    <>
+      <div
+        onClick={handleOpen}
+        style={{
+          marginRight: 5,
+          display: "flex",
+          gap: 5,
+          padding: "2px 8px 2px 8px",
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "rgb(241 241 241)",
+          borderRadius: 2,
+          cursor: "pointer",
+          userSelect: "none",
+        }}
+      >
+        <RunningWithErrorsOutlinedIcon style={{ fontSize: 15 }} />
+        <p style={{ fontSize: 14, fontWeight: 500 }}>{todayTasks.length}</p>
+      </div>
 
       <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
         <DialogTitle>Today's Tasks</DialogTitle>
@@ -113,7 +163,22 @@ function TodayTasksButton() {
           </List>
         </DialogContent>
       </Dialog>
-    </div>
+
+      {/* <Snackbar
+        open={toastOpen}
+        autoHideDuration={6000}
+        onClose={handleToastClose}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          onClose={handleToastClose}
+          severity="info"
+          sx={{ width: "100%" }}
+        >
+          You have {todayTasks.length} tasks with deadline today or tomorrow!
+        </Alert>
+      </Snackbar> */}
+    </>
   );
 }
 

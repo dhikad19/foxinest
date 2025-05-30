@@ -1,5 +1,3 @@
-// REFACTORED TaskForm based on EditModal structure
-
 import React, { useState, useEffect, useMemo } from "react";
 import {
   Box,
@@ -177,7 +175,8 @@ const TaskForm = ({ onAdd, defaultCategory = "", onCancel }) => {
           {/* Due Date */}
           <div
             style={buttonMenu}
-            onClick={(e) => setDueAnchor(e.currentTarget)}>
+            onClick={(e) => setDueAnchor(e.currentTarget)}
+          >
             <EventIcon style={{ fontSize: 16, marginRight: 4 }} />
             {form.dueDate
               ? dayjs(form.dueDate).format("MMM D, YYYY")
@@ -187,7 +186,8 @@ const TaskForm = ({ onAdd, defaultCategory = "", onCancel }) => {
             open={Boolean(dueAnchor)}
             anchorEl={dueAnchor}
             onClose={() => setDueAnchor(null)}
-            anchorOrigin={{ vertical: "bottom", horizontal: "left" }}>
+            anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+          >
             <Box>
               <List dense sx={{ mt: 1 }}>
                 {quickDates.map((item) => (
@@ -199,7 +199,8 @@ const TaskForm = ({ onAdd, defaultCategory = "", onCancel }) => {
                           dueDate: item.date.format("YYYY-MM-DD"),
                         }));
                         setDueAnchor(null);
-                      }}>
+                      }}
+                    >
                       <ListItemIcon sx={{ minWidth: 30 }}>
                         {item.icon}
                       </ListItemIcon>
@@ -239,7 +240,8 @@ const TaskForm = ({ onAdd, defaultCategory = "", onCancel }) => {
           {/* Priority */}
           <div
             style={buttonMenu}
-            onClick={(e) => setPriorityAnchor(e.currentTarget)}>
+            onClick={(e) => setPriorityAnchor(e.currentTarget)}
+          >
             <FlagIcon
               style={{
                 color: selectedPriority?.color,
@@ -252,14 +254,16 @@ const TaskForm = ({ onAdd, defaultCategory = "", onCancel }) => {
           <Menu
             anchorEl={priorityAnchor}
             open={Boolean(priorityAnchor)}
-            onClose={() => setPriorityAnchor(null)}>
+            onClose={() => setPriorityAnchor(null)}
+          >
             {priorities.map((p) => (
               <MenuItem
                 key={p.value}
                 onClick={() => {
                   setForm((prev) => ({ ...prev, priority: p.value }));
                   setPriorityAnchor(null);
-                }}>
+                }}
+              >
                 <FlagIcon
                   style={{
                     fontSize: 16,
@@ -277,20 +281,23 @@ const TaskForm = ({ onAdd, defaultCategory = "", onCancel }) => {
           {/* Category */}
           <div
             style={buttonMenu}
-            onClick={(e) => setCategoryAnchor(e.currentTarget)}>
+            onClick={(e) => setCategoryAnchor(e.currentTarget)}
+          >
             {form.category || "Category 🏷️"}
           </div>
           <Menu
             anchorEl={categoryAnchor}
             open={Boolean(categoryAnchor)}
-            onClose={() => setCategoryAnchor(null)}>
+            onClose={() => setCategoryAnchor(null)}
+          >
             {sections.map((section) => (
               <MenuItem
                 key={section}
                 onClick={() => {
                   setForm((prev) => ({ ...prev, category: section }));
                   setCategoryAnchor(null);
-                }}>
+                }}
+              >
                 {section}
               </MenuItem>
             ))}
@@ -311,7 +318,8 @@ const TaskForm = ({ onAdd, defaultCategory = "", onCancel }) => {
                 color: "#000",
                 textTransform: "capitalize",
                 mr: 1,
-              }}>
+              }}
+            >
               Cancel
             </Button>
           )}
@@ -325,7 +333,8 @@ const TaskForm = ({ onAdd, defaultCategory = "", onCancel }) => {
               "&:hover": { backgroundColor: "#e06f00" },
               textTransform: "capitalize",
             }}
-            disabled={!form.title.trim()}>
+            disabled={!form.title.trim()}
+          >
             Add Task
           </Button>
         </Box>

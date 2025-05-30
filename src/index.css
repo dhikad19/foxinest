@@ -7,11 +7,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
-}
-
 div p {
   margin: 0;
 }
@@ -110,6 +105,17 @@ div p {
     align-items: start !important;
     gap: 10px;
   }
+}
+
+/* In your CSS or Tailwind config */
+.custom-toast {
+  line-height: normal !important;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+.custom-toast-progress {
+  background: #ff7800 !important;
 }
 
 /* .ProseMirror p.is-editor-empty:first-child::before {
