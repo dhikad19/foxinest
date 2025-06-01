@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Box,
   List,
@@ -7,6 +7,9 @@ import {
   IconButton,
   Button,
 } from "@mui/material";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 import ProjectModal from "../Modal/Project/Add";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
@@ -15,18 +18,27 @@ import { useNavigate } from "react-router-dom";
 
 const Projects = () => {
   const navigate = useNavigate();
+
   const [projects, setProjects] = useState(() => {
     const stored = localStorage.getItem("projects");
     return stored ? JSON.parse(stored) : [];
   });
 
+  const [searchQuery, setSearchQuery] = useState("");
   const [openModal, setOpenModal] = useState(false);
   const [editProject, setEditProject] = useState(null);
   const [projectName, setProjectName] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const [isFavorite, setIsFavorite] = useState(false);
+  const [menuAnchor, setMenuAnchor] = useState(null);
 
   const normalizeName = (str) => str.trim().toLowerCase().replace(/\s+/g, "-");
+  const normalizeDisplay = (str) =>
+    str
+      .replaceAll("-", " ")
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
 
   const handleModalOpen = (project = null) => {
     if (project) {
@@ -120,8 +132,23 @@ const Projects = () => {
     triggerProjectChange();
   };
 
+  const filteredProjects = projects.filter((project) =>
+    project.name
+      .replaceAll("-", " ")
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <Box sx={{ p: 3 }}>
+    <div
+      style={{
+        paddingLeft: "45px",
+        paddingRight: "45px",
+        maxWidth: "700px",
+        margin: "0 auto",
+        overflow: "visible",
+        position: "relative",
+      }}>
       <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
         <Typography variant="h5">Projects</Typography>
         <Button
@@ -132,48 +159,88 @@ const Projects = () => {
         </Button>
       </Box>
 
+      <Box sx={{ mb: 2 }}>
+        <input
+          type="text"
+          placeholder="Search projects..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          style={{
+            width: "100%",
+            padding: "10px",
+            borderRadius: "4px",
+            border: "1px solid #ccc",
+            fontSize: "16px",
+          }}
+        />
+      </Box>
+
       <List>
-        {projects.length > 0 ? (
-          projects.map((project) => (
-            <ListItem
-              key={project.id}
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                mb: 1,
-                border: "1px solid #ddd",
-                borderRadius: 1,
-                p: 2,
-              }}>
-              <Box>
-                <Typography variant="h6">
-                  {project.name
-                    .replaceAll("-", " ")
-                    .split(" ")
-                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                    .join(" ")}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {`Color: ${project.color}`}
-                </Typography>
-              </Box>
-              <Box>
-                <IconButton
-                  color="primary"
-                  onClick={() => handleModalOpen(project)}>
-                  <EditIcon />
-                </IconButton>
-                <IconButton
-                  color="error"
-                  onClick={() => handleDelete(project.id)}>
-                  <DeleteIcon />
-                </IconButton>
-              </Box>
-            </ListItem>
-          ))
+        {filteredProjects.length > 0 ? (
+          filteredProjects.map((project) => {
+            const displayName = normalizeDisplay(project.name);
+            const projectPath = `/project/${project.name}`;
+
+            const handleMenuOpen = (event) => {
+              setMenuAnchor(event.currentTarget);
+            };
+
+            const handleMenuClose = () => {
+              setMenuAnchor(null);
+            };
+
+            return (
+              <ListItem
+                key={project.id}
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mb: 1,
+                  border: "1px solid #ddd",
+                  borderRadius: 1,
+                  p: 2,
+                  cursor: "pointer",
+                }}
+                onClick={() => navigate(projectPath)}>
+                <Box>
+                  <Typography variant="h6">{displayName}</Typography>
+                  {/* <Typography variant="body2" color="text.secondary">
+                    {`Color: ${project.color}`}
+                  </Typography> */}
+                </Box>
+
+                <Box onClick={(e) => e.stopPropagation()}>
+                  <IconButton onClick={handleMenuOpen}>
+                    <MoreVertIcon />
+                  </IconButton>
+                  <Menu
+                    anchorEl={menuAnchor}
+                    open={Boolean(menuAnchor)}
+                    onClose={handleMenuClose}>
+                    <MenuItem
+                      style={{ fontSize: 14 }}
+                      onClick={() => {
+                        handleMenuClose();
+                        handleModalOpen(project);
+                      }}>
+                      Edit
+                    </MenuItem>
+                    <MenuItem
+                      style={{ fontSize: 14 }}
+                      onClick={() => {
+                        handleMenuClose();
+                        handleDelete(project.id);
+                      }}>
+                      Delete
+                    </MenuItem>
+                  </Menu>
+                </Box>
+              </ListItem>
+            );
+          })
         ) : (
-          <Typography>No projects found. Add a new project!</Typography>
+          <Typography>No projects found.</Typography>
         )}
       </List>
 
@@ -189,7 +256,7 @@ const Projects = () => {
         setIsFavorite={setIsFavorite}
         editProject={editProject}
       />
-    </Box>
+    </div>
   );
 };
 

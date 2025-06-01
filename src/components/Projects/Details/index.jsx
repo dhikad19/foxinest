@@ -16,8 +16,19 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
+  ListItemButton,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
   DialogTitle,
 } from "@mui/material";
+import {
+  Today as TodayIcon,
+  CalendarToday as CalendarTodayIcon,
+  Weekend as WeekendIcon,
+  Event as EventIcon,
+} from "@mui/icons-material";
 import TaskForm from "../../Task/Form";
 import TaskItem from "../../Task/Item";
 import CustomSnackbar from "../../Snackbar";
@@ -47,6 +58,33 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+
+const quickDates = [
+  {
+    label: "Today",
+    date: dayjs(),
+    icon: <TodayIcon fontSize="small" />,
+    display: (d) => d.format("ddd"),
+  },
+  {
+    label: "Tomorrow",
+    date: dayjs().add(1, "day"),
+    icon: <CalendarTodayIcon fontSize="small" />,
+    display: (d) => d.format("ddd"),
+  },
+  {
+    label: "This Weekend",
+    date: dayjs().day(6), // Saturday
+    icon: <WeekendIcon fontSize="small" />,
+    display: (d) => d.format("ddd"),
+  },
+  {
+    label: "Next Week",
+    date: dayjs().add(1, "week").startOf("week").add(1, "day"), // Next Monday
+    icon: <EventIcon fontSize="small" />,
+    display: (d) => `${d.format("ddd")}, ${d.format("D MMM")}`,
+  },
+];
 
 const ProjectDetail = () => {
   const { projectId } = useParams();
@@ -266,7 +304,7 @@ const ProjectDetail = () => {
     const formatted = newDate.format("YYYY-MM-DD");
 
     const updatedTasks = projectData.tasks.map((task) =>
-      task.dueDate && task.dueDate < today
+      task.dueDate && task.dueDate < dayjs().format("YYYY-MM-DD")
         ? { ...task, dueDate: formatted }
         : task
     );
@@ -512,16 +550,14 @@ const ProjectDetail = () => {
         margin: "0 auto",
         overflow: "visible",
         position: "relative",
-      }}
-    >
+      }}>
       <div style={{ paddingLeft: "3px", paddingRight: "3px" }}>
         <div
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-          }}
-        >
+          }}>
           <h2 style={{ marginBottom: "0px", marginTop: "10px" }}>
             {capitalizeEachWord(projectId.replaceAll("-", " "))}
           </h2>
@@ -538,8 +574,7 @@ const ProjectDetail = () => {
                 color: "white",
                 borderRadius: 4,
               }}
-              onClick={() => setEditDialogOpen(true)}
-            >
+              onClick={() => setEditDialogOpen(true)}>
               <EditOutlinedIcon style={{ fontSize: 18 }} />
             </div>
             <div
@@ -552,8 +587,7 @@ const ProjectDetail = () => {
                 color: "white",
                 borderRadius: 4,
               }}
-              onClick={() => setDeleteDialogOpen(true)}
-            >
+              onClick={() => setDeleteDialogOpen(true)}>
               <DeleteOutlinedIcon style={{ fontSize: 18 }} />
             </div>
           </div>
@@ -593,12 +627,10 @@ const ProjectDetail = () => {
             padding: 4,
             marginTop: 18,
           }}
-          onClick={() => setShowForm(true)}
-        >
+          onClick={() => setShowForm(true)}>
           <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
           <span
-            style={{ fontWeight: "bold", color: "#ff7800", fontSize: "15px" }}
-          >
+            style={{ fontWeight: "bold", color: "#ff7800", fontSize: "15px" }}>
             Add Section
           </span>
           <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
@@ -606,8 +638,7 @@ const ProjectDetail = () => {
       ) : (
         <form
           onSubmit={handleAddSection}
-          style={{ gap: 8, marginTop: 10, marginBottom: 30, padding: 3 }}
-        >
+          style={{ gap: 8, marginTop: 10, marginBottom: 30, padding: 3 }}>
           <div
             style={{
               display: "flex",
@@ -616,12 +647,14 @@ const ProjectDetail = () => {
               userSelect: "none",
               marginBottom: 16,
               marginTop: 7,
-            }}
-          >
+            }}>
             <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
             <span
-              style={{ fontWeight: "bold", color: "#ff7800", fontSize: "15px" }}
-            >
+              style={{
+                fontWeight: "bold",
+                color: "#ff7800",
+                fontSize: "15px",
+              }}>
               Add new section
             </span>
             <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
@@ -665,8 +698,7 @@ const ProjectDetail = () => {
                 fontSize: "12px",
                 marginRight: "6px",
               }}
-              disabled={!newSection.trim()}
-            >
+              disabled={!newSection.trim()}>
               Add Section
             </Button>
             <Button
@@ -684,8 +716,7 @@ const ProjectDetail = () => {
               onClick={() => {
                 setShowForm(false);
                 setNewSection("");
-              }}
-            >
+              }}>
               Cancel
             </Button>
           </div>
@@ -700,8 +731,7 @@ const ProjectDetail = () => {
               justifyContent: "space-between",
               alignItems: "center",
               marginBottom: 10,
-            }}
-          >
+            }}>
             <div style={{ display: "flex", alignItems: "center" }}>
               <div
                 onClick={() => setShowOverdue((prev) => !prev)}
@@ -716,8 +746,7 @@ const ProjectDetail = () => {
                   width: 22,
                   marginLeft: "-30px",
                   backgroundColor: "#fafafa",
-                }}
-              >
+                }}>
                 {showOverdue ? (
                   <FaChevronDown size={10} color="grey" />
                 ) : (
@@ -738,40 +767,51 @@ const ProjectDetail = () => {
                   backgroundColor: "rgb(241, 241, 241)",
                   fontWeight: 500,
                   fontSize: 14,
-                }}
-              >
+                }}>
                 {selectedDate
                   ? selectedDate.format("MMM D, YYYY")
                   : "Select Date"}
               </div>
+
               <Popover
                 open={Boolean(anchorEl)}
                 anchorEl={anchorEl}
                 onClose={() => setAnchorEl(null)}
-                anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-              >
-                <Box p={1}>
-                  <Stack direction="row" spacing={1} padding={2}>
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      onClick={() => handleDateChange(dayjs())}
-                    >
-                      Today
-                    </Button>
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      onClick={() => handleDateChange(dayjs().add(1, "day"))}
-                    >
-                      Tomorrow
-                    </Button>
-                  </Stack>
-                  <DateCalendar
-                    disablePast
-                    value={selectedDate}
-                    onChange={handleDateChange}
-                  />
+                anchorOrigin={{ vertical: "bottom", horizontal: "left" }}>
+                <Box>
+                  <List dense sx={{ mt: 1 }}>
+                    {quickDates.map((item) => (
+                      <ListItem disablePadding key={item.label}>
+                        <ListItemButton
+                          onClick={() => handleDateChange(item.date)}
+                          sx={{ justifyContent: "space-between" }}>
+                          <ListItemIcon sx={{ minWidth: 30, ml: 1 }}>
+                            {item.icon}
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={
+                              <Typography
+                                sx={{ fontSize: 13, fontWeight: 500 }}>
+                                {item.label}
+                              </Typography>
+                            }
+                          />
+                          <Typography
+                            sx={{ fontSize: 13, color: "#666", mr: 1 }}>
+                            {item.display(item.date)}
+                          </Typography>
+                        </ListItemButton>
+                      </ListItem>
+                    ))}
+                  </List>
+
+                  <Box px={2} pb={2}>
+                    <DateCalendar
+                      disablePast
+                      value={selectedDate}
+                      onChange={handleDateChange}
+                    />
+                  </Box>
                 </Box>
               </Popover>
             </LocalizationProvider>
@@ -817,15 +857,13 @@ const ProjectDetail = () => {
         filteredSections.map((section) => (
           <div
             key={section}
-            style={{ marginBottom: "1rem", borderRadius: 8, padding: 4 }}
-          >
+            style={{ marginBottom: "1rem", borderRadius: 8, padding: 4 }}>
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
                 marginBottom: 10,
-              }}
-            >
+              }}>
               <div
                 onClick={() => toggleExpand(section)}
                 style={{
@@ -839,8 +877,7 @@ const ProjectDetail = () => {
                   width: 22,
                   marginLeft: "-30px",
                   backgroundColor: "#fafafa",
-                }}
-              >
+                }}>
                 {expandedSections[section] !== false ? (
                   <FaChevronDown size={10} color="grey" />
                 ) : (
@@ -853,8 +890,7 @@ const ProjectDetail = () => {
                   alignItems: "center",
                   width: "100%",
                   justifyContent: "space-between",
-                }}
-              >
+                }}>
                 <LiveSectionEditor
                   initialContent={section}
                   onChange={(newName) => handleEditSection(section, newName)}
@@ -868,8 +904,7 @@ const ProjectDetail = () => {
                 <Menu
                   anchorEl={anchorEl2}
                   open={Boolean(anchorEl2)}
-                  onClose={handleMenuClose}
-                >
+                  onClose={handleMenuClose}>
                   <MenuItem style={{ fontSize: 14 }} onClick={handleDialogOpen}>
                     Delete Section
                   </MenuItem>
@@ -880,14 +915,12 @@ const ProjectDetail = () => {
             <DndContext
               collisionDetection={closestCenter}
               onDragEnd={handleDragEnd}
-              sensors={sensors}
-            >
+              sensors={sensors}>
               {expandedSections[section] !== false && (
                 <>
                   <SortableContext
                     items={tasksByCategory[section]?.map((t) => t.id)}
-                    strategy={verticalListSortingStrategy}
-                  >
+                    strategy={verticalListSortingStrategy}>
                     {tasksByCategory[section]?.map((task) =>
                       editingTaskId === task.id ? (
                         <EditModal
@@ -924,8 +957,7 @@ const ProjectDetail = () => {
                         alignItems: "center",
                         cursor: "pointer",
                         marginTop: 10,
-                      }}
-                    >
+                      }}>
                       <AddIcon style={{ marginRight: "8px", fontSize: 20 }} />
                       <p style={{ fontSize: 14, fontWeight: 500 }}>Add Task</p>
                     </div>

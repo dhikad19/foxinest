@@ -60,6 +60,8 @@ const ResponsiveLayout = ({ children }) => {
         return "Calendar";
       case "/completed":
         return "Completed";
+      case "/project":
+        return "Project";
       default:
         return location.pathname;
     }
@@ -261,15 +263,16 @@ const ResponsiveLayout = ({ children }) => {
               path: "/",
               icon: <HomeIcon style={{ fontSize: "22px" }} />,
             },
-            {
-              label: "Completed",
-              path: "/completed",
-              icon: <CompletedIcon style={{ fontSize: "22px" }} />,
-            },
+
             {
               label: "Calendar",
               path: "/calendar",
               icon: <CalendarIcon style={{ fontSize: "22px" }} />,
+            },
+            {
+              label: "Completed",
+              path: "/completed",
+              icon: <CompletedIcon style={{ fontSize: "22px" }} />,
             },
             {
               label: "About",
@@ -609,7 +612,8 @@ const ResponsiveLayout = ({ children }) => {
                       transition: "top 0.2s ease, opacity 0.1s ease",
                     }}>
                     {capitalizeEachWord(
-                      location.pathname.split("/")[2].replaceAll("-", " ")
+                      location.pathname.split("/")[2]?.replaceAll("-", " ") ||
+                        ""
                     )}
                   </Typography>
                 </div>

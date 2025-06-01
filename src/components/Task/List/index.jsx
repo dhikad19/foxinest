@@ -7,7 +7,17 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { Menu, MenuItem, IconButton } from "@mui/material";
+import {
+  Menu,
+  MenuItem,
+  IconButton,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemButton,
+  ListItemText,
+  Typography,
+} from "@mui/material";
 import { Dialog, DialogTitle, DialogActions } from "@mui/material";
 
 import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
@@ -30,6 +40,12 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 
 // Icons
+import {
+  Today as TodayIcon,
+  CalendarToday as CalendarTodayIcon,
+  Weekend as WeekendIcon,
+  Event as EventIcon,
+} from "@mui/icons-material";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 
 // Date Picker
@@ -37,6 +53,33 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import dayjs from "dayjs";
+
+const quickDates = [
+  {
+    label: "Today",
+    date: dayjs(),
+    icon: <TodayIcon fontSize="small" />,
+    display: (d) => d.format("ddd"),
+  },
+  {
+    label: "Tomorrow",
+    date: dayjs().add(1, "day"),
+    icon: <CalendarTodayIcon fontSize="small" />,
+    display: (d) => d.format("ddd"),
+  },
+  {
+    label: "This Weekend",
+    date: dayjs().day(6), // Saturday
+    icon: <WeekendIcon fontSize="small" />,
+    display: (d) => d.format("ddd"),
+  },
+  {
+    label: "Next Week",
+    date: dayjs().add(1, "week").startOf("week").add(1, "day"), // Next Monday
+    icon: <EventIcon fontSize="small" />,
+    display: (d) => `${d.format("ddd")}, ${d.format("D MMM")}`,
+  },
+];
 
 // 📝 Section name inline editor
 const LiveSectionEditor = ({ initialContent, onChange }) => {
@@ -256,27 +299,21 @@ const TaskList = ({
 
   const handleDateChange = (newDate) => {
     if (!newDate) return;
-    const formattedDate = newDate.format("YYYY-MM-DD");
-    setSelectedDate(newDate);
-    handleClose();
+    const formatted = newDate.format("YYYY-MM-DD");
 
-    // Update all overdue tasks with new date
-    const updatedTasks = overdueTasks.map((task) => ({
-      ...task,
-      dueDate: formattedDate,
-    }));
-
-    const onClose = () => {
-      setEditingTaskId(null); // Tutup mode edit
-    };
-
-    // Keep non-overdue tasks
-    const remainingTasks = Object.values(tasksByCategory)
+    const updatedTasks = Object.values(tasksByCategory)
       .flat()
-      .filter((task) => !(task.dueDate && task.dueDate < todayStr));
+      .map((task) =>
+        task.dueDate && task.dueDate < todayStr
+          ? { ...task, dueDate: formatted }
+          : task
+      );
 
-    // Call external updater
-    onReorderTasks([...remainingTasks, ...updatedTasks]);
+    setSelectedDate(newDate);
+    setEditingTaskId(null);
+    setAnchorEl(null);
+
+    onReorderTasks(updatedTasks);
   };
 
   return (
@@ -304,8 +341,7 @@ const TaskList = ({
                   color: "#333",
                   // Disable transition during dragging for smooth behavior
                   transition: isDragging ? "none" : "all 0.3s ease",
-                }}
-              >
+                }}>
                 {draggedItem.name}
               </div>
             ) : null}
@@ -319,8 +355,7 @@ const TaskList = ({
                   justifyContent: "space-between",
                   alignItems: "center",
                   marginBottom: 10,
-                }}
-              >
+                }}>
                 <div style={{ display: "flex", alignItems: "center" }}>
                   <div
                     onClick={() => setShowOverdue((prev) => !prev)}
@@ -335,8 +370,7 @@ const TaskList = ({
                       width: 22,
                       marginLeft: "-30px",
                       backgroundColor: "#fafafa",
-                    }}
-                  >
+                    }}>
                     {showOverdue ? (
                       <FaChevronDown size={10} color="grey" />
                     ) : (
@@ -348,7 +382,7 @@ const TaskList = ({
 
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <div
-                    onClick={handleOpen}
+                    onClick={(e) => setAnchorEl(e.currentTarget)}
                     style={{
                       marginLeft: "auto",
                       cursor: "pointer",
@@ -357,44 +391,51 @@ const TaskList = ({
                       backgroundColor: "rgb(241, 241, 241)",
                       fontWeight: 500,
                       fontSize: 14,
-                    }}
-                  >
+                    }}>
                     {selectedDate
                       ? selectedDate.format("MMM D, YYYY")
                       : "Select Date"}
                   </div>
 
                   <Popover
-                    open={open}
+                    open={Boolean(anchorEl)}
                     anchorEl={anchorEl}
-                    onClose={handleClose}
-                    anchorOrigin={{
-                      vertical: "bottom",
-                      horizontal: "left",
-                    }}
-                  >
-                    <Box p={1}>
-                      <Stack direction="row" spacing={1} padding={2}>
-                        <Button
-                          size="small"
-                          variant="outlined"
-                          onClick={() => handleDateChange(today)}
-                        >
-                          Today
-                        </Button>
-                        <Button
-                          size="small"
-                          variant="outlined"
-                          onClick={() => handleDateChange(tomorrow)}
-                        >
-                          Tomorrow
-                        </Button>
-                      </Stack>
-                      <DateCalendar
-                        disablePast
-                        value={selectedDate}
-                        onChange={handleDateChange}
-                      />
+                    onClose={() => setAnchorEl(null)}
+                    anchorOrigin={{ vertical: "bottom", horizontal: "left" }}>
+                    <Box>
+                      <List dense sx={{ mt: 1 }}>
+                        {quickDates.map((item) => (
+                          <ListItem disablePadding key={item.label}>
+                            <ListItemButton
+                              onClick={() => handleDateChange(item.date)}
+                              sx={{ justifyContent: "space-between" }}>
+                              <ListItemIcon sx={{ minWidth: 30, ml: 1 }}>
+                                {item.icon}
+                              </ListItemIcon>
+                              <ListItemText
+                                primary={
+                                  <Typography
+                                    sx={{ fontSize: 13, fontWeight: 500 }}>
+                                    {item.label}
+                                  </Typography>
+                                }
+                              />
+                              <Typography
+                                sx={{ fontSize: 13, color: "#666", mr: 1 }}>
+                                {item.display(item.date)}
+                              </Typography>
+                            </ListItemButton>
+                          </ListItem>
+                        ))}
+                      </List>
+
+                      <Box px={2} pb={2}>
+                        <DateCalendar
+                          disablePast
+                          value={selectedDate}
+                          onChange={handleDateChange}
+                        />
+                      </Box>
                     </Box>
                   </Popover>
                 </LocalizationProvider>
@@ -433,16 +474,14 @@ const TaskList = ({
           {Object.entries(filteredTasksByCategory).map(([category, tasks]) => (
             <div
               key={category}
-              style={{ marginBottom: "1rem", borderRadius: 8, padding: 4 }}
-            >
+              style={{ marginBottom: "1rem", borderRadius: 8, padding: 4 }}>
               <div
                 style={{
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
                   marginBottom: 10,
-                }}
-              >
+                }}>
                 <div style={{ display: "flex", alignItems: "center" }}>
                   <div
                     onClick={() => toggleExpand(category)}
@@ -457,8 +496,7 @@ const TaskList = ({
                       width: 22,
                       marginLeft: "-30px",
                       backgroundColor: "#fafafa",
-                    }}
-                  >
+                    }}>
                     {expandedSections[category] ? (
                       <FaChevronDown size={10} color="grey" />
                     ) : (
@@ -478,16 +516,14 @@ const TaskList = ({
                 <Menu
                   anchorEl={menuAnchorEl}
                   open={Boolean(menuAnchorEl) && menuCategory === category}
-                  onClose={handleMenuClose}
-                >
+                  onClose={handleMenuClose}>
                   <MenuItem
                     onClick={() => {
                       setPendingDeleteCategory(category);
                       setConfirmOpen(true);
                       handleMenuClose();
                     }}
-                    style={{ fontSize: 14 }}
-                  >
+                    style={{ fontSize: 14 }}>
                     Delete Section
                   </MenuItem>
                 </Menu>
@@ -500,12 +536,10 @@ const TaskList = ({
                   paddingLeft: 4,
                   paddingRight: 4,
                   maxHeight: expandedSections[category] ? "100%" : "0",
-                }}
-              >
+                }}>
                 <SortableContext
                   items={tasks.map((t) => t.id)}
-                  strategy={verticalListSortingStrategy}
-                >
+                  strategy={verticalListSortingStrategy}>
                   {tasks.map((task) =>
                     editingTaskId === task.id ? (
                       <EditTask
@@ -542,8 +576,7 @@ const TaskList = ({
                         hoveredCategory === category ? "#ff7800" : "inherit",
                       cursor: "pointer",
                       marginTop: 10,
-                    }}
-                  >
+                    }}>
                     {hoveredCategory === category ? (
                       <AddIconFilled
                         style={{ marginRight: "8px", fontSize: 20 }}
@@ -582,8 +615,7 @@ const TaskList = ({
               onDeleteSection(pendingDeleteCategory);
               setConfirmOpen(false);
             }}
-            color="error"
-          >
+            color="error">
             Delete
           </Button>
         </DialogActions>
