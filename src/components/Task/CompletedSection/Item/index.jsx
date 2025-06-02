@@ -32,14 +32,16 @@ const CompletedTaskItem = ({ task, onDelete }) => {
                 display: "flex",
                 alignItems: "center",
                 marginTop: 5,
-              }}>
+              }}
+            >
               <DateIcon style={{ fontSize: "14px", color: "grey" }} />
               <p
                 style={{
                   fontSize: "13px",
                   color: "grey",
                   marginLeft: "5px",
-                }}>
+                }}
+              >
                 {(() => {
                   const currentYear = new Date().getFullYear();
                   const dueDate = new Date(task.dueDate);
@@ -75,7 +77,8 @@ const CompletedTaskItem = ({ task, onDelete }) => {
             fontWeight: "bold",
             fontSize: "12px",
             marginRight: "6px",
-          }}>
+          }}
+        >
           Delete
         </Button>
       </div>

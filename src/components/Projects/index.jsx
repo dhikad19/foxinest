@@ -14,8 +14,9 @@ import ProjectModal from "../Modal/Project/Add";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import TagIcon from "@mui/icons-material/TagOutlined";
 import { useNavigate } from "react-router-dom";
-
+import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
 const Projects = () => {
   const navigate = useNavigate();
 
@@ -148,15 +149,32 @@ const Projects = () => {
         margin: "0 auto",
         overflow: "visible",
         position: "relative",
-      }}>
+      }}
+    >
       <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
-        <Typography variant="h5">Projects</Typography>
-        <Button
+        <h2 style={{ marginBottom: "0px", marginTop: "10px" }}>Projects</h2>
+        {/* <Button
           variant="contained"
           startIcon={<AddIcon />}
-          onClick={() => handleModalOpen()}>
+          onClick={() => handleModalOpen()}
+        >
           Add Project
-        </Button>
+        </Button> */}
+        <div
+          style={{
+            backgroundColor: "#fafafa",
+            display: "flex",
+            alignItems: "center",
+            cursor: "pointer",
+            paddingLeft: "10px",
+            paddingRight: "10px",
+            borderRadius: "4px",
+            justifyContent: "center",
+          }}
+          onClick={() => handleModalOpen()}
+        >
+          <AddIcon />
+        </div>
       </Box>
 
       <Box sx={{ mb: 2 }}>
@@ -197,45 +215,64 @@ const Projects = () => {
                   justifyContent: "space-between",
                   alignItems: "center",
                   mb: 1,
-                  border: "1px solid #ddd",
-                  borderRadius: 1,
-                  p: 2,
+                  padding: "5px",
                   cursor: "pointer",
+                  "&:hover": {
+                    backgroundColor: "#fafafa",
+                    borderRadius: "4px",
+                  },
                 }}
-                onClick={() => navigate(projectPath)}>
-                <Box>
-                  <Typography variant="h6">{displayName}</Typography>
-                  {/* <Typography variant="body2" color="text.secondary">
-                    {`Color: ${project.color}`}
-                  </Typography> */}
-                </Box>
+                onClick={() => navigate(projectPath)}
+              >
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <TagIcon
+                    style={{
+                      color: project.color,
+                      marginRight: 10,
+                      fontSize: 20,
+                    }}
+                  />
+                  <p style={{ fontSize: 15 }}>{displayName}</p>
+                </div>
 
-                <Box onClick={(e) => e.stopPropagation()}>
-                  <IconButton onClick={handleMenuOpen}>
-                    <MoreVertIcon />
-                  </IconButton>
+                <div onClick={(e) => e.stopPropagation()}>
+                  <MoreHorizOutlinedIcon
+                    style={{ marginTop: 7 }}
+                    onClick={handleMenuOpen}
+                  />
                   <Menu
                     anchorEl={menuAnchor}
                     open={Boolean(menuAnchor)}
-                    onClose={handleMenuClose}>
+                    onClose={handleMenuClose}
+                    PaperProps={{
+                      style: {
+                        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)", // lighter shadow
+                        borderRadius: 4, // optional: makes the menu look cleaner
+                      },
+                    }}
+                  >
                     <MenuItem
-                      style={{ fontSize: 14 }}
                       onClick={() => {
                         handleMenuClose();
                         handleModalOpen(project);
-                      }}>
-                      Edit
+                      }}
+                    >
+                      <EditIcon style={{ fontSize: "19px", marginRight: 12 }} />
+                      <p style={{ fontSize: "13px" }}>Edit</p>
                     </MenuItem>
                     <MenuItem
-                      style={{ fontSize: 14 }}
                       onClick={() => {
                         handleMenuClose();
                         handleDelete(project.id);
-                      }}>
-                      Delete
+                      }}
+                    >
+                      <DeleteIcon
+                        style={{ fontSize: "19px", marginRight: 12 }}
+                      />
+                      <p style={{ fontSize: "13px" }}>Delete</p>
                     </MenuItem>
                   </Menu>
-                </Box>
+                </div>
               </ListItem>
             );
           })

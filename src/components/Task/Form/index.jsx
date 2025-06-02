@@ -283,7 +283,7 @@ const TaskForm = ({ onAdd, defaultCategory = "", onCancel }) => {
             style={buttonMenu}
             onClick={(e) => setCategoryAnchor(e.currentTarget)}
           >
-            {form.category || "Category 🏷️"}
+            {form.category || "Category"}
           </div>
           <Menu
             anchorEl={categoryAnchor}
@@ -293,6 +293,7 @@ const TaskForm = ({ onAdd, defaultCategory = "", onCancel }) => {
             {sections.map((section) => (
               <MenuItem
                 key={section}
+                style={{ fontSize: 13 }}
                 onClick={() => {
                   setForm((prev) => ({ ...prev, category: section }));
                   setCategoryAnchor(null);

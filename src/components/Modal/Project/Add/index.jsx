@@ -1,19 +1,22 @@
-// components/ProjectModal.jsx
+// components/ProjectDialog.jsx
 import React from "react";
 import {
-  Box,
-  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Select,
+  MenuItem,
+  OutlinedInput,
   FormControl,
   FormControlLabel,
-  InputLabel,
-  OutlinedInput,
-  MenuItem,
-  Modal,
-  Select,
   Switch,
-  TextField,
+  Button,
+  Box,
   Typography,
 } from "@mui/material";
+
 const colorOptions = [
   { value: "default", label: "Default", color: "#ccc" },
   { value: "blue", label: "Blue", color: "#2196f3" },
@@ -25,7 +28,7 @@ const colorOptions = [
   { value: "teal", label: "Teal", color: "#009688" },
 ];
 
-const ProjectModal = ({
+const ProjectDialog = ({
   open,
   onClose,
   onSubmit,
@@ -42,124 +45,121 @@ const ProjectModal = ({
   };
 
   return (
-    <Modal open={open} onClose={onClose}>
-      <Box
-        sx={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: 400,
-          bgcolor: "background.paper",
-          boxShadow: 24,
-          borderRadius: 2,
-          p: 3,
-        }}>
-        <div style={{ paddingRight: 15, paddingLeft: 15 }}>
-          <p variant="h6" gutterBottom>
-            {editProject ? "Edit Project" : "Add New Project"}
-          </p>
-          <TextField
-            placeholder="Project Name"
-            fullWidth
-            value={projectName}
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
+      <DialogTitle sx={{ fontSize: 18 }}>
+        {editProject ? "Edit Project" : "Add New Project"}
+      </DialogTitle>
+
+      <DialogContent>
+        <TextField
+          placeholder="Project Name"
+          fullWidth
+          value={projectName}
+          size="small"
+          onChange={(e) => setProjectName(e.target.value)}
+          sx={{ mb: 2 }}
+        />
+
+        <FormControl fullWidth sx={{ mb: 2 }}>
+          <Select
+            value={selectedColor}
+            onChange={handleChange}
             size="small"
-            onChange={(e) => setProjectName(e.target.value)}
-            sx={{ mb: 2 }}
-          />
-          <FormControl fullWidth sx={{ mb: 2 }}>
-            <Select
-              value={selectedColor}
-              onChange={handleChange}
-              size="small"
-              displayEmpty
-              input={<OutlinedInput />}
-              renderValue={(value) => {
-                if (!value) {
-                  return <em style={{ color: "#aaa" }}>Select a color</em>; // placeholder
-                }
-                const selected = colorOptions.find((c) => c.value === value);
-                return (
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <Box
-                      sx={{
-                        width: 14,
-                        height: 14,
-                        borderRadius: "50%",
-                        backgroundColor: selected?.color,
-                        marginRight: 1.5,
-                      }}
-                    />
-                    {selected?.label}
-                  </Box>
-                );
-              }}
-              inputProps={{ "aria-label": "Select color" }}>
-              <MenuItem disabled value="">
-                <em>Select a color</em>
-              </MenuItem>
-              {colorOptions.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
+            displayEmpty
+            input={<OutlinedInput />}
+            renderValue={(value) => {
+              if (!value) {
+                return <em style={{ color: "#aaa" }}>Select a color</em>;
+              }
+              const selected = colorOptions.find((c) => c.value === value);
+              return (
+                <Box sx={{ display: "flex", alignItems: "center" }}>
                   <Box
                     sx={{
                       width: 14,
                       height: 14,
                       borderRadius: "50%",
-                      backgroundColor: option.color,
-                      display: "inline-block",
+                      backgroundColor: selected?.color,
                       marginRight: 1.5,
                     }}
                   />
-                  <Typography variant="body2">{option.label}</Typography>
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={isFavorite}
-                onChange={() => setIsFavorite(!isFavorite)}
-                sx={{
-                  "& .MuiSwitch-switchBase.Mui-checked": {
-                    color: "#ff7800", // thumb color when checked
-                  },
-                  "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                    backgroundColor: "#ff7800", // track color when checked
-                  },
-                }}
-              />
-            }
-            label="Add to favorite"
-            sx={{
-              mb: 2,
-              "& .MuiFormControlLabel-label": {
-                fontSize: 14,
-              },
+                  {selected?.label}
+                </Box>
+              );
             }}
-          />
+            inputProps={{ "aria-label": "Select color" }}
+          >
+            <MenuItem disabled value="">
+              <em>Select a color</em>
+            </MenuItem>
+            {colorOptions.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                <Box
+                  sx={{
+                    width: 14,
+                    height: 14,
+                    borderRadius: "50%",
+                    backgroundColor: option.color,
+                    display: "inline-block",
+                    marginRight: 1.5,
+                  }}
+                />
+                <Typography variant="body2">{option.label}</Typography>
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
 
-          <Button
-            style={{
-              textTransform: "capitalize",
-              fontWeight: "bold",
-              fontSize: "12px",
-              marginRight: "6px",
-            }}
-            sx={{
-              backgroundColor: "#ff7800",
-              "&:hover": { backgroundColor: "#ff871f" },
-            }}
-            variant="contained"
-            fullWidth
-            disableElevation
-            onClick={onSubmit}>
-            {editProject ? "Save Changes" : "Add Project"}
-          </Button>
-        </div>
-      </Box>
-    </Modal>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={isFavorite}
+              onChange={() => setIsFavorite(!isFavorite)}
+              sx={{
+                "& .MuiSwitch-switchBase.Mui-checked": {
+                  color: "#ff7800",
+                },
+                "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+                  backgroundColor: "#ff7800",
+                },
+              }}
+            />
+          }
+          label="Add to favorite"
+          sx={{
+            "& .MuiFormControlLabel-label": {
+              fontSize: 14,
+            },
+          }}
+        />
+      </DialogContent>
+
+      <DialogActions sx={{ px: 3, pb: 2 }}>
+        <Button
+          onClick={onClose}
+          sx={{ textTransform: "capitalize", color: "#ff7800" }}
+        >
+          Cancel
+        </Button>
+        <Button
+          variant="contained"
+          onClick={onSubmit}
+          disableElevation
+          sx={{
+            backgroundColor: "#ff7800",
+            textTransform: "capitalize",
+            fontWeight: "bold",
+            fontSize: "12px",
+            "&:hover": {
+              backgroundColor: "#ff871f",
+            },
+          }}
+        >
+          {editProject ? "Save Changes" : "Add Project"}
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };
 
-export default ProjectModal;
+export default ProjectDialog;

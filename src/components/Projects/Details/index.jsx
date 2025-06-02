@@ -45,7 +45,8 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import dayjs from "dayjs";
 import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
-
+import DeleteIcon from "@mui/icons-material/DeleteOutlined";
+import EditIcon from "@mui/icons-material/EditOutlined";
 import {
   DndContext,
   closestCenter,
@@ -119,6 +120,7 @@ const ProjectDetail = () => {
   const [anchorEl2, setAnchorEl2] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedSection, setSelectedSection] = useState(null);
+  const [menuAnchor, setMenuAnchor] = useState(null);
 
   const handleMenuClick = (event, section) => {
     setAnchorEl2(event.currentTarget);
@@ -127,6 +129,7 @@ const ProjectDetail = () => {
 
   const handleMenuClose = () => {
     setAnchorEl2(null);
+    setMenuAnchor(null);
   };
 
   const handleDialogOpen = () => {
@@ -144,6 +147,10 @@ const ProjectDetail = () => {
       handleDeleteSection(selectedSection);
     }
     handleDialogClose();
+  };
+
+  const handleMenuOpen = (event) => {
+    setMenuAnchor(event.currentTarget);
   };
 
   const normalize = (str) => str.trim().toLowerCase().replace(/\s+/g, "-");
@@ -550,20 +557,51 @@ const ProjectDetail = () => {
         margin: "0 auto",
         overflow: "visible",
         position: "relative",
-      }}>
+      }}
+    >
       <div style={{ paddingLeft: "3px", paddingRight: "3px" }}>
         <div
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-          }}>
+          }}
+        >
           <h2 style={{ marginBottom: "0px", marginTop: "10px" }}>
             {capitalizeEachWord(projectId.replaceAll("-", " "))}
           </h2>
 
           <div style={{ display: "flex" }}>
-            <div
+            <MoreHorizOutlinedIcon
+              style={{ fontSize: "20px", cursor: "pointer" }}
+              onClick={handleMenuOpen}
+            />
+
+            <Menu
+              anchorEl={menuAnchor}
+              open={Boolean(menuAnchor)}
+              onClose={handleMenuClose}
+            >
+              <MenuItem
+                onClick={() => {
+                  setEditDialogOpen(true);
+                  handleMenuClose();
+                }}
+              >
+                <EditIcon style={{ fontSize: "19px", marginRight: 12 }} />{" "}
+                <p style={{ fontSize: "13px" }}>Edit</p>
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  setDeleteDialogOpen(true);
+                  handleMenuClose();
+                }}
+              >
+                <DeleteIcon style={{ fontSize: "19px", marginRight: 12 }} />{" "}
+                <p style={{ fontSize: "13px" }}>Delete</p>
+              </MenuItem>
+            </Menu>
+            {/* <div
               style={{
                 padding: 5,
                 display: "flex",
@@ -574,7 +612,8 @@ const ProjectDetail = () => {
                 color: "white",
                 borderRadius: 4,
               }}
-              onClick={() => setEditDialogOpen(true)}>
+              onClick={() => setEditDialogOpen(true)}
+            >
               <EditOutlinedIcon style={{ fontSize: 18 }} />
             </div>
             <div
@@ -587,9 +626,10 @@ const ProjectDetail = () => {
                 color: "white",
                 borderRadius: 4,
               }}
-              onClick={() => setDeleteDialogOpen(true)}>
+              onClick={() => setDeleteDialogOpen(true)}
+            >
               <DeleteOutlinedIcon style={{ fontSize: 18 }} />
-            </div>
+            </div> */}
           </div>
         </div>
         <TextField
@@ -627,10 +667,12 @@ const ProjectDetail = () => {
             padding: 4,
             marginTop: 18,
           }}
-          onClick={() => setShowForm(true)}>
+          onClick={() => setShowForm(true)}
+        >
           <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
           <span
-            style={{ fontWeight: "bold", color: "#ff7800", fontSize: "15px" }}>
+            style={{ fontWeight: "bold", color: "#ff7800", fontSize: "15px" }}
+          >
             Add Section
           </span>
           <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
@@ -638,7 +680,8 @@ const ProjectDetail = () => {
       ) : (
         <form
           onSubmit={handleAddSection}
-          style={{ gap: 8, marginTop: 10, marginBottom: 30, padding: 3 }}>
+          style={{ gap: 8, marginTop: 10, marginBottom: 30, padding: 3 }}
+        >
           <div
             style={{
               display: "flex",
@@ -647,14 +690,16 @@ const ProjectDetail = () => {
               userSelect: "none",
               marginBottom: 16,
               marginTop: 7,
-            }}>
+            }}
+          >
             <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
             <span
               style={{
                 fontWeight: "bold",
                 color: "#ff7800",
                 fontSize: "15px",
-              }}>
+              }}
+            >
               Add new section
             </span>
             <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
@@ -698,7 +743,8 @@ const ProjectDetail = () => {
                 fontSize: "12px",
                 marginRight: "6px",
               }}
-              disabled={!newSection.trim()}>
+              disabled={!newSection.trim()}
+            >
               Add Section
             </Button>
             <Button
@@ -716,7 +762,8 @@ const ProjectDetail = () => {
               onClick={() => {
                 setShowForm(false);
                 setNewSection("");
-              }}>
+              }}
+            >
               Cancel
             </Button>
           </div>
@@ -731,7 +778,8 @@ const ProjectDetail = () => {
               justifyContent: "space-between",
               alignItems: "center",
               marginBottom: 10,
-            }}>
+            }}
+          >
             <div style={{ display: "flex", alignItems: "center" }}>
               <div
                 onClick={() => setShowOverdue((prev) => !prev)}
@@ -746,7 +794,8 @@ const ProjectDetail = () => {
                   width: 22,
                   marginLeft: "-30px",
                   backgroundColor: "#fafafa",
-                }}>
+                }}
+              >
                 {showOverdue ? (
                   <FaChevronDown size={10} color="grey" />
                 ) : (
@@ -767,7 +816,8 @@ const ProjectDetail = () => {
                   backgroundColor: "rgb(241, 241, 241)",
                   fontWeight: 500,
                   fontSize: 14,
-                }}>
+                }}
+              >
                 {selectedDate
                   ? selectedDate.format("MMM D, YYYY")
                   : "Select Date"}
@@ -777,27 +827,31 @@ const ProjectDetail = () => {
                 open={Boolean(anchorEl)}
                 anchorEl={anchorEl}
                 onClose={() => setAnchorEl(null)}
-                anchorOrigin={{ vertical: "bottom", horizontal: "left" }}>
+                anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+              >
                 <Box>
                   <List dense sx={{ mt: 1 }}>
                     {quickDates.map((item) => (
                       <ListItem disablePadding key={item.label}>
                         <ListItemButton
                           onClick={() => handleDateChange(item.date)}
-                          sx={{ justifyContent: "space-between" }}>
+                          sx={{ justifyContent: "space-between" }}
+                        >
                           <ListItemIcon sx={{ minWidth: 30, ml: 1 }}>
                             {item.icon}
                           </ListItemIcon>
                           <ListItemText
                             primary={
                               <Typography
-                                sx={{ fontSize: 13, fontWeight: 500 }}>
+                                sx={{ fontSize: 13, fontWeight: 500 }}
+                              >
                                 {item.label}
                               </Typography>
                             }
                           />
                           <Typography
-                            sx={{ fontSize: 13, color: "#666", mr: 1 }}>
+                            sx={{ fontSize: 13, color: "#666", mr: 1 }}
+                          >
                             {item.display(item.date)}
                           </Typography>
                         </ListItemButton>
@@ -853,17 +907,19 @@ const ProjectDetail = () => {
         </div>
       )}
 
-      {filteredSections.length > 0 ? (
+      {filteredSections.length > 0 || !searchQuery ? (
         filteredSections.map((section) => (
           <div
             key={section}
-            style={{ marginBottom: "1rem", borderRadius: 8, padding: 4 }}>
+            style={{ marginBottom: "1rem", borderRadius: 8, padding: 4 }}
+          >
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
                 marginBottom: 10,
-              }}>
+              }}
+            >
               <div
                 onClick={() => toggleExpand(section)}
                 style={{
@@ -877,7 +933,8 @@ const ProjectDetail = () => {
                   width: 22,
                   marginLeft: "-30px",
                   backgroundColor: "#fafafa",
-                }}>
+                }}
+              >
                 {expandedSections[section] !== false ? (
                   <FaChevronDown size={10} color="grey" />
                 ) : (
@@ -890,7 +947,8 @@ const ProjectDetail = () => {
                   alignItems: "center",
                   width: "100%",
                   justifyContent: "space-between",
-                }}>
+                }}
+              >
                 <LiveSectionEditor
                   initialContent={section}
                   onChange={(newName) => handleEditSection(section, newName)}
@@ -904,9 +962,11 @@ const ProjectDetail = () => {
                 <Menu
                   anchorEl={anchorEl2}
                   open={Boolean(anchorEl2)}
-                  onClose={handleMenuClose}>
-                  <MenuItem style={{ fontSize: 14 }} onClick={handleDialogOpen}>
-                    Delete Section
+                  onClose={handleMenuClose}
+                >
+                  <MenuItem onClick={handleDialogOpen}>
+                    <DeleteIcon style={{ fontSize: "19px", marginRight: 12 }} />{" "}
+                    <p style={{ fontSize: "13px" }}>Delete Section</p>
                   </MenuItem>
                 </Menu>
               </div>
@@ -915,12 +975,14 @@ const ProjectDetail = () => {
             <DndContext
               collisionDetection={closestCenter}
               onDragEnd={handleDragEnd}
-              sensors={sensors}>
+              sensors={sensors}
+            >
               {expandedSections[section] !== false && (
                 <>
                   <SortableContext
                     items={tasksByCategory[section]?.map((t) => t.id)}
-                    strategy={verticalListSortingStrategy}>
+                    strategy={verticalListSortingStrategy}
+                  >
                     {tasksByCategory[section]?.map((task) =>
                       editingTaskId === task.id ? (
                         <EditModal
@@ -952,16 +1014,28 @@ const ProjectDetail = () => {
                   {!openFormSection && (
                     <div
                       onClick={() => setOpenFormSection(section)}
+                      onMouseEnter={() => setHoveredSection(section)}
+                      onMouseLeave={() => setHoveredSection(null)}
                       style={{
                         display: "flex",
                         alignItems: "center",
                         cursor: "pointer",
                         marginTop: 10,
-                      }}>
-                      <AddIcon style={{ marginRight: "8px", fontSize: 20 }} />
+                        color:
+                          hoveredSection === section ? "#ff7800" : "inherit",
+                      }}
+                    >
+                      {hoveredSection === section ? (
+                        <AddIconFilled
+                          style={{ marginRight: 8, fontSize: 20 }}
+                        />
+                      ) : (
+                        <AddIcon style={{ marginRight: 8, fontSize: 20 }} />
+                      )}
                       <p style={{ fontSize: 14, fontWeight: 500 }}>Add Task</p>
                     </div>
                   )}
+
                   {openFormSection === section && (
                     <TaskForm
                       defaultCategory={section}

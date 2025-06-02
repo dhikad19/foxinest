@@ -19,7 +19,7 @@ import {
   Typography,
 } from "@mui/material";
 import { Dialog, DialogTitle, DialogActions } from "@mui/material";
-
+import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
 
 import { Divider, Popover, Button, Stack, Box } from "@mui/material";
@@ -341,7 +341,8 @@ const TaskList = ({
                   color: "#333",
                   // Disable transition during dragging for smooth behavior
                   transition: isDragging ? "none" : "all 0.3s ease",
-                }}>
+                }}
+              >
                 {draggedItem.name}
               </div>
             ) : null}
@@ -355,7 +356,8 @@ const TaskList = ({
                   justifyContent: "space-between",
                   alignItems: "center",
                   marginBottom: 10,
-                }}>
+                }}
+              >
                 <div style={{ display: "flex", alignItems: "center" }}>
                   <div
                     onClick={() => setShowOverdue((prev) => !prev)}
@@ -370,7 +372,8 @@ const TaskList = ({
                       width: 22,
                       marginLeft: "-30px",
                       backgroundColor: "#fafafa",
-                    }}>
+                    }}
+                  >
                     {showOverdue ? (
                       <FaChevronDown size={10} color="grey" />
                     ) : (
@@ -391,7 +394,8 @@ const TaskList = ({
                       backgroundColor: "rgb(241, 241, 241)",
                       fontWeight: 500,
                       fontSize: 14,
-                    }}>
+                    }}
+                  >
                     {selectedDate
                       ? selectedDate.format("MMM D, YYYY")
                       : "Select Date"}
@@ -401,27 +405,31 @@ const TaskList = ({
                     open={Boolean(anchorEl)}
                     anchorEl={anchorEl}
                     onClose={() => setAnchorEl(null)}
-                    anchorOrigin={{ vertical: "bottom", horizontal: "left" }}>
+                    anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+                  >
                     <Box>
                       <List dense sx={{ mt: 1 }}>
                         {quickDates.map((item) => (
                           <ListItem disablePadding key={item.label}>
                             <ListItemButton
                               onClick={() => handleDateChange(item.date)}
-                              sx={{ justifyContent: "space-between" }}>
+                              sx={{ justifyContent: "space-between" }}
+                            >
                               <ListItemIcon sx={{ minWidth: 30, ml: 1 }}>
                                 {item.icon}
                               </ListItemIcon>
                               <ListItemText
                                 primary={
                                   <Typography
-                                    sx={{ fontSize: 13, fontWeight: 500 }}>
+                                    sx={{ fontSize: 13, fontWeight: 500 }}
+                                  >
                                     {item.label}
                                   </Typography>
                                 }
                               />
                               <Typography
-                                sx={{ fontSize: 13, color: "#666", mr: 1 }}>
+                                sx={{ fontSize: 13, color: "#666", mr: 1 }}
+                              >
                                 {item.display(item.date)}
                               </Typography>
                             </ListItemButton>
@@ -474,14 +482,16 @@ const TaskList = ({
           {Object.entries(filteredTasksByCategory).map(([category, tasks]) => (
             <div
               key={category}
-              style={{ marginBottom: "1rem", borderRadius: 8, padding: 4 }}>
+              style={{ marginBottom: "1rem", borderRadius: 8, padding: 4 }}
+            >
               <div
                 style={{
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
                   marginBottom: 10,
-                }}>
+                }}
+              >
                 <div style={{ display: "flex", alignItems: "center" }}>
                   <div
                     onClick={() => toggleExpand(category)}
@@ -496,7 +506,8 @@ const TaskList = ({
                       width: 22,
                       marginLeft: "-30px",
                       backgroundColor: "#fafafa",
-                    }}>
+                    }}
+                  >
                     {expandedSections[category] ? (
                       <FaChevronDown size={10} color="grey" />
                     ) : (
@@ -516,15 +527,17 @@ const TaskList = ({
                 <Menu
                   anchorEl={menuAnchorEl}
                   open={Boolean(menuAnchorEl) && menuCategory === category}
-                  onClose={handleMenuClose}>
+                  onClose={handleMenuClose}
+                >
                   <MenuItem
                     onClick={() => {
                       setPendingDeleteCategory(category);
                       setConfirmOpen(true);
                       handleMenuClose();
                     }}
-                    style={{ fontSize: 14 }}>
-                    Delete Section
+                  >
+                    <DeleteIcon style={{ fontSize: "19px", marginRight: 12 }} />{" "}
+                    <p style={{ fontSize: "13px" }}>Delete Section</p>
                   </MenuItem>
                 </Menu>
               </div>
@@ -533,13 +546,13 @@ const TaskList = ({
               <div
                 style={{
                   overflow: "hidden",
-                  paddingLeft: 4,
-                  paddingRight: 4,
                   maxHeight: expandedSections[category] ? "100%" : "0",
-                }}>
+                }}
+              >
                 <SortableContext
                   items={tasks.map((t) => t.id)}
-                  strategy={verticalListSortingStrategy}>
+                  strategy={verticalListSortingStrategy}
+                >
                   {tasks.map((task) =>
                     editingTaskId === task.id ? (
                       <EditTask
@@ -576,7 +589,8 @@ const TaskList = ({
                         hoveredCategory === category ? "#ff7800" : "inherit",
                       cursor: "pointer",
                       marginTop: 10,
-                    }}>
+                    }}
+                  >
                     {hoveredCategory === category ? (
                       <AddIconFilled
                         style={{ marginRight: "8px", fontSize: 20 }}
@@ -615,7 +629,8 @@ const TaskList = ({
               onDeleteSection(pendingDeleteCategory);
               setConfirmOpen(false);
             }}
-            color="error">
+            color="error"
+          >
             Delete
           </Button>
         </DialogActions>

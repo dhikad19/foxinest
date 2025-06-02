@@ -292,19 +292,35 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
     handleCloseCommentMenu();
   };
 
+  // const menuRef = useRef(null);
+  // const menuButtonRef = useRef(null);
+
+  const handleContainerClick = (e) => {
+    // Only open dialog if menu is NOT open
+    if (!menuAnchor) {
+      handleOpenDialog(task.id);
+    }
+  };
+
   return (
     <div
       ref={setNodeRef}
       style={containerStyle(isDragging, transform, transition)}
     >
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
+      <div
+        style={{ display: "flex", justifyContent: "space-between" }}
+        onClick={handleContainerClick}
+      >
         <div
           style={{ flex: 1, display: "flex", height: "100%", marginTop: 10 }}
         >
           <div style={{ marginRight: 10 }}>
             <Checkbox
               checked={task.completed}
-              onChange={() => onComplete(task.id)}
+              onChange={(e) => {
+                e.stopPropagation(); // prevent dialog on checkbox toggle
+                onComplete(task.id);
+              }}
               style={{ marginLeft: -2, marginTop: -9 }}
               size="small"
               sx={{
@@ -332,6 +348,7 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
               }}
             />
           </div>
+
           <div style={{ width: "100%" }}>
             <div
               style={{
@@ -377,12 +394,7 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
               dangerouslySetInnerHTML={{ __html: task.description }}
             ></div>
 
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
+            <div style={{ display: "flex", alignItems: "center" }}>
               {(task.dueDate || comments.length > 0) && (
                 <div
                   style={{
@@ -435,7 +447,10 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                         cursor: "pointer",
                         marginTop: 5,
                       }}
-                      onClick={handleOpenDialog}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOpenDialog(task.id);
+                      }}
                       title="View comments"
                     >
                       <CommentsIcon
@@ -461,45 +476,57 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
             </div>
           </div>
         </div>
+
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <MoreHorizOutlinedIcon
             style={{ fontSize: "20px", cursor: "pointer" }}
-            onClick={handleMenuOpen}
+            onClick={(e) => {
+              e.stopPropagation(); // prevent dialog from opening
+              handleMenuOpen(e);
+            }}
           />
 
           <Menu
             anchorEl={menuAnchor}
             open={Boolean(menuAnchor)}
-            MenuListProps={{ sx: { py: 0 } }}
             onClose={handleMenuClose}
+            // Optional: prevent clicks inside menu from bubbling up
+            PaperProps={{
+              onClick: (e) => e.stopPropagation(),
+            }}
           >
             <MenuItem
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 onEdit(task);
                 handleMenuClose();
               }}
             >
-              <EditIcon style={{ fontSize: "19px", marginRight: 12 }} />{" "}
+              <EditIcon style={{ fontSize: "19px", marginRight: 12 }} />
               <p style={{ fontSize: "13px" }}>Edit</p>
             </MenuItem>
+
             <MenuItem
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 onDelete(task.id);
                 handleMenuClose();
               }}
             >
-              <DeleteIcon style={{ fontSize: "19px", marginRight: 12 }} />{" "}
+              <DeleteIcon style={{ fontSize: "19px", marginRight: 12 }} />
               <p style={{ fontSize: "13px" }}>Delete</p>
             </MenuItem>
+
             <MenuItem
-              onClick={() => {
-                handleOpenDialog();
+              onClick={(e) => {
+                e.stopPropagation();
+                handleOpenDialog(task.id);
                 handleMenuClose();
               }}
             >
               <CommentsIcon
                 style={{ fontSize: "17px", marginRight: 12, marginLeft: 2 }}
-              />{" "}
+              />
               <p style={{ fontSize: "13px" }}>Comments</p>
             </MenuItem>
           </Menu>
@@ -509,6 +536,7 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
             {...attributes}
             {...listeners}
             title="Drag"
+            onClick={(e) => e.stopPropagation()} // optional: prevent dialog on drag icon click
             style={{
               cursor: "grab",
               padding: "4px 4px 0px 4px",
@@ -523,7 +551,6 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
       </div>
 
       {!isDragging && <Divider />}
-
       <Dialog
         open={openDialog}
         onClose={handleCloseDialog}
@@ -637,7 +664,7 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                           >
                             {editCommentEditor?.isEmpty && (
                               <div style={placeholderStyleDescription}>
-                                Edit your comment here...
+                                Edit your comment
                               </div>
                             )}
 
