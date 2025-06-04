@@ -9,8 +9,12 @@ import {
   ListItemText,
   Typography,
   Snackbar,
+  Divider,
+  useTheme,
   Alert,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import NotificationImportantIcon from "@mui/icons-material/NotificationImportant";
 import RunningWithErrorsOutlinedIcon from "@mui/icons-material/RunningWithErrorsOutlined";
@@ -32,6 +36,9 @@ function TodayTasksButton() {
     tomorrow.setDate(tomorrow.getDate() + 1);
     return tomorrow.toISOString().split("T")[0];
   };
+
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   const loadTasksFromLocalStorage = () => {
     const todayDate = getTodayDateString();
@@ -137,12 +144,41 @@ function TodayTasksButton() {
         <p style={{ fontSize: 14, fontWeight: 500 }}>{todayTasks.length}</p>
       </div>
 
-      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
-        <DialogTitle>Today's Tasks</DialogTitle>
+      <Dialog
+        fullScreen={fullScreen}
+        open={open}
+        onClose={handleClose}
+        fullWidth
+        maxWidth="sm"
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <DialogTitle
+            style={{ padding: "12px 24px", fontSize: 17, marginTop: 5 }}
+          >
+            Today's Tasks
+          </DialogTitle>
+          <div
+            style={{ padding: "12px 24px", marginTop: 5 }}
+            onClick={handleClose}
+          >
+            <CloseIcon />
+          </div>
+        </div>
+        <Divider />
         <DialogContent>
           <List>
             {todayTasks.map((task) => (
-              <ListItem key={task.id} divider>
+              <ListItem
+                key={task.id}
+                divider
+                style={{ paddingLeft: 0, paddingRight: 0 }}
+              >
                 <ListItemText
                   primary={task.title}
                   secondary={
@@ -163,21 +199,6 @@ function TodayTasksButton() {
           </List>
         </DialogContent>
       </Dialog>
-
-      {/* <Snackbar
-        open={toastOpen}
-        autoHideDuration={6000}
-        onClose={handleToastClose}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Alert
-          onClose={handleToastClose}
-          severity="info"
-          sx={{ width: "100%" }}
-        >
-          You have {todayTasks.length} tasks with deadline today or tomorrow!
-        </Alert>
-      </Snackbar> */}
     </>
   );
 }

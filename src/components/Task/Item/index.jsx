@@ -17,6 +17,7 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
+import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 import FlagIcon from "@mui/icons-material/Flag";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import CloseIcon from "@mui/icons-material/Close";
@@ -34,6 +35,7 @@ import EmojiPicker from "emoji-picker-react";
 import IconButton from "@mui/material/IconButton";
 import InsertEmoticonIcon from "@mui/icons-material/InsertEmoticon";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
+import { Fullscreen } from "@mui/icons-material";
 
 // Styles
 const containerStyle = (isDragging, transform, transition) => ({
@@ -68,6 +70,7 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
   const [commentToEdit, setCommentToEdit] = useState(null);
   const [editingContent, setEditingContent] = useState("");
   const [lastFocusedEditor, setLastFocusedEditor] = useState(null); // 'add' | 'edit'
+  const [showComments, setShowComments] = useState(true);
 
   const [anchorElEmoji, setAnchorElEmoji] = useState(null);
   const [anchorElCommentMenu, setAnchorElCommentMenu] = useState(null);
@@ -88,6 +91,7 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
 
     return new Intl.DateTimeFormat("en-GB", options).format(parsedDate);
   }
+  const toggleComments = () => setShowComments((prev) => !prev);
 
   const handleOpenCommentMenu = (event, index) => {
     setAnchorElCommentMenu(event.currentTarget);
@@ -651,218 +655,296 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                 />
               </div>
             </div>
+
             {task.dueDate && (
-              <div style={{ marginBottom: 15 }}>
-                <p style={{ fontWeight: 500, fontSize: 15 }}>Date</p>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    marginTop: 5,
-                  }}
-                >
-                  <DateIcon style={{ fontSize: 18, marginRight: 6 }} />
-                  <p style={{ fontSize: 14 }}>
-                    {(() => {
-                      const currentYear = new Date().getFullYear();
-                      const dueDate = new Date(task.dueDate);
-                      const options = {
-                        day: "2-digit",
-                        month: "short",
-                        ...(dueDate.getFullYear() !== currentYear && {
-                          year: "numeric",
-                        }),
-                      };
-                      return new Intl.DateTimeFormat("en-GB", options).format(
-                        dueDate
-                      );
-                    })()}
-                  </p>
+              <>
+                <Divider />
+                <div style={{ marginBottom: 12, marginTop: 12 }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      marginTop: 5,
+                    }}
+                  >
+                    <DateIcon
+                      style={{
+                        fontSize: 19,
+                        marginRight: 16,
+                        marginLeft: "-2px",
+                        color: "#4f4f4f",
+                      }}
+                    />
+                    <p style={{ fontSize: 14 }}>
+                      {(() => {
+                        const currentYear = new Date().getFullYear();
+                        const dueDate = new Date(task.dueDate);
+                        const options = {
+                          day: "2-digit",
+                          month: "short",
+                          ...(dueDate.getFullYear() !== currentYear && {
+                            year: "numeric",
+                          }),
+                        };
+                        return new Intl.DateTimeFormat("en-GB", options).format(
+                          dueDate
+                        );
+                      })()}
+                    </p>
+                  </div>
                 </div>
-              </div>
+              </>
             )}
-            <div>
-              <p style={{ fontWeight: 500, fontSize: 15 }}>Priority</p>
+            <Divider />
+            <div style={{ marginBottom: 12, marginTop: 12 }}>
               <div
                 style={{ display: "flex", alignItems: "center", marginTop: 5 }}
               >
-                <FlagIcon style={{ fontSize: 18, marginRight: 6 }} />
+                <FlagIcon
+                  style={{
+                    fontSize: 19,
+                    marginRight: 16,
+                    marginLeft: "-2px",
+                    color: "#4f4f4f",
+                  }}
+                />
                 <p style={{ fontSize: 14 }}>{task.priority}</p>
               </div>
             </div>
+            <Divider />
           </div>
-          <div style={{ flexGrow: 1, overflowY: "auto", padding: "8px" }}>
+          <div style={{ flexGrow: 1, overflowY: "auto" }}>
             <div>
-              <List>
-                {comments.map((comment, index) => (
-                  <ListItem
-                    key={index}
-                    style={{ display: "flex", alignItems: "flex-start" }}
-                  >
-                    {commentToEdit === index ? (
-                      <div style={{ flexGrow: 1 }}>
-                        <div
-                          style={{ position: "relative", marginBottom: "8px" }}
-                        >
-                          {editingContent.trim() === "" && (
-                            <div style={placeholderStyleDescription}>
-                              Edit your comment here...
-                            </div>
-                          )}
+              <div
+                style={{
+                  marginTop: 12,
+                  marginBottom: 12,
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <CommentsIcon
+                  style={{
+                    fontSize: 17,
+                    marginRight: 17,
+                    marginLeft: "-2px",
+                    color: "#4f4f4f",
+                  }}
+                />
+                <p style={{ fontSize: 14 }}>Comments</p>
+              </div>
+              <Divider />
+              {comments.length > 0 ? (
+                <List>
+                  {comments.map((comment, index) => (
+                    <ListItem
+                      key={index}
+                      style={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        paddingLeft: 0,
+                        paddingRight: 0,
+                      }}
+                    >
+                      {commentToEdit === index ? (
+                        <div style={{ flexGrow: 1 }}>
                           <div
                             style={{
-                              border: "1px solid #ccc",
-                              borderRadius: "4px",
-                              padding: "8px",
-                              minHeight: "120px",
-                              display: "flex",
-                              flexDirection: "column",
-                              justifyContent: "space-between",
-                              fontSize: "14px",
+                              position: "relative",
+                              marginBottom: "8px",
                             }}
                           >
+                            {editingContent.trim() === "" && (
+                              <div style={placeholderStyleDescription}>
+                                Edit your comment here...
+                              </div>
+                            )}
                             <div
                               style={{
-                                position: "relative",
-                                marginBottom: "8px",
-                              }}
-                            >
-                              {editCommentEditor?.isEmpty && (
-                                <div style={placeholderStyleDescription}>
-                                  Edit your comment
-                                </div>
-                              )}
-
-                              <EditorContent
-                                editor={editCommentEditor}
-                                className="border p-2 rounded-md"
-                                style={{
-                                  border: "1px solid #ccc",
-                                  borderRadius: "4px",
-                                  padding: "8px",
-                                  minHeight: "120px",
-                                }}
-                              />
-                            </div>
-
-                            <div
-                              style={{
+                                border: "1px solid #ccc",
+                                borderRadius: "4px",
+                                padding: "8px",
+                                minHeight: "120px",
                                 display: "flex",
-                                marginTop: 10,
-                                alignItems: "center",
+                                flexDirection: "column",
                                 justifyContent: "space-between",
+                                fontSize: "14px",
                               }}
                             >
                               <div
                                 style={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  gap: "2px",
+                                  position: "relative",
+                                  marginBottom: "8px",
                                 }}
                               >
-                                <IconButton
-                                  onClick={handleOpenEmojiPicker}
-                                  size="small"
-                                >
-                                  <InsertEmoticonIcon
-                                    style={{ fontSize: 20, color: "#4f4f4f" }}
-                                  />
-                                </IconButton>
+                                {editCommentEditor?.isEmpty && (
+                                  <div style={placeholderStyleDescription}>
+                                    Edit your comment
+                                  </div>
+                                )}
 
-                                <Tooltip title="In development" arrow>
-                                  <IconButton size="small">
-                                    <AttachFileIcon
+                                <EditorContent
+                                  editor={editCommentEditor}
+                                  className="border p-2 rounded-md"
+                                  style={{
+                                    border: "1px solid #ccc",
+                                    borderRadius: "4px",
+                                    padding: "8px",
+                                    minHeight: "120px",
+                                  }}
+                                />
+                              </div>
+
+                              <div
+                                style={{
+                                  display: "flex",
+                                  marginTop: 10,
+                                  alignItems: "center",
+                                  justifyContent: "space-between",
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "2px",
+                                  }}
+                                >
+                                  <IconButton
+                                    onClick={handleOpenEmojiPicker}
+                                    size="small"
+                                  >
+                                    <InsertEmoticonIcon
                                       style={{ fontSize: 20, color: "#4f4f4f" }}
                                     />
                                   </IconButton>
-                                </Tooltip>
-                                <Menu
-                                  anchorEl={anchorElEmoji}
-                                  open={Boolean(anchorElEmoji)}
-                                  onClose={handleCloseEmojiPicker}
-                                >
-                                  <EmojiPicker
-                                    onEmojiClick={handleEmojiSelect}
-                                  />
-                                </Menu>
-                              </div>
-                              <div style={{ display: "flex", gap: "2px" }}>
-                                <Button
-                                  onClick={() => setCommentToEdit(null)}
-                                  size="small"
-                                  variant="contained"
-                                  disableElevation
-                                  style={{
-                                    textTransform: "capitalize",
-                                    marginRight: "6px",
-                                  }}
-                                  sx={{
-                                    color: "#000000",
-                                    backgroundColor: "#f0f0f0",
-                                  }}
-                                >
-                                  Cancel
-                                </Button>
-                                <Button
-                                  onClick={saveEditedComment}
-                                  size="small"
-                                  variant="contained"
-                                  sx={{
-                                    backgroundColor: "#ff7800",
-                                    textTransform: "capitalize",
-                                    boxShadow: "none",
-                                    fontWeight: "bold",
-                                    "&:hover": { backgroundColor: "#e06f00" },
-                                  }}
-                                >
-                                  Save
-                                </Button>
+
+                                  <Tooltip title="In development" arrow>
+                                    <IconButton size="small">
+                                      <AttachFileIcon
+                                        style={{
+                                          fontSize: 20,
+                                          color: "#4f4f4f",
+                                        }}
+                                      />
+                                    </IconButton>
+                                  </Tooltip>
+                                  <Menu
+                                    anchorEl={anchorElEmoji}
+                                    open={Boolean(anchorElEmoji)}
+                                    onClose={handleCloseEmojiPicker}
+                                  >
+                                    <EmojiPicker
+                                      onEmojiClick={handleEmojiSelect}
+                                    />
+                                  </Menu>
+                                </div>
+                                <div style={{ display: "flex", gap: "2px" }}>
+                                  <Button
+                                    onClick={() => setCommentToEdit(null)}
+                                    size="small"
+                                    variant="contained"
+                                    disableElevation
+                                    style={{
+                                      textTransform: "capitalize",
+                                      marginRight: "6px",
+                                    }}
+                                    sx={{
+                                      color: "#000000",
+                                      backgroundColor: "#f0f0f0",
+                                    }}
+                                  >
+                                    Cancel
+                                  </Button>
+                                  <Button
+                                    onClick={saveEditedComment}
+                                    size="small"
+                                    variant="contained"
+                                    sx={{
+                                      backgroundColor: "#ff7800",
+                                      textTransform: "capitalize",
+                                      boxShadow: "none",
+                                      fontWeight: "bold",
+                                      "&:hover": { backgroundColor: "#e06f00" },
+                                    }}
+                                  >
+                                    Save
+                                  </Button>
+                                </div>
                               </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    ) : (
-                      <>
-                        <ListItemText
-                          primary={
-                            <div
-                              style={{ fontSize: "14px" }}
-                              dangerouslySetInnerHTML={{ __html: comment.text }}
-                            />
-                          }
-                          secondary={
-                            <p style={{ fontSize: "12px" }}>
-                              Posted on: {formatDate(comment.date)}
-                            </p>
-                          }
-                          style={{ flexGrow: 1 }}
-                        />
-                        <IconButton
-                          onClick={(e) => handleOpenCommentMenu(e, index)}
-                        >
-                          <MoreHorizOutlinedIcon />
-                        </IconButton>
-                        <Menu
-                          anchorEl={anchorElCommentMenu}
-                          open={
-                            Boolean(anchorElCommentMenu) &&
-                            commentMenuIndex === index
-                          }
-                          onClose={handleCloseCommentMenu}
-                        >
-                          <MenuItem onClick={() => handleEditComment(index)}>
-                            Edit
-                          </MenuItem>
-                          <MenuItem onClick={() => handleDeleteComment(index)}>
-                            Delete
-                          </MenuItem>
-                        </Menu>
-                      </>
-                    )}
-                  </ListItem>
-                ))}
-              </List>
+                      ) : (
+                        <>
+                          <ListItemText
+                            primary={
+                              <div
+                                style={{ fontSize: "14px" }}
+                                dangerouslySetInnerHTML={{
+                                  __html: comment.text,
+                                }}
+                              />
+                            }
+                            secondary={
+                              <p style={{ fontSize: "12px" }}>
+                                Posted on: {formatDate(comment.date)}
+                              </p>
+                            }
+                            style={{ flexGrow: 1 }}
+                          />
+                          <IconButton
+                            onClick={(e) => handleOpenCommentMenu(e, index)}
+                          >
+                            <MoreHorizOutlinedIcon />
+                          </IconButton>
+                          <Menu
+                            anchorEl={anchorElCommentMenu}
+                            open={
+                              Boolean(anchorElCommentMenu) &&
+                              commentMenuIndex === index
+                            }
+                            onClose={handleCloseCommentMenu}
+                          >
+                            <MenuItem onClick={() => handleEditComment(index)}>
+                              Edit
+                            </MenuItem>
+                            <MenuItem
+                              onClick={() => handleDeleteComment(index)}
+                            >
+                              Delete
+                            </MenuItem>
+                          </Menu>
+                        </>
+                      )}
+                    </ListItem>
+                  ))}
+                </List>
+              ) : (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    marginTop: fullScreen ? 140 : 30,
+                    marginBottom: fullScreen ? 0 : 40,
+                  }}
+                >
+                  <img
+                    style={{
+                      objectFit: "contain",
+                      width: fullScreen ? 160 : 120,
+                      height: fullScreen ? 160 : 120,
+                    }}
+                    src="/sad.png"
+                    alt=""
+                  />
+                  <p style={{ fontSize: 14, marginTop: 15 }}>
+                    It looks like there are no comments here.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -914,7 +996,7 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
 
               <p
                 style={{
-                  fontSize: 15,
+                  fontSize: 14,
                   color: "#4f4f4f",
                   cursor: "pointer",
                   fontWeight: 500,

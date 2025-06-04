@@ -612,7 +612,7 @@ const ResponsiveLayout = ({ children }) => {
                     src="/logo.png"
                     style={{
                       objectFit: "contain",
-                      maxWidth: 50,
+                      maxWidth: 60,
                       marginTop: 6,
                     }}
                     alt="Logo"

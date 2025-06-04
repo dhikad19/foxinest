@@ -151,7 +151,14 @@ const Projects = () => {
         position: "relative",
       }}
     >
-      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          mb: 2,
+        }}
+      >
         <h2 style={{ marginBottom: "0px", marginTop: "10px" }}>Projects</h2>
         {/* <Button
           variant="contained"
@@ -164,10 +171,14 @@ const Projects = () => {
           style={{
             backgroundColor: "#fafafa",
             display: "flex",
+            marginTop: 12,
             alignItems: "center",
             cursor: "pointer",
-            paddingLeft: "10px",
-            paddingRight: "10px",
+            paddingLeft: "3px",
+            paddingRight: "3px",
+            paddingTop: "12px",
+            paddingBottom: "12px",
+            maxHeight: "30px",
             borderRadius: "4px",
             justifyContent: "center",
           }}
