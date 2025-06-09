@@ -551,6 +551,7 @@ const ProjectDetail = () => {
   return (
     <div
       style={{
+        paddingTop: "60px",
         paddingLeft: "45px",
         paddingRight: "45px",
         maxWidth: "700px",
@@ -811,11 +812,9 @@ const ProjectDetail = () => {
                 style={{
                   marginLeft: "auto",
                   cursor: "pointer",
-                  padding: "4px 10px",
-                  borderRadius: 4,
-                  backgroundColor: "rgb(241, 241, 241)",
+                  color: "#ff7800",
                   fontWeight: 500,
-                  fontSize: 14,
+                  fontSize: 15,
                 }}
               >
                 {selectedDate

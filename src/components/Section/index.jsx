@@ -81,7 +81,20 @@ const Section = () => {
     setTasks((prev) => {
       const updatedTasks = prev.map((task) => {
         if (task.id === taskId) {
-          const updatedTask = { ...task, completed: !task.completed };
+          const now = new Date();
+          const updatedTask = {
+            ...task,
+            completed: !task.completed,
+            dateCompleted: !task.completed
+              ? now.toISOString().split("T")[0]
+              : null, // Only the date (YYYY-MM-DD)
+            timeCompleted: !task.completed
+              ? `${now.getHours().toString().padStart(2, "0")}:${now
+                  .getMinutes()
+                  .toString()
+                  .padStart(2, "0")}` // HH:mm format
+              : null,
+          };
 
           if (!task.completed) {
             setPrevTasksState(prev);
@@ -146,6 +159,7 @@ const Section = () => {
   return (
     <div
       style={{
+        paddingTop: "60px",
         paddingLeft: "45px",
         paddingRight: "45px",
         maxWidth: "700px",

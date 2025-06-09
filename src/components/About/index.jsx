@@ -14,7 +14,10 @@ import {
 } from "@mui/icons-material";
 const AboutPage = () => {
   return (
-    <Container style={{ maxWidth: 700 }} sx={{ mt: 2, mb: 6 }}>
+    <Container
+      style={{ maxWidth: 700, paddingTop: "60px" }}
+      sx={{ mt: 2, mb: 6 }}
+    >
       <Box sx={{ mb: 3 }}>
         <h2 style={{ marginBottom: "0px", marginTop: "-5px" }}>About</h2>
       </Box>
@@ -51,7 +54,8 @@ const AboutPage = () => {
               lg: "repeat(3, 1fr)",
             },
             justifyContent: "center",
-          }}>
+          }}
+        >
           {[
             {
               icon: (
@@ -86,20 +90,23 @@ const AboutPage = () => {
                   transform: "scale(1.05)",
                 },
                 cursor: "pointer",
-              }}>
+              }}
+            >
               {feature.icon}
               <p
                 style={{
                   fontWeight: 500,
                   lineHeight: "normal",
                   marginTop: "15px",
-                }}>
+                }}
+              >
                 {feature.title}
               </p>
               <Typography
                 variant="body1"
                 style={{ fontSize: 14 }}
-                sx={{ mt: 1, wordBreak: "break-word", whiteSpace: "normal" }}>
+                sx={{ mt: 1, wordBreak: "break-word", whiteSpace: "normal" }}
+              >
                 {feature.text}
               </Typography>
             </Card>

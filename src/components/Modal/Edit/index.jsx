@@ -70,10 +70,12 @@ const buttonMenu = {
   paddingLeft: 8,
   paddingRight: 8,
   paddingBottom: 2,
-  cursor: "pointer",
   paddingTop: 2,
+  cursor: "pointer",
   border: "1px solid #e0e0e0",
-  marginRight: 6,
+  whiteSpace: "nowrap",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
   borderRadius: 4,
   fontSize: 13,
   color: "#4f4f4f",
@@ -162,11 +164,12 @@ const EditModal = ({ task, onSave, onClose, onCancel }) => {
           </Box>
 
           {/* Menu Selectors */}
-          <Box display="flex" mt={2}>
+          <Box display="flex" mt={2} gap={1}>
             {/* Due Date */}
             <div
               onClick={(e) => setDueAnchor(e.currentTarget)}
-              style={buttonMenu}>
+              style={buttonMenu}
+            >
               <EventIcon
                 color="#4f4f4f"
                 style={{ fontSize: 15, marginRight: 5 }}
@@ -179,7 +182,8 @@ const EditModal = ({ task, onSave, onClose, onCancel }) => {
               open={Boolean(dueAnchor)}
               anchorEl={dueAnchor}
               onClose={() => setDueAnchor(null)}
-              anchorOrigin={{ vertical: "bottom", horizontal: "left" }}>
+              anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+            >
               <Box>
                 <List dense style={{ marginTop: 10 }}>
                   {quickDates.map((item) => (
@@ -192,10 +196,12 @@ const EditModal = ({ task, onSave, onClose, onCancel }) => {
                           }));
                           setDueAnchor(null);
                         }}
-                        sx={{ justifyContent: "space-between" }}>
+                        sx={{ justifyContent: "space-between" }}
+                      >
                         <ListItemIcon
                           sx={{ minWidth: 30 }}
-                          style={{ marginLeft: "7px" }}>
+                          style={{ marginLeft: "7px" }}
+                        >
                           {item.icon}
                         </ListItemIcon>
                         <ListItemText
@@ -207,7 +213,8 @@ const EditModal = ({ task, onSave, onClose, onCancel }) => {
                         />
                         <Typography
                           style={{ marginRight: "7px" }}
-                          sx={{ fontSize: 13, color: "#666" }}>
+                          sx={{ fontSize: 13, color: "#666" }}
+                        >
                           {item.display(item.date)}
                         </Typography>
                       </ListItemButton>
@@ -236,7 +243,8 @@ const EditModal = ({ task, onSave, onClose, onCancel }) => {
             {/* Priority */}
             <div
               onClick={(e) => setPriorityAnchor(e.currentTarget)}
-              style={buttonMenu}>
+              style={buttonMenu}
+            >
               <FlagIcon
                 style={{
                   color: selectedPriority.color,
@@ -250,7 +258,8 @@ const EditModal = ({ task, onSave, onClose, onCancel }) => {
               anchorEl={priorityAnchor}
               open={Boolean(priorityAnchor)}
               MenuListProps={{ sx: { py: 0 } }}
-              onClose={() => setPriorityAnchor(null)}>
+              onClose={() => setPriorityAnchor(null)}
+            >
               {priorities.map((p) => {
                 const isSelected = form.priority === p.value;
                 const iconColor = isSelected ? p.color : "#bdbdbd";
@@ -262,7 +271,8 @@ const EditModal = ({ task, onSave, onClose, onCancel }) => {
                     onClick={() => {
                       setForm((prev) => ({ ...prev, priority: p.value }));
                       setPriorityAnchor(null);
-                    }}>
+                    }}
+                  >
                     <span
                       style={{
                         fontSize: 13,
@@ -270,7 +280,8 @@ const EditModal = ({ task, onSave, onClose, onCancel }) => {
                         display: "flex",
                         alignItems: "center",
                         gap: 6,
-                      }}>
+                      }}
+                    >
                       <FlagIcon style={{ color: iconColor, fontSize: 16 }} />
                       <p>Priority {p.label}</p>
                     </span>
@@ -282,14 +293,16 @@ const EditModal = ({ task, onSave, onClose, onCancel }) => {
             {/* Category */}
             <div
               onClick={(e) => setCategoryAnchor(e.currentTarget)}
-              style={buttonMenu}>
-              {form.category || "Category 🏷️"}
+              style={buttonMenu}
+            >
+              {form.category || "Category"}
             </div>
             <Menu
               anchorEl={categoryAnchor}
               MenuListProps={{ sx: { py: 0 } }}
               open={Boolean(categoryAnchor)}
-              onClose={() => setCategoryAnchor(null)}>
+              onClose={() => setCategoryAnchor(null)}
+            >
               <Divider />
               {sections.map((section, index) => {
                 const isSelected = form.category === section;
@@ -306,7 +319,8 @@ const EditModal = ({ task, onSave, onClose, onCancel }) => {
                       fontWeight: isSelected ? 600 : 400,
                       fontSize: 13,
                       color: textColor,
-                    }}>
+                    }}
+                  >
                     {section}
                   </MenuItem>
                 );
@@ -332,7 +346,8 @@ const EditModal = ({ task, onSave, onClose, onCancel }) => {
               sx={{
                 color: "#000000",
                 backgroundColor: "#f0f0f0",
-              }}>
+              }}
+            >
               Cancel
             </Button>
             <Button
@@ -345,7 +360,8 @@ const EditModal = ({ task, onSave, onClose, onCancel }) => {
                 boxShadow: "none",
                 fontWeight: "bold",
                 "&:hover": { backgroundColor: "#e06f00" },
-              }}>
+              }}
+            >
               Save
             </Button>
           </Box>

@@ -143,6 +143,7 @@ const Projects = () => {
   return (
     <div
       style={{
+        paddingTop: "60px",
         paddingLeft: "45px",
         paddingRight: "45px",
         maxWidth: "700px",

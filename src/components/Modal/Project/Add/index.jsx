@@ -13,10 +13,15 @@ import {
   FormControlLabel,
   Switch,
   Button,
+  IconButton,
+  useTheme,
+  useMediaQuery,
+  Drawer,
   Box,
+  Divider,
   Typography,
 } from "@mui/material";
-
+import CloseIcon from "@mui/icons-material/Close";
 const colorOptions = [
   { value: "default", label: "Default", color: "#ccc" },
   { value: "blue", label: "Blue", color: "#2196f3" },
@@ -44,20 +49,48 @@ const ProjectDialog = ({
     setSelectedColor(event.target.value);
   };
 
-  return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle sx={{ fontSize: 18 }}>
-        {editProject ? "Edit Project" : "Add New Project"}
-      </DialogTitle>
-
+  const renderContent = () => (
+    <>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <DialogTitle
+          style={{ padding: "12px 24px", fontSize: 17, marginTop: 5 }}
+        >
+          {editProject ? "Edit Project" : "Add New Project"}
+        </DialogTitle>
+        <IconButton
+          onClick={onClose}
+          style={{ padding: "12px 19px", marginTop: 5 }}
+        >
+          <CloseIcon />
+        </IconButton>
+      </div>
+      <Divider />
       <DialogContent>
         <TextField
           placeholder="Project Name"
           fullWidth
           value={projectName}
+          label="Project Name"
+          style={{ marginBottom: 12, marginTop: 10 }}
+          sx={{
+            "& label.Mui-focused": { color: "#4f4f4f" },
+            "& .MuiOutlinedInput-root.Mui-focused": {
+              "& fieldset": {
+                borderColor: "#4f4f4f",
+              },
+              "& input": {
+                color: "#4f4f4f",
+              },
+            },
+          }}
           size="small"
           onChange={(e) => setProjectName(e.target.value)}
-          sx={{ mb: 2 }}
         />
 
         <FormControl fullWidth sx={{ mb: 2 }}>
@@ -65,11 +98,12 @@ const ProjectDialog = ({
             value={selectedColor}
             onChange={handleChange}
             size="small"
+            label="Select Color"
             displayEmpty
             input={<OutlinedInput />}
             renderValue={(value) => {
               if (!value) {
-                return <em style={{ color: "#aaa" }}>Select a color</em>;
+                return <span style={{ color: "#707070" }}>Select Color</span>;
               }
               const selected = colorOptions.find((c) => c.value === value);
               return (
@@ -90,7 +124,7 @@ const ProjectDialog = ({
             inputProps={{ "aria-label": "Select color" }}
           >
             <MenuItem disabled value="">
-              <em>Select a color</em>
+              <span style={{ color: "#4f4f4f" }}>Select Color</span>
             </MenuItem>
             {colorOptions.map((option) => (
               <MenuItem key={option.value} value={option.value}>
@@ -117,10 +151,10 @@ const ProjectDialog = ({
               onChange={() => setIsFavorite(!isFavorite)}
               sx={{
                 "& .MuiSwitch-switchBase.Mui-checked": {
-                  color: "#ff7800",
+                  color: "#4f4f4f",
                 },
                 "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                  backgroundColor: "#ff7800",
+                  backgroundColor: "#4f4f4f",
                 },
               }}
             />
@@ -133,31 +167,43 @@ const ProjectDialog = ({
           }}
         />
       </DialogContent>
-
-      <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button
+      <DialogActions style={{ paddingRight: "24px", paddingBottom: "24px" }}>
+        {/* <Button
           onClick={onClose}
           sx={{ textTransform: "capitalize", color: "#ff7800" }}
         >
           Cancel
-        </Button>
+        </Button> */}
         <Button
           variant="contained"
           onClick={onSubmit}
           disableElevation
           sx={{
-            backgroundColor: "#ff7800",
+            backgroundColor: "#4f4f4f",
             textTransform: "capitalize",
             fontWeight: "bold",
             fontSize: "12px",
             "&:hover": {
-              backgroundColor: "#ff871f",
+              backgroundColor: "#4f4f4f",
             },
           }}
         >
           {editProject ? "Save Changes" : "Add Project"}
         </Button>
       </DialogActions>
+    </>
+  );
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  return isMobile ? (
+    <Drawer anchor="bottom" open={open} onClose={onClose}>
+      {renderContent()}
+    </Drawer>
+  ) : (
+    <Dialog open={open} onClose={onClose} fullWidth>
+      {renderContent()}
     </Dialog>
   );
 };

@@ -137,6 +137,14 @@ const ResponsiveLayout = ({ children }) => {
 
     return `${dayOfWeek}, ${day} ${month}`;
   };
+  const getCurrentDateMobile = () => {
+    const today = new Date();
+    const day = today.getDate();
+    // const dayOfWeek = today.toLocaleString("default", { weekday: "short" });
+    const month = today.toLocaleString("default", { month: "short" });
+
+    return `${day} ${month}`;
+  };
 
   const userData = JSON.parse(localStorage.getItem("user_data"));
 
@@ -530,6 +538,7 @@ const ResponsiveLayout = ({ children }) => {
   return (
     <Box sx={{ display: "flex", height: "100vh" }}>
       <CssBaseline />
+
       <Box
         component="nav"
         sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
@@ -576,12 +585,12 @@ const ResponsiveLayout = ({ children }) => {
           {drawer}
         </Drawer>
       </Box>
-
       <Box sx={{ flexGrow: 1, width: "100%", pl: { sm: `${drawerWidth}px` } }}>
         <AppBar
-          position="sticky"
           elevation={0}
           sx={{
+            width: isMobile ? "100vw" : `calc(100vw - ${drawerWidth}px)`,
+            top: 0,
             backgroundColor: "#fff",
             color: "#000",
             borderBottom: showBorder ? "1px solid rgba(0, 0, 0, 0.12)" : "none",
@@ -632,12 +641,17 @@ const ResponsiveLayout = ({ children }) => {
                     variant="h6"
                     sx={{
                       position: "absolute",
-                      top: showTitle ? "50%" : "80%",
-                      left: isMobile ? "50%" : "50%",
+                      textAlign: "center",
+                      top: "50%",
+                      left: "50%",
                       transform: "translate(-50%, -50%)",
                       fontSize: isMobile ? "16px" : "17px",
+                      maxWidth: isMobile ? "80px" : "150px",
+                      textOverflow: "ellipsis",
+                      overflow: "hidden",
+                      whiteSpace: "nowrap",
                       opacity: showTitle ? 1 : 0,
-                      transition: "top 0.2s ease, opacity 0.1s ease",
+                      transition: "opacity 0.2s ease",
                     }}
                   >
                     {capitalizeEachWord(
@@ -651,12 +665,17 @@ const ResponsiveLayout = ({ children }) => {
                   variant="h6"
                   sx={{
                     position: "absolute",
-                    top: showTitle ? "50%" : "80%",
-                    left: isMobile ? "50%" : "50%",
+                    textAlign: "center",
+                    top: "50%",
+                    left: "50%",
                     transform: "translate(-50%, -50%)",
                     fontSize: isMobile ? "16px" : "17px",
+                    maxWidth: isMobile ? "80px" : "150px",
+                    textOverflow: "ellipsis",
+                    overflow: "hidden",
+                    whiteSpace: "nowrap",
                     opacity: showTitle ? 1 : 0,
-                    transition: "top 0.2s ease, opacity 0.1s ease",
+                    transition: "opacity 0.2s ease",
                   }}
                 >
                   {getTitle()}
@@ -682,7 +701,7 @@ const ResponsiveLayout = ({ children }) => {
                   >
                     <CalendarTodayIcon style={{ fontSize: 15 }} />
                     <p style={{ fontSize: 14, fontWeight: 500 }}>
-                      {getCurrentDate()}
+                      {isMobile ? getCurrentDateMobile() : getCurrentDate()}
                     </p>
                   </div>
                 </NavLink>
@@ -704,7 +723,6 @@ const ResponsiveLayout = ({ children }) => {
           {children}
         </Box>
       </Box>
-
       <ProjectModal
         open={openModal}
         onClose={handleModalClose}

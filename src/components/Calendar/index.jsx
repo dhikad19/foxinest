@@ -12,13 +12,17 @@ import {
   TextField,
   Box,
   useTheme,
+  Divider,
   useMediaQuery,
   Typography,
   CircularProgress,
 } from "@mui/material";
-
+import EventDetailDialog from "./Components/Edit";
+import AddEventDialog from "./Components/Add";
+import CloseIcon from "@mui/icons-material/Close";
 import interactionPlugin from "@fullcalendar/interaction"; // Required for interactions
 import "@fullcalendar/common/main.css";
+import DateIcon from "@mui/icons-material/DateRangeOutlined";
 
 const Calendar = () => {
   const [events, setEvents] = useState([]);
@@ -39,12 +43,6 @@ const Calendar = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const addOneDay = (dateStr) => {
-    const date = new Date(dateStr);
-    date.setDate(date.getDate() + 1);
-    return date.toISOString().split("T")[0];
-  };
-
   const handleEditEvent = () => {
     if (!selectedEvent) return;
 
@@ -59,7 +57,7 @@ const Calendar = () => {
           ...evt,
           title: editTitle,
           start: editStart,
-          end: addOneDay(editEnd),
+          end: editEnd,
         };
       }
       return evt;
@@ -180,7 +178,7 @@ const Calendar = () => {
           return {
             ...event,
             start: mergedStart.toISOString().split("T")[0],
-            end: addOneDay(mergedEnd.toISOString().split("T")[0]),
+            end: mergedEnd.toISOString().split("T")[0],
           };
         }
       }
@@ -210,7 +208,7 @@ const Calendar = () => {
         maxWidth: "100%",
         height: "100%",
         margin: "0 auto",
-        padding: isMobile ? "0px 15px 0px 15px" : "0px 25px 0px 25px",
+        padding: isMobile ? "60px0px 15px 0px 15px" : "60px 25px 0px 25px",
       }}
     >
       {isLoaded ? (
@@ -253,7 +251,7 @@ const Calendar = () => {
             setNewEventTitle("");
             setNewEventDates({
               start: info.dateStr,
-              end: info.dateStr, // Ubah jadi sama dengan start
+              end: info.dateStr,
             });
             setDialogOpen(true);
           }}
@@ -261,7 +259,7 @@ const Calendar = () => {
             setNewEventTitle("");
             setNewEventDates({
               start: selectionInfo.startStr,
-              end: selectionInfo.endStr, // Gunakan endStr langsung, jangan ditambah
+              end: selectionInfo.endStr,
             });
             setDialogOpen(true);
           }}
@@ -282,104 +280,31 @@ const Calendar = () => {
           </Typography>
         </Box>
       )}
-
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
-        <DialogTitle>Tambah Event</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Judul Event"
-            fullWidth
-            value={newEventTitle}
-            onChange={(e) => setNewEventTitle(e.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>Batal</Button>
-          <Button
-            onClick={() => {
-              if (newEventTitle.trim() !== "") {
-                handleAddEvent({
-                  title: newEventTitle,
-                  start: newEventDates.start,
-                  end: addOneDay(newEventDates.end),
-                  backgroundColor: "#4caf50",
-                  textColor: "#fff",
-                });
-              }
-              setDialogOpen(false);
-            }}
-          >
-            Simpan
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog
+      <AddEventDialog
+        isMobile={isMobile}
+        dialogOpen={dialogOpen}
+        setDialogOpen={setDialogOpen}
+        newEventTitle={newEventTitle}
+        setNewEventTitle={setNewEventTitle}
+        newEventDates={newEventDates}
+        handleAddEvent={handleAddEvent}
+      />
+      <EventDetailDialog
+        isMobile={isMobile}
         open={detailDialogOpen}
         onClose={() => setDetailDialogOpen(false)}
-      >
-        <DialogTitle>Detail Event</DialogTitle>
-        <DialogContent>
-          {selectedEvent && (
-            <>
-              <p>
-                <strong>Judul:</strong> {selectedEvent.title}
-              </p>
-              <p>
-                <strong>Tanggal:</strong>{" "}
-                {selectedEvent.end && selectedEvent.start !== selectedEvent.end
-                  ? `${formatDate(selectedEvent.start)} sampai ${formatDate(
-                      selectedEvent.end
-                    )}`
-                  : formatDate(selectedEvent.start)}
-              </p>
-
-              {!isHoliday && (
-                <>
-                  <TextField
-                    label="Edit Judul Event"
-                    fullWidth
-                    value={editTitle}
-                    onChange={(e) => setEditTitle(e.target.value)}
-                    margin="dense"
-                  />
-                  <TextField
-                    label="Tanggal Mulai"
-                    type="date"
-                    fullWidth
-                    margin="dense"
-                    value={editStart}
-                    onChange={(e) => setEditStart(e.target.value)}
-                    InputLabelProps={{ shrink: true }}
-                  />
-                  <TextField
-                    label="Tanggal Selesai"
-                    type="date"
-                    fullWidth
-                    margin="dense"
-                    value={editEnd}
-                    onChange={(e) => setEditEnd(e.target.value)}
-                    InputLabelProps={{ shrink: true }}
-                  />
-                </>
-              )}
-            </>
-          )}
-        </DialogContent>
-
-        <DialogActions>
-          <Button onClick={() => setDetailDialogOpen(false)}>Tutup</Button>
-          {!isHoliday && (
-            <>
-              <Button onClick={handleDeleteEvent} color="error">
-                Hapus
-              </Button>
-              <Button onClick={handleEditEvent}>Simpan</Button>
-            </>
-          )}
-        </DialogActions>
-      </Dialog>
+        selectedEvent={selectedEvent}
+        editTitle={editTitle}
+        editStart={editStart}
+        editEnd={editEnd}
+        isHoliday={isHoliday}
+        setEditTitle={setEditTitle}
+        setEditStart={setEditStart}
+        setEditEnd={setEditEnd}
+        handleEditEvent={handleEditEvent}
+        handleDeleteEvent={handleDeleteEvent}
+        formatDate={formatDate}
+      />
     </div>
   );
 };

@@ -267,7 +267,6 @@ const TaskList = ({
     }
   }, [tasksByCategory]);
 
-  // 🔍 Overdue tasks filter
   const overdueTasks = [];
   const todayStr = today.format("YYYY-MM-DD");
 
@@ -389,11 +388,9 @@ const TaskList = ({
                     style={{
                       marginLeft: "auto",
                       cursor: "pointer",
-                      padding: "4px 10px",
-                      borderRadius: 4,
-                      backgroundColor: "rgb(241, 241, 241)",
+                      color: "#ff7800",
                       fontWeight: 500,
-                      fontSize: 14,
+                      fontSize: 15,
                     }}
                   >
                     {selectedDate

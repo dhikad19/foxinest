@@ -468,7 +468,7 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                         style={{
                           fontSize: "14px",
                           color: "grey",
-                          marginLeft: 6,
+                          // marginLeft: 6,
                         }}
                       />
                       <p
@@ -582,7 +582,7 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
             {task.category}
           </DialogTitle>
           <div
-            style={{ padding: "12px 24px", marginTop: 5 }}
+            style={{ padding: "12px 24px", marginTop: 5, cursor: "pointer" }}
             onClick={handleCloseDialog}
           >
             <CloseIcon />

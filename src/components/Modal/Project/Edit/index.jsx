@@ -10,11 +10,16 @@ import {
   FormControl,
   FormControlLabel,
   Switch,
+  IconButton,
   OutlinedInput,
   Box,
+  Drawer,
+  useTheme,
+  useMediaQuery,
+  Divider,
   Typography,
 } from "@mui/material";
-
+import CloseIcon from "@mui/icons-material/Close";
 const colorOptions = [
   { value: "default", label: "Default", color: "#ccc" },
   { value: "blue", label: "Blue", color: "#2196f3" },
@@ -39,38 +44,48 @@ const EditProjectDialog = ({
     setProjectData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const renderColorValue = (value) => {
-    if (!value) return <em style={{ color: "#aaa" }}>Select a color</em>;
-
-    const selected = colorOptions.find((c) => c.value === value);
-    return (
-      <Box sx={{ display: "flex", alignItems: "center" }}>
-        <Box
-          sx={{
-            width: 14,
-            height: 14,
-            borderRadius: "50%",
-            backgroundColor: selected?.color,
-            marginRight: 1.5,
-          }}
-        />
-        {selected?.label}
-      </Box>
-    );
-  };
-
-  return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle sx={{ fontSize: 18 }}>Edit Project</DialogTitle>
-
+  const renderContent = () => (
+    <>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <DialogTitle
+          style={{ padding: "12px 24px", fontSize: 17, marginTop: 5 }}
+        >
+          Edit Project
+        </DialogTitle>
+        <IconButton
+          onClick={onClose}
+          style={{ padding: "12px 19px", marginTop: 5 }}
+        >
+          <CloseIcon />
+        </IconButton>
+      </div>
+      <Divider />
       <DialogContent>
         <TextField
           placeholder="Project Name"
           value={projectData.name}
+          label="Project Name"
           onChange={handleChange("name")}
           fullWidth
           size="small"
-          sx={{ mb: 2 }}
+          style={{ marginBottom: 12, marginTop: 10 }}
+          sx={{
+            "& label.Mui-focused": { color: "#4f4f4f" },
+            "& .MuiOutlinedInput-root.Mui-focused": {
+              "& fieldset": {
+                borderColor: "#4f4f4f",
+              },
+              "& input": {
+                color: "#4f4f4f",
+              },
+            },
+          }}
         />
 
         <FormControl fullWidth sx={{ mb: 2 }}>
@@ -84,7 +99,7 @@ const EditProjectDialog = ({
             inputProps={{ "aria-label": "Select color" }}
           >
             <MenuItem disabled value="">
-              <em>Select a color</em>
+              <span style={{ color: "#4f4f4f" }}>Select Color</span>
             </MenuItem>
             {colorOptions.map(({ value, label, color }) => (
               <MenuItem key={value} value={value}>
@@ -111,10 +126,10 @@ const EditProjectDialog = ({
               onChange={handleChange("isFavorite")}
               sx={{
                 "& .MuiSwitch-switchBase.Mui-checked": {
-                  color: "#ff7800",
+                  color: "#4f4f4f",
                 },
                 "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                  backgroundColor: "#ff7800",
+                  backgroundColor: "#4f4f4f",
                 },
               }}
             />
@@ -128,21 +143,21 @@ const EditProjectDialog = ({
         />
       </DialogContent>
 
-      <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button
+      <DialogActions style={{ paddingRight: "24px", paddingBottom: "24px" }}>
+        {/* <Button
           sx={{ textTransform: "capitalize", color: "#ff7800" }}
           onClick={onClose}
         >
           Cancel
-        </Button>
+        </Button> */}
         <Button
           sx={{
-            backgroundColor: "#ff7800",
+            backgroundColor: "#4f4f4f",
             textTransform: "capitalize",
             fontWeight: "bold",
             fontSize: "12px",
             "&:hover": {
-              backgroundColor: "#ff871f",
+              backgroundColor: "#4f4f4f",
             },
           }}
           disableElevation
@@ -152,6 +167,39 @@ const EditProjectDialog = ({
           Save
         </Button>
       </DialogActions>
+    </>
+  );
+
+  const renderColorValue = (value) => {
+    if (!value) return <em style={{ color: "#aaa" }}>Select a color</em>;
+
+    const selected = colorOptions.find((c) => c.value === value);
+    return (
+      <Box sx={{ display: "flex", alignItems: "center" }}>
+        <Box
+          sx={{
+            width: 14,
+            height: 14,
+            borderRadius: "50%",
+            backgroundColor: selected?.color,
+            marginRight: 1.5,
+          }}
+        />
+        {selected?.label}
+      </Box>
+    );
+  };
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  return isMobile ? (
+    <Drawer anchor="bottom" open={open} onClose={onClose}>
+      {renderContent()}
+    </Drawer>
+  ) : (
+    <Dialog open={open} onClose={onClose} fullWidth>
+      {renderContent()}
     </Dialog>
   );
 };

@@ -1,9 +1,15 @@
-import React, { useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import dayjs from "dayjs";
-import { Button, Divider } from "@mui/material";
+import { Button, Divider, IconButton, Menu, MenuItem } from "@mui/material";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import DateIcon from "@mui/icons-material/DateRangeOutlined";
+import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
+import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 
 const CompletedTaskItem = ({ task, onDelete }) => {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const menuOpen = Boolean(anchorEl);
+
   // Get project name by task.id from localStorage
   const projectName = useMemo(() => {
     const projects = JSON.parse(localStorage.getItem("projects")) || [];
@@ -11,9 +17,29 @@ const CompletedTaskItem = ({ task, onDelete }) => {
     return match ? match.name : task.projectId;
   }, [task.projectId]);
 
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleDelete = () => {
+    onDelete(task.id);
+    handleMenuClose();
+  };
+
   return (
     <div>
-      <div style={{ display: "flex", alignItems: "start" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "start",
+          marginTop: 15,
+          marginBottom: 15,
+        }}
+      >
         <div style={{ flex: 1 }}>
           <p style={{ fontSize: 15 }}>{task.title}</p>
           <p dangerouslySetInnerHTML={{ __html: task.description }} />
@@ -21,7 +47,7 @@ const CompletedTaskItem = ({ task, onDelete }) => {
           <p>
             {task.source === "home_projects_data"
               ? `Home/${task.category}`
-              : `My Projects/${projectName.replaceAll("-", " ").to}/${
+              : `My Projects/${projectName.replaceAll("-", " ")}/${
                   task.category
                 }`}
           </p>
@@ -60,27 +86,28 @@ const CompletedTaskItem = ({ task, onDelete }) => {
             </div>
           )}
           <strong>Priority:</strong> {task.priority}
+          <p style={{ margin: "5px 0", fontSize: "14px", color: "#555" }}>
+            <strong>Completed on:</strong>{" "}
+            {task.dateCompleted ? (
+              <>
+                {task.dateCompleted} at {task.timeCompleted}
+              </>
+            ) : (
+              "N/A"
+            )}
+          </p>
         </div>
 
-        {/* Delete button */}
-        <Button
-          onClick={() => onDelete(task.id)}
-          variant="contained"
-          sx={{
-            backgroundColor: "#ff7800",
-            "&:hover": { backgroundColor: "#ff871f" },
-          }}
-          disableElevation
-          size="small"
-          style={{
-            textTransform: "capitalize",
-            fontWeight: "bold",
-            fontSize: "12px",
-            marginRight: "6px",
-          }}
-        >
-          Delete
-        </Button>
+        <MoreHorizOutlinedIcon
+          style={{ fontSize: "20px", cursor: "pointer" }}
+          onClick={handleMenuOpen}
+        />
+        <Menu anchorEl={anchorEl} open={menuOpen} onClose={handleMenuClose}>
+          <MenuItem style={{ fontSize: 14 }} onClick={handleDelete}>
+            <DeleteIcon style={{ fontSize: "19px", marginRight: 12 }} />{" "}
+            <p style={{ fontSize: "13px" }}>Delete</p>
+          </MenuItem>
+        </Menu>
       </div>
       <Divider />
     </div>

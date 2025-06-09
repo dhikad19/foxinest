@@ -9,6 +9,8 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
+import ChecklistRtlOutlinedIcon from "@mui/icons-material/ChecklistRtlOutlined";
+import SortOutlinedIcon from "@mui/icons-material/SortOutlined";
 import { FaChevronDown } from "react-icons/fa";
 import { SortByAlpha, DateRange, NewReleases } from "@mui/icons-material";
 
@@ -81,9 +83,51 @@ const CompletedSection = () => {
       }
     }
 
+    // === START: Remove completed tasks older than 7 days ===
+    const now = new Date();
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+    // Filter tasks to keep only those completed within last 7 days
+    const filteredTasks = combinedCompletedTasks.filter((task) => {
+      if (!task.dateCompleted) return true; // keep if no completion date
+      const completedDate = new Date(task.dateCompleted);
+      return completedDate >= sevenDaysAgo;
+    });
+
+    // Clean up localStorage - remove old completed tasks from projects_data
+    if (projectsRaw) {
+      const projects = JSON.parse(projectsRaw);
+      Object.entries(projects).forEach(([projectId, project]) => {
+        if (project.tasks && Array.isArray(project.tasks)) {
+          projects[projectId].tasks = project.tasks.filter((task) => {
+            if (!task.completed) return true;
+            if (!task.dateCompleted) return true;
+            const completedDate = new Date(task.dateCompleted);
+            return completedDate >= sevenDaysAgo;
+          });
+        }
+      });
+      localStorage.setItem("projects_data", JSON.stringify(projects));
+    }
+
+    // Clean up localStorage - remove old completed tasks from home_projects_data
+    if (todoRaw) {
+      const todo = JSON.parse(todoRaw);
+      if (todo.tasks && Array.isArray(todo.tasks)) {
+        todo.tasks = todo.tasks.filter((task) => {
+          if (!task.completed) return true;
+          if (!task.dateCompleted) return true;
+          const completedDate = new Date(task.dateCompleted);
+          return completedDate >= sevenDaysAgo;
+        });
+        localStorage.setItem("home_projects_data", JSON.stringify(todo));
+      }
+    }
+    // === END: cleanup ===
+
     setProjectList([...new Set(tempProjects)].sort());
 
-    let sorted = sortTasks([...combinedCompletedTasks]);
+    let sorted = sortTasks(filteredTasks);
 
     if (searchQuery.trim()) {
       sorted = sorted.filter((task) =>
@@ -213,15 +257,16 @@ const CompletedSection = () => {
   return (
     <div
       style={{
-        paddingLeft: "16px",
-        paddingRight: "16px",
+        paddingTop: "60px",
+        paddingLeft: "48px",
+        paddingRight: "48px",
         maxWidth: "700px",
         margin: "0 auto",
       }}
     >
       <h2
         style={{
-          marginBottom: 10,
+          marginBottom: 8,
           marginTop: "10px",
         }}
       >
@@ -255,7 +300,7 @@ const CompletedSection = () => {
         style={{
           display: "flex",
           alignItems: "center",
-          marginTop: 10,
+          marginTop: 15,
           marginBottom: 30,
         }}
       >
@@ -267,7 +312,7 @@ const CompletedSection = () => {
             marginRight: 15,
           }}
         >
-          <p style={{ fontWeight: "bold" }}>Activity:</p>
+          <ChecklistRtlOutlinedIcon />
           <div
             onClick={handleProjectClick}
             style={{
@@ -369,7 +414,7 @@ const CompletedSection = () => {
         </div>
         <div style={{ fontSize: 14 }}>
           <div style={{ display: "flex", alignItems: "center" }}>
-            <p style={{ fontWeight: "bold", marginRight: 6 }}>Sort:</p>
+            <SortOutlinedIcon style={{ marginRight: 5 }} />
             <div
               style={{
                 display: "flex",

@@ -82,22 +82,7 @@ const TodoItem = ({ item }) => {
 };
 
 const App = () => {
-  const [tasks, setTasks] = useState([
-    {
-      id: "1",
-      title: "Buy groceries",
-      dueDate: "2025-04-18",
-      priority: "High",
-      description: "Milk, eggs, bread, and coffee.",
-    },
-    {
-      id: "2",
-      title: "Finish project report",
-      dueDate: "2025-04-20",
-      priority: "Medium",
-      description: "Compile all data and send to team.",
-    },
-  ]);
+  const [tasks, setTasks] = useState([]);
 
   const [form, setForm] = useState({
     title: "",
