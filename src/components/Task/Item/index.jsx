@@ -17,7 +17,6 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
-import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 import FlagIcon from "@mui/icons-material/Flag";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import CloseIcon from "@mui/icons-material/Close";
@@ -25,7 +24,6 @@ import CommentsIcon from "@mui/icons-material/ChatBubbleOutline";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import EditIcon from "@mui/icons-material/EditOutlined";
 import DragIcon from "@mui/icons-material/DragIndicator";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
 import DateIcon from "@mui/icons-material/DateRangeOutlined";
 import { useEditor, EditorContent } from "@tiptap/react";
@@ -35,7 +33,6 @@ import EmojiPicker from "emoji-picker-react";
 import IconButton from "@mui/material/IconButton";
 import InsertEmoticonIcon from "@mui/icons-material/InsertEmoticon";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
-import { Fullscreen } from "@mui/icons-material";
 
 // Styles
 const containerStyle = (isDragging, transform, transition) => ({

@@ -1,5 +1,10 @@
 // src/App.jsx
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
 import { useState, useEffect } from "react";
 import Home from "./pages/Home";
 import About from "./pages/About";
@@ -13,6 +18,17 @@ import NotFoundPage from "./components/404";
 import { CircularProgress, Box, Typography } from "@mui/material";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
+const routeTitles = {
+  "/": "Home - Todo",
+  "/about": "About Us - Todo",
+  "/calendar": "Calendar - Todo",
+  "/completed": "Completed Tasks - Todo",
+  "/project": "Projects - Todo",
+  "/project/:projectId": "Project Details - Todo",
+  "/welcome": "Welcome - Todo",
+  "*": "404 - Page Not Found",
+};
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -58,6 +74,7 @@ const App = () => {
     <>
       <ToastContainer position="top-right" autoClose={6000} />
       <Router>
+        <PageTitleUpdater />
         <Routes>
           <Route
             path="/welcome"
@@ -142,6 +159,24 @@ const App = () => {
       </Router>
     </>
   );
+};
+
+const PageTitleUpdater = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    const matchedRoute = Object.keys(routeTitles).find((route) => {
+      if (route === "*") return false; // Skip wildcard for matching
+
+      // Create a regex to match routes, replacing dynamic segments with a pattern
+      const routeRegex = new RegExp(`^${route.replace(/:\w+/g, "[^/]+")}$`);
+      return routeRegex.test(location.pathname);
+    });
+
+    document.title = routeTitles[matchedRoute] || routeTitles["*"];
+  }, [location.pathname]);
+
+  return null;
 };
 
 export default App;

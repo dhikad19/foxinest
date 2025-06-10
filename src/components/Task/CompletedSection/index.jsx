@@ -248,6 +248,119 @@ const CompletedSection = () => {
     marginRight: 8,
   };
 
+  const fetchCompletedTasks = () => {
+    const combinedCompletedTasks = [];
+    const tempProjects = [];
+
+    const projectsRaw = localStorage.getItem("projects_data");
+    if (projectsRaw) {
+      const projects = JSON.parse(projectsRaw);
+      tempProjects.push(...Object.keys(projects));
+      if (projects && typeof projects === "object") {
+        Object.entries(projects).forEach(([projectId, project]) => {
+          if (project.tasks && Array.isArray(project.tasks)) {
+            project.tasks
+              .filter((task) => task.completed)
+              .forEach((task) =>
+                combinedCompletedTasks.push({
+                  ...task,
+                  source: "projects_data",
+                  projectId,
+                })
+              );
+          }
+        });
+      }
+    }
+
+    const todoRaw = localStorage.getItem("home_projects_data");
+    if (todoRaw) {
+      const todo = JSON.parse(todoRaw);
+      tempProjects.push("home");
+      if (todo && todo.tasks && Array.isArray(todo.tasks)) {
+        todo.tasks
+          .filter((task) => task.completed)
+          .forEach((task) =>
+            combinedCompletedTasks.push({
+              ...task,
+              source: "home_projects_data",
+            })
+          );
+      }
+    }
+
+    const now = new Date();
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+    const filteredTasks = combinedCompletedTasks.filter((task) => {
+      if (!task.dateCompleted) return true;
+      const completedDate = new Date(task.dateCompleted);
+      return completedDate >= sevenDaysAgo;
+    });
+
+    setProjectList([...new Set(tempProjects)].sort());
+
+    let sorted = sortTasks(filteredTasks);
+
+    if (searchQuery.trim()) {
+      sorted = sorted.filter((task) =>
+        task.title.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    if (selectedProject !== "all") {
+      sorted = sorted.filter(
+        (task) =>
+          (task.source === "projects_data" &&
+            task.projectId === selectedProject) ||
+          (task.source === "home_projects_data" && selectedProject === "home")
+      );
+    }
+
+    setCompletedTasks(sorted);
+  };
+
+  const handleCompleteTask = (id) => {
+    const taskToUpdate = completedTasks.find((task) => task.id === id);
+    if (!taskToUpdate) return;
+
+    if (taskToUpdate.source === "projects_data") {
+      const raw = localStorage.getItem("projects_data");
+      if (!raw) return;
+      const projects = JSON.parse(raw);
+
+      const updatedProjectTasks = projects[taskToUpdate.projectId].tasks.map(
+        (task) =>
+          task.id === id ? { ...task, completed: !task.completed } : task
+      );
+
+      projects[taskToUpdate.projectId].tasks = updatedProjectTasks;
+
+      localStorage.setItem("projects_data", JSON.stringify(projects));
+    }
+
+    if (taskToUpdate.source === "home_projects_data") {
+      const raw = localStorage.getItem("home_projects_data");
+      if (!raw) return;
+      const todo = JSON.parse(raw);
+
+      const updatedTasks = todo.tasks.map((task) =>
+        task.id === id ? { ...task, completed: !task.completed } : task
+      );
+
+      todo.tasks = updatedTasks;
+
+      localStorage.setItem("home_projects_data", JSON.stringify(todo));
+    }
+
+    // Refresh state
+    fetchCompletedTasks();
+  };
+
+  useEffect(() => {
+    fetchCompletedTasks();
+  }, [sortOption, searchQuery, selectedProject]);
+
   const filteredProjects = projectList.filter((name) =>
     name.toLowerCase().includes(projectSearch.toLowerCase())
   );
@@ -301,7 +414,7 @@ const CompletedSection = () => {
           display: "flex",
           alignItems: "center",
           marginTop: 15,
-          marginBottom: 30,
+          marginBottom: 50,
         }}
       >
         <div
@@ -497,7 +610,11 @@ const CompletedSection = () => {
           </Menu>
         </div>
       </div>
-      <CompletedTaskList tasks={completedTasks} onDelete={handleDelete} />
+      <CompletedTaskList
+        onComplete={handleCompleteTask}
+        tasks={completedTasks}
+        onDelete={handleDelete}
+      />
     </div>
   );
 };
