@@ -208,7 +208,7 @@ const Calendar = () => {
         maxWidth: "100%",
         height: "100%",
         margin: "0 auto",
-        padding: isMobile ? "60px0px 15px 0px 15px" : "60px 25px 0px 25px",
+        padding: isMobile ? "60px 15px 0px 15px" : "60px 25px 0px 25px",
       }}
     >
       {isLoaded ? (

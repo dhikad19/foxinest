@@ -50,7 +50,11 @@ const EventDetailDialog = ({
         </DialogTitle>
         <div
           onClick={onClose}
-          style={{ padding: "12px 19px", cursor: "pointer", marginTop: 5 }}
+          style={{
+            padding: "12px 19px",
+            cursor: "pointer",
+            marginTop: 5,
+          }}
         >
           <CloseIcon />
         </div>

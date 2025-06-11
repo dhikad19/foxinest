@@ -16,6 +16,7 @@ import {
   Button,
   Tooltip,
 } from "@mui/material";
+import { Link } from "react-router-dom";
 import FlagIcon from "@mui/icons-material/Flag";
 import { useEditor, EditorContent } from "@tiptap/react";
 import DateIcon from "@mui/icons-material/DateRangeOutlined";
@@ -216,6 +217,21 @@ const CompletedTaskItem = ({ task, onDelete, onComplete }) => {
         }}
       >
         <div style={{ flex: 1 }}>
+          {task.dateCompleted && (
+            <div
+              style={{ display: "flex", alignItems: "center", marginBottom: 5 }}
+            >
+              <DateIcon
+                style={{
+                  fontSize: 19,
+                  marginRight: 5,
+                  marginLeft: "-2px",
+                  color: "#4f4f4f",
+                }}
+              />
+              <p style={{ fontSize: "14px" }}>{task.dateCompleted}</p>
+            </div>
+          )}
           <p style={{ fontSize: 15 }}>
             <b style={{ marginRight: 5 }}>You</b>
             completed a task:
@@ -240,68 +256,23 @@ const CompletedTaskItem = ({ task, onDelete, onComplete }) => {
             }}
           >
             <p style={{ fontSize: "14px" }}>{task.timeCompleted}</p>
-            <p style={{ fontSize: "14px" }}>
-              <b>
-                {task.source === "home_projects_data"
-                  ? `# Home`
-                  : `# ${projectName.replaceAll("-", " ")}`}
-              </b>
-            </p>
-          </div>
-          {/* <p dangerouslySetInnerHTML={{ __html: task.description }} /> */}
-          {/* Show source path */}
-          {/* <p>
-            {task.source === "home_projects_data"
-              ? `Home/${task.category}`
-              : `My Projects/${projectName.replaceAll("-", " ")}/${
-                  task.category
-                }`}
-          </p> */}
-          {/* Due date and priority */}
-          {/* {task.dueDate && (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                marginTop: 5,
-              }}
+            <Link
+              style={{ color: "black" }}
+              to={
+                task.source === "home_projects_data"
+                  ? "/"
+                  : `/project/${projectName}`
+              }
             >
-              <DateIcon style={{ fontSize: "14px", color: "grey" }} />
-              <p
-                style={{
-                  fontSize: "13px",
-                  color: "grey",
-                  marginLeft: "5px",
-                }}
-              >
-                {(() => {
-                  const currentYear = new Date().getFullYear();
-                  const dueDate = new Date(task.dueDate);
-                  const options = {
-                    day: "2-digit",
-                    month: "short",
-                    ...(dueDate.getFullYear() !== currentYear && {
-                      year: "numeric",
-                    }),
-                  };
-                  return new Intl.DateTimeFormat("en-GB", options).format(
-                    dueDate
-                  );
-                })()}
+              <p style={{ fontSize: "14px" }}>
+                <b>
+                  {task.source === "home_projects_data"
+                    ? `#Home`
+                    : `#${projectName.replaceAll("-", " ")}`}
+                </b>
               </p>
-            </div>
-          )} */}
-          {/* <strong>Priority:</strong> {task.priority}
-          <p style={{ margin: "5px 0", fontSize: "14px", color: "#555" }}>
-            <strong>Completed on:</strong>{" "}
-            {task.dateCompleted ? (
-              <>
-                {task.dateCompleted} at {task.timeCompleted}
-              </>
-            ) : (
-              "N/A"
-            )}
-          </p> */}
+            </Link>
+          </div>
         </div>
       </div>
       <Divider />
@@ -324,7 +295,9 @@ const CompletedTaskItem = ({ task, onDelete, onComplete }) => {
           >
             Completed
           </DialogTitle>
-          <div style={{ display: "flex", alignItems: "center" }}>
+          <div
+            style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
+          >
             <MoreHorizOutlinedIcon
               style={{ fontSize: "20px", cursor: "pointer" }}
               onClick={(e) => {
@@ -340,7 +313,7 @@ const CompletedTaskItem = ({ task, onDelete, onComplete }) => {
               </MenuItem>
             </Menu>
             <div
-              style={{ padding: "12px 24px", marginTop: 5 }}
+              style={{ padding: "12px 19px", marginTop: 5 }}
               onClick={handleClose}
             >
               <CloseIcon />
@@ -403,13 +376,14 @@ const CompletedTaskItem = ({ task, onDelete, onComplete }) => {
                     fontWeight: 500,
                     lineHeight: "normal",
                     marginBottom: 10,
+                    textDecoration: "line-through",
                     marginTop: 0,
                   }}
                 >
                   {task.title}
                 </p>
                 <div
-                  style={{ fontSize: "14px" }}
+                  style={{ fontSize: "14px", textDecoration: "line-through" }}
                   dangerouslySetInnerHTML={{ __html: task.description }}
                 />
               </div>

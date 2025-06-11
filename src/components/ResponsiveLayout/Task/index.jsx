@@ -13,6 +13,7 @@ import {
   useTheme,
   Alert,
 } from "@mui/material";
+import DateIcon from "@mui/icons-material/DateRangeOutlined";
 import CloseIcon from "@mui/icons-material/Close";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
@@ -164,7 +165,7 @@ function TodayTasksButton() {
             Today's Tasks
           </DialogTitle>
           <div
-            style={{ padding: "12px 24px", marginTop: 5 }}
+            style={{ padding: "12px 19px", marginTop: 5 }}
             onClick={handleClose}
           >
             <CloseIcon />
@@ -179,7 +180,80 @@ function TodayTasksButton() {
                 divider
                 style={{ paddingLeft: 0, paddingRight: 0 }}
               >
-                <ListItemText
+                <div style={{ width: "100%" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      width: "100%",
+                      marginBottom: 10,
+                      marginTop: 10,
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        width: "100%",
+                      }}
+                    >
+                      <DateIcon
+                        style={{
+                          fontSize: 19,
+                          marginRight: 5,
+                          marginLeft: "-2px",
+                          color: "#4f4f4f",
+                        }}
+                      />
+                      <p style={{ fontSize: 14 }}>
+                        {(() => {
+                          const currentYear = new Date().getFullYear();
+                          const dueDate = new Date(task.dueDate);
+                          const options = {
+                            day: "2-digit",
+                            month: "short",
+                            ...(dueDate.getFullYear() !== currentYear && {
+                              year: "numeric",
+                            }),
+                          };
+                          return new Intl.DateTimeFormat(
+                            "en-GB",
+                            options
+                          ).format(dueDate);
+                        })()}
+                      </p>
+                    </div>
+                    <p
+                      style={{
+                        fontSize: 14,
+                        whiteSpace: "nowrap",
+                        textOverflow: "ellipsis",
+                        width: "180px",
+                        overflow: "hidden",
+                        textAlign: "right",
+                      }}
+                    >
+                      {task.category}
+                    </p>
+                  </div>
+                  <p
+                    style={{
+                      fontSize: "15px",
+                      fontWeight: 500,
+                      lineHeight: "normal",
+                      marginBottom: 10,
+                      marginTop: 0,
+                    }}
+                  >
+                    {task.title}
+                  </p>
+                  <div
+                    style={{ fontSize: "14px", marginBottom: 5 }}
+                    dangerouslySetInnerHTML={{ __html: task.description }}
+                  />
+                </div>
+                {/* <ListItemText
                   primary={task.title}
                   secondary={
                     <>
@@ -193,7 +267,7 @@ function TodayTasksButton() {
                       </Typography>
                     </>
                   }
-                />
+                /> */}
               </ListItem>
             ))}
           </List>

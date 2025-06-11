@@ -363,8 +363,23 @@ const ProjectDetail = () => {
   };
 
   const handleCompleteTask = (id) => {
+    const now = new Date();
     const updatedTasks = projectData.tasks.map((task) =>
-      task.id === id ? { ...task, completed: !task.completed } : task
+      task.id === id
+        ? {
+            ...task,
+            completed: !task.completed,
+            dateCompleted: !task.completed
+              ? now.toISOString().split("T")[0]
+              : null,
+            timeCompleted: !task.completed
+              ? `${now.getHours().toString().padStart(2, "0")}:${now
+                  .getMinutes()
+                  .toString()
+                  .padStart(2, "0")}`
+              : null,
+          }
+        : task
     );
     setProjectData((prev) => ({ ...prev, tasks: updatedTasks }));
     const completed = projectData.tasks.find((t) => t.id === id);

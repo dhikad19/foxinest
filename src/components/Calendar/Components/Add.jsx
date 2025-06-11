@@ -37,7 +37,11 @@ const AddEventDialog = ({
             Add Event
           </DialogTitle>
           <div
-            style={{ padding: "12px 19px", marginTop: 5, cursor: "pointer" }}
+            style={{
+              padding: "12px 19px",
+              marginTop: 5,
+              cursor: "pointer",
+            }}
             onClick={handleClose}
           >
             <CloseIcon />
