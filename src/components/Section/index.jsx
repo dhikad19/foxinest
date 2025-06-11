@@ -3,8 +3,8 @@ import { loadFromStorage, saveToStorage } from "../../utils/storage";
 import TaskList from "../../components/Task/List";
 import EditModal from "../../components/Modal/Edit";
 import SearchBar from "../../components/Search";
-import Snackbar from "../../components/Snackbar";
-
+import { ToastContainer, toast } from "react-toastify";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { Button, TextField, Divider, Typography } from "@mui/material";
 
 const Section = () => {
@@ -78,36 +78,51 @@ const Section = () => {
   }, {});
 
   const handleCompleteTask = (taskId) => {
-    setTasks((prev) => {
-      const updatedTasks = prev.map((task) => {
-        if (task.id === taskId) {
-          const now = new Date();
-          const updatedTask = {
-            ...task,
-            completed: !task.completed,
-            dateCompleted: !task.completed
-              ? now.toISOString().split("T")[0]
-              : null, // Only the date (YYYY-MM-DD)
-            timeCompleted: !task.completed
-              ? `${now.getHours().toString().padStart(2, "0")}:${now
-                  .getMinutes()
-                  .toString()
-                  .padStart(2, "0")}` // HH:mm format
-              : null,
-          };
+    const now = new Date();
+    let updatedTask = null;
 
-          if (!task.completed) {
-            setPrevTasksState(prev);
-            setSnackbarVisible(true);
-            setTaskToUndo(updatedTask);
-          }
-
-          return updatedTask;
-        }
-        return task;
-      });
-      return updatedTasks;
+    const updatedTasks = tasks.map((task) => {
+      if (task.id === taskId) {
+        updatedTask = {
+          ...task,
+          completed: !task.completed,
+          dateCompleted: !task.completed
+            ? now.toISOString().split("T")[0]
+            : null,
+          timeCompleted: !task.completed
+            ? `${now.getHours().toString().padStart(2, "0")}:${now
+                .getMinutes()
+                .toString()
+                .padStart(2, "0")}`
+            : null,
+        };
+        return updatedTask;
+      }
+      return task;
     });
+
+    setTasks(updatedTasks);
+
+    if (updatedTask && updatedTask.completed) {
+      setPrevTasksState(tasks);
+      setTaskToUndo(updatedTask);
+
+      toast.info("Task marked as completed. Click to undo.", {
+        className: "custom-toast",
+        progressClassName: "custom-toast-progress",
+        icon: (
+          <div>
+            <InfoOutlinedIcon color="#ff7800" style={{ color: "#ff7800" }} />
+          </div>
+        ),
+        position: "bottom-left",
+        onClick: handleUndoComplete,
+        closeOnClick: true,
+        pauseOnHover: true,
+        autoClose: 6000,
+        draggable: true,
+      });
+    }
   };
 
   const handleEditTask = (updatedTask) => {
@@ -310,7 +325,7 @@ const Section = () => {
           onClose={() => setEditTask(null)}
         />
       )}
-      {snackbarVisible && <Snackbar onUndo={handleUndoComplete} />}
+      {snackbarVisible && <ToastContainer />}
     </div>
   );
 };

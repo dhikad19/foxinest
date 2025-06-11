@@ -352,7 +352,6 @@ const CompletedSection = () => {
 
       localStorage.setItem("home_projects_data", JSON.stringify(todo));
     }
-
     // Refresh state
     fetchCompletedTasks();
   };
