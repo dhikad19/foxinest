@@ -33,7 +33,6 @@ const ProjectPage = () => {
     };
 
     localStorage.setItem("projects_data", JSON.stringify(storedProjectsData));
-
     // Optionally dispatch event if you listen for it elsewhere
     window.dispatchEvent(new Event("projectsUpdated"));
   };

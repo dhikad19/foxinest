@@ -156,7 +156,10 @@ const TaskForm = ({ onAdd, defaultCategory = "", onCancel }) => {
       <Box sx={{ padding: 1 }}>
         {/* Title */}
         <Box sx={editorBoxStyle}>
-          <EditorContent editor={titleEditor} />
+          <EditorContent
+            editor={titleEditor}
+            style={{ fontWeight: 500, fontSize: 17 }}
+          />
           {form.title === "" && (
             <div style={placeholderStyle}>{randomPlaceholder}</div>
           )}
@@ -164,7 +167,7 @@ const TaskForm = ({ onAdd, defaultCategory = "", onCancel }) => {
 
         {/* Description */}
         <Box sx={editorBoxStyle}>
-          <EditorContent editor={descriptionEditor} />
+          <EditorContent editor={descriptionEditor} style={{ fontSize: 15 }} />
           {form.description === "" && (
             <div style={placeholderStyleDescription}>Description</div>
           )}
@@ -278,12 +281,20 @@ const TaskForm = ({ onAdd, defaultCategory = "", onCancel }) => {
             ))}
           </Menu>
 
-          {/* Category */}
           <div
             style={buttonMenu}
             onClick={(e) => setCategoryAnchor(e.currentTarget)}
           >
-            {form.category || "Category"}
+            <p
+              style={{
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                maxWidth: "70px",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {form.category || "Category"}
+            </p>
           </div>
           <Menu
             anchorEl={categoryAnchor}
@@ -305,7 +316,6 @@ const TaskForm = ({ onAdd, defaultCategory = "", onCancel }) => {
           </Menu>
         </Box>
 
-        {/* Footer Buttons */}
         <Divider sx={{ my: 2 }} />
         <Box display="flex" justifyContent="flex-end">
           {onCancel && (
@@ -344,7 +354,6 @@ const TaskForm = ({ onAdd, defaultCategory = "", onCancel }) => {
   );
 };
 
-// Styles
 const modalStyle = {
   width: "100%",
   bgcolor: "background.paper",

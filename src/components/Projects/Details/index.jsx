@@ -342,17 +342,46 @@ const ProjectDetail = () => {
         JSON.parse(localStorage.getItem("projects_data")) || {};
       storedData[normalizedId] = updatedData;
       localStorage.setItem("projects_data", JSON.stringify(storedData));
-
       setNewSection(""); // Clear the input after adding the section
       setShowForm(false); // Close the form after adding the section
     }
   };
 
   const handleAddTask = (task) => {
-    setProjectData((prev) => ({
-      ...prev,
-      tasks: [...prev.tasks, { ...task, completed: false }],
-    }));
+    if (task.dueDate && task.dueDate.trim() !== "") {
+      // Generate a unique ID for the task
+      var uniqueId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+      // Update project data with the new task
+      setProjectData((prev) => ({
+        ...prev,
+        tasks: [
+          ...prev.tasks,
+          { ...task, completed: false, id: uniqueId }, // Assign unique ID to task
+        ],
+      }));
+
+      // Create a new event with a unique ID
+      const newEvent = {
+        id: uniqueId, // Assign unique ID to the event
+        title: task.title,
+        start: task.dueDate,
+        end: task.dueDate,
+        backgroundColor: "#00008b",
+        textColor: "#fff",
+        details: task,
+      };
+
+      // Retrieve existing events from localStorage
+      const existingEvents =
+        JSON.parse(localStorage.getItem("user_events")) || [];
+
+      // Add the new event to the array and save to localStorage
+      const updatedEvents = [...existingEvents, newEvent];
+      localStorage.setItem("user_events", JSON.stringify(updatedEvents));
+    } else {
+      console.error("Task dueDate is invalid or empty");
+    }
   };
 
   const handleDeleteTask = (id) => {
@@ -1003,12 +1032,39 @@ const ProjectDetail = () => {
                           key={task.id}
                           task={task}
                           onSave={(updatedTask) => {
+                            // Update project data
                             setProjectData((prev) => ({
                               ...prev,
                               tasks: prev.tasks.map((t) =>
-                                t.id === updatedTask.id ? updatedTask : t
+                                t.id === updatedTask.id
+                                  ? { ...t, ...updatedTask }
+                                  : t
                               ),
                             }));
+
+                            // Sync with localStorage for user_events
+                            const storedEvents = JSON.parse(
+                              localStorage.getItem("user_events") || "[]"
+                            );
+
+                            const updatedEvents = storedEvents.map((event) =>
+                              event.id === updatedTask.id
+                                ? {
+                                    ...event,
+                                    title: updatedTask.title,
+                                    start: updatedTask.dueDate,
+                                    end: updatedTask.dueDate,
+                                    details: updatedTask,
+                                  }
+                                : event
+                            );
+
+                            localStorage.setItem(
+                              "user_events",
+                              JSON.stringify(updatedEvents)
+                            );
+
+                            // Close the modal
                             setEditingTaskId(null);
                           }}
                           onCancel={() => onClose()}
@@ -1025,6 +1081,7 @@ const ProjectDetail = () => {
                       )
                     )}
                   </SortableContext>
+
                   {!openFormSection && (
                     <div
                       onClick={() => setOpenFormSection(section)}

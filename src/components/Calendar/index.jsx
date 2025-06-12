@@ -117,6 +117,8 @@ const Calendar = () => {
       const storedEvents = JSON.parse(
         localStorage.getItem("user_events") || "[]"
       );
+
+      // Merge stored user events with holiday events
       setEvents([...Object.values(eventMap), ...storedEvents]);
       setIsLoaded(true);
     } catch (error) {
@@ -126,9 +128,11 @@ const Calendar = () => {
 
   // Save user-added events to localStorage
   const saveUserEvents = (allEvents) => {
-    // Separate user events from holiday events
+    // Filter out non-holiday events to save only user events
     const userEvents = allEvents.filter(
-      (event) => event.backgroundColor === "#4caf50"
+      (event) =>
+        event.backgroundColor === "#4caf50" ||
+        event.backgroundColor === "#00008b"
     );
     localStorage.setItem("user_events", JSON.stringify(userEvents));
   };
@@ -149,7 +153,7 @@ const Calendar = () => {
     if (isLoaded) {
       saveUserEvents(events);
     }
-  }, [events]);
+  }, [events, isLoaded]);
 
   const mergeUserEvent = (existingEvents, newEvent) => {
     const oneDay = 24 * 60 * 60 * 1000;

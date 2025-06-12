@@ -31,7 +31,39 @@ const Section = () => {
   }, [tasks, sections]);
 
   const handleAddTask = (newTask) => {
-    setTasks((prev) => [...prev, newTask]);
+    if (newTask.dueDate) {
+      // Generate a unique ID for the task and event
+      var uniqueId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+      // Create a new event with the unique ID
+      const newEvent = {
+        id: uniqueId, // Assign unique ID to the event
+        title: newTask.title,
+        start: newTask.dueDate,
+        end: newTask.dueDate,
+        backgroundColor: "#00008b",
+        textColor: "#fff",
+        details: newTask,
+      };
+
+      // Retrieve existing events from localStorage
+      const storedEvents = JSON.parse(
+        localStorage.getItem("user_events") || "[]"
+      );
+
+      // Add the new event to the array and save to localStorage
+      const updatedEvents = [...storedEvents, newEvent];
+      localStorage.setItem("user_events", JSON.stringify(updatedEvents));
+    }
+
+    // Assign a unique ID to the task and update the tasks state
+    setTasks((prev) => [
+      ...prev,
+      {
+        ...newTask,
+        id: uniqueId,
+      },
+    ]);
   };
 
   const handleAddSection = (name) => {
@@ -126,12 +158,41 @@ const Section = () => {
   };
 
   const handleEditTask = (updatedTask) => {
+    // Update the tasks in the state
     setTasks((prevTasks) =>
       prevTasks.map((task) =>
         task.id === updatedTask.id ? { ...task, ...updatedTask } : task
       )
     );
+
+    // Update the corresponding event in localStorage
+    const storedEvents = JSON.parse(
+      localStorage.getItem("user_events") || "[]"
+    );
+
+    const updatedEvents = storedEvents.map((event) =>
+      event.id === updatedTask.id
+        ? {
+            ...event,
+            title: updatedTask.title,
+            start: updatedTask.dueDate,
+            end: updatedTask.dueDate,
+            details: updatedTask,
+          }
+        : event
+    );
+
+    // Save updated events back to localStorage
+    localStorage.setItem("user_events", JSON.stringify(updatedEvents));
   };
+
+  // const handleEditTask = (updatedTask) => {
+  //   setTasks((prevTasks) =>
+  //     prevTasks.map((task) =>
+  //       task.id === updatedTask.id ? { ...task, ...updatedTask } : task
+  //     )
+  //   );
+  // };
 
   const filteredTasks = tasks.filter((task) =>
     task.title.toLowerCase().includes(searchQuery.toLowerCase())

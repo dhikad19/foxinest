@@ -188,7 +188,6 @@ const ResponsiveLayout = ({ children }) => {
     };
 
     localStorage.setItem("projects_data", JSON.stringify(projectsData));
-
     // UI cleanup
     setProjectName("");
     setSelectedColor("");

@@ -148,7 +148,7 @@ const EditModal = ({ task, onSave, onClose, onCancel }) => {
           <Box sx={editorBoxStyle}>
             <EditorContent
               editor={titleEditor}
-              style={{ fontWeight: "bold" }}
+              style={{ fontWeight: 500, fontSize: 17 }}
             />
             {form.title === "" && (
               <div style={placeholderStyle}>Edit task title</div>
@@ -157,7 +157,10 @@ const EditModal = ({ task, onSave, onClose, onCancel }) => {
 
           {/* Description Editor */}
           <Box sx={editorBoxStyle}>
-            <EditorContent editor={descriptionEditor} />
+            <EditorContent
+              editor={descriptionEditor}
+              style={{ fontSize: 15 }}
+            />
             {form.description === "" && (
               <div style={placeholderStyleDescription}>Description</div>
             )}
@@ -295,7 +298,16 @@ const EditModal = ({ task, onSave, onClose, onCancel }) => {
               onClick={(e) => setCategoryAnchor(e.currentTarget)}
               style={buttonMenu}
             >
-              {form.category || "Category"}
+              <p
+                style={{
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  maxWidth: "70px",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {form.category || "Category"}
+              </p>
             </div>
             <Menu
               anchorEl={categoryAnchor}
