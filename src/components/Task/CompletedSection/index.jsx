@@ -147,12 +147,50 @@ const CompletedSection = () => {
     setCompletedTasks(sorted);
   }, [sortOption, searchQuery, selectedProject]);
 
+  // const handleDelete = (taskIdToDelete) => {
+  //   const taskToRemove = completedTasks.find(
+  //     (task) => task.id === taskIdToDelete
+  //   );
+  //   if (!taskToRemove) return;
+
+  //   if (taskToRemove.source === "projects_data") {
+  //     const raw = localStorage.getItem("projects_data");
+  //     if (!raw) return;
+  //     const projects = JSON.parse(raw);
+  //     const updatedProject = {
+  //       ...projects[taskToRemove.projectId],
+  //       tasks: projects[taskToRemove.projectId].tasks.filter(
+  //         (t) => t.id !== taskIdToDelete
+  //       ),
+  //     };
+  //     const updatedProjects = {
+  //       ...projects,
+  //       [taskToRemove.projectId]: updatedProject,
+  //     };
+  //     localStorage.setItem("projects_data", JSON.stringify(updatedProjects));
+  //   }
+
+  //   if (taskToRemove.source === "home_projects_data") {
+  //     const raw = localStorage.getItem("home_projects_data");
+  //     if (!raw) return;
+  //     const todo = JSON.parse(raw);
+  //     const updatedTodo = {
+  //       ...todo,
+  //       tasks: todo.tasks.filter((t) => t.id !== taskIdToDelete),
+  //     };
+  //     localStorage.setItem("home_projects_data", JSON.stringify(updatedTodo));
+  //   }
+
+  //   setCompletedTasks((prev) => prev.filter((t) => t.id !== taskIdToDelete));
+  // };
+
   const handleDelete = (taskIdToDelete) => {
     const taskToRemove = completedTasks.find(
       (task) => task.id === taskIdToDelete
     );
     if (!taskToRemove) return;
 
+    // Handle tasks from "projects_data"
     if (taskToRemove.source === "projects_data") {
       const raw = localStorage.getItem("projects_data");
       if (!raw) return;
@@ -170,6 +208,7 @@ const CompletedSection = () => {
       localStorage.setItem("projects_data", JSON.stringify(updatedProjects));
     }
 
+    // Handle tasks from "home_projects_data"
     if (taskToRemove.source === "home_projects_data") {
       const raw = localStorage.getItem("home_projects_data");
       if (!raw) return;
@@ -181,6 +220,17 @@ const CompletedSection = () => {
       localStorage.setItem("home_projects_data", JSON.stringify(updatedTodo));
     }
 
+    // Update user_events in localStorage
+    const rawEvents = localStorage.getItem("user_events");
+    if (rawEvents) {
+      const userEvents = JSON.parse(rawEvents);
+      const updatedEvents = userEvents.filter(
+        (event) => event.id !== taskIdToDelete
+      );
+      localStorage.setItem("user_events", JSON.stringify(updatedEvents));
+    }
+
+    // Update completedTasks state
     setCompletedTasks((prev) => prev.filter((t) => t.id !== taskIdToDelete));
   };
 

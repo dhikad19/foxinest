@@ -4,25 +4,16 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import listPlugin from "@fullcalendar/list";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
   Box,
   useTheme,
-  Divider,
   useMediaQuery,
   Typography,
   CircularProgress,
 } from "@mui/material";
 import EventDetailDialog from "./Components/Edit";
 import AddEventDialog from "./Components/Add";
-import CloseIcon from "@mui/icons-material/Close";
-import interactionPlugin from "@fullcalendar/interaction"; // Required for interactions
+import interactionPlugin from "@fullcalendar/interaction";
 import "@fullcalendar/common/main.css";
-import DateIcon from "@mui/icons-material/DateRangeOutlined";
 
 const Calendar = () => {
   const [events, setEvents] = useState([]);
@@ -82,7 +73,6 @@ const Calendar = () => {
     setDetailDialogOpen(false);
   };
 
-  // Load holidays and local events
   const fetchHolidayData = async () => {
     try {
       const response = await fetch(
@@ -101,6 +91,7 @@ const Calendar = () => {
               start: date,
               end: date,
               description: details.description.join(", "),
+              priority: details.priority,
               backgroundColor: details.holiday ? "#ff5722" : "#2196f3",
               textColor: "#fff",
             };
@@ -118,7 +109,6 @@ const Calendar = () => {
         localStorage.getItem("user_events") || "[]"
       );
 
-      // Merge stored user events with holiday events
       setEvents([...Object.values(eventMap), ...storedEvents]);
       setIsLoaded(true);
     } catch (error) {
@@ -126,9 +116,7 @@ const Calendar = () => {
     }
   };
 
-  // Save user-added events to localStorage
   const saveUserEvents = (allEvents) => {
-    // Filter out non-holiday events to save only user events
     const userEvents = allEvents.filter(
       (event) =>
         event.backgroundColor === "#4caf50" ||
@@ -148,7 +136,6 @@ const Calendar = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Whenever events change, update localStorage for user events
   useEffect(() => {
     if (isLoaded) {
       saveUserEvents(events);
@@ -169,7 +156,6 @@ const Calendar = () => {
         const newStart = new Date(newEvent.start);
         const newEnd = new Date(newEvent.end);
 
-        // Merge if adjacent or overlapping
         if (
           Math.abs(existingEnd.getTime() - newStart.getTime()) <= oneDay ||
           Math.abs(newEnd.getTime() - existingStart.getTime()) <= oneDay ||
@@ -220,14 +206,28 @@ const Calendar = () => {
           eventClick={(info) => {
             const startStr = info.event.startStr;
             const endStr = info.event.endStr || info.event.startStr;
-
             const holiday = info.event.backgroundColor !== "#4caf50"; // libur jika bukan user event
 
+            const storedEvents = JSON.parse(
+              localStorage.getItem("user_events") || "[]"
+            );
+
+            // Find the event in localStorage with the same title, start, and end
+            const matchedEvent = storedEvents.find(
+              (event) => event.id === info.event.id
+            );
+
+            // Update the selectedEvent state with the event details
             setSelectedEvent({
               title: info.event.title,
               start: startStr,
               end: endStr,
+              priority: matchedEvent?.details?.priority || null,
+              description: matchedEvent?.details?.description || null,
+              completed: matchedEvent?.details?.completed || null,
+              category: matchedEvent?.details?.category || null,
             });
+
             setEditTitle(info.event.title);
             setEditStart(startStr);
             setEditEnd(endStr);
@@ -294,6 +294,7 @@ const Calendar = () => {
         handleAddEvent={handleAddEvent}
       />
       <EventDetailDialog
+        event={events}
         isMobile={isMobile}
         open={detailDialogOpen}
         onClose={() => setDetailDialogOpen(false)}

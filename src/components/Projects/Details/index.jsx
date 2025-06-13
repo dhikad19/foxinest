@@ -29,14 +29,12 @@ import {
   Weekend as WeekendIcon,
   Event as EventIcon,
 } from "@mui/icons-material";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import TaskForm from "../../Task/Form";
 import TaskItem from "../../Task/Item";
-import CustomSnackbar from "../../Snackbar";
 import EditModal from "../../Modal/Edit";
 import DeleteProjectDialog from "../../Modal/Project/Delete";
 import EditProjectDialog from "../../Modal/Project/Edit";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa";
@@ -47,6 +45,7 @@ import dayjs from "dayjs";
 import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import EditIcon from "@mui/icons-material/EditOutlined";
+import { ToastContainer, toast } from "react-toastify";
 import {
   DndContext,
   closestCenter,
@@ -393,27 +392,66 @@ const ProjectDetail = () => {
 
   const handleCompleteTask = (id) => {
     const now = new Date();
-    const updatedTasks = projectData.tasks.map((task) =>
-      task.id === id
-        ? {
-            ...task,
-            completed: !task.completed,
-            dateCompleted: !task.completed
-              ? now.toISOString().split("T")[0]
-              : null,
-            timeCompleted: !task.completed
-              ? `${now.getHours().toString().padStart(2, "0")}:${now
-                  .getMinutes()
-                  .toString()
-                  .padStart(2, "0")}`
-              : null,
-          }
-        : task
-    );
+    let updatedTask = null;
+
+    const updatedTasks = projectData.tasks.map((task) => {
+      if (task.id === id) {
+        updatedTask = {
+          ...task,
+          completed: !task.completed,
+          dateCompleted: !task.completed
+            ? now.toISOString().split("T")[0]
+            : null,
+          timeCompleted: !task.completed
+            ? `${now.getHours().toString().padStart(2, "0")}:${now
+                .getMinutes()
+                .toString()
+                .padStart(2, "0")}`
+            : null,
+        };
+        return updatedTask;
+      }
+      return task;
+    });
+
     setProjectData((prev) => ({ ...prev, tasks: updatedTasks }));
-    const completed = projectData.tasks.find((t) => t.id === id);
-    setCompletedTask(completed);
-    setShowSnackbar(true);
+
+    if (updatedTask && updatedTask.completed) {
+      setCompletedTask(updatedTask);
+
+      // Show toast with undo option
+      toast.info("Task marked as completed. Click to undo.", {
+        className: "custom-toast",
+        progressClassName: "custom-toast-progress",
+        icon: (
+          <div>
+            <InfoOutlinedIcon style={{ color: "#ff7800" }} />
+          </div>
+        ),
+        position: "bottom-left",
+        onClick: handleUndo,
+        closeOnClick: true,
+        pauseOnHover: true,
+        autoClose: 6000,
+        draggable: true,
+      });
+    } else if (updatedTask) {
+      // Task marked as incomplete
+      toast.info("Task marked as incomplete.", {
+        className: "custom-toast",
+        progressClassName: "custom-toast-progress",
+        icon: (
+          <div>
+            <InfoOutlinedIcon style={{ color: "#ff7800" }} />
+          </div>
+        ),
+        position: "bottom-left",
+        closeOnClick: true,
+        pauseOnHover: true,
+        autoClose: 6000,
+        draggable: true,
+      });
+    }
   };
 
   const handleUndo = () => {
@@ -1153,9 +1191,7 @@ const ProjectDetail = () => {
         </DialogActions>
       </Dialog>
 
-      {showSnackbar && (
-        <CustomSnackbar message="Task completed!" onUndo={handleUndo} />
-      )}
+      {showSnackbar && <ToastContainer />}
 
       <DeleteProjectDialog
         open={deleteDialogOpen}

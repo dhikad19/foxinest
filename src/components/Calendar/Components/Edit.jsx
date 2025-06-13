@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -17,6 +17,7 @@ import DateIcon from "@mui/icons-material/DateRangeOutlined";
 const EventDetailDialog = ({
   open,
   onClose,
+  event,
   selectedEvent,
   editTitle,
   editStart,
@@ -30,6 +31,15 @@ const EventDetailDialog = ({
   formatDate,
   isMobile,
 }) => {
+  const [events, setEvents] = useState(null);
+
+  // useEffect(() => {
+  //   if (!selectedEvent?.id) return;
+
+  //   const data = JSON.parse(localStorage.getItem("user_events") || "[]");
+  //   setEvents(data.filter((event) => event.id === selectedEvent.id));
+  // }, [selectedEvent]);
+
   const renderContent = () => (
     <>
       <div
@@ -68,6 +78,18 @@ const EventDetailDialog = ({
                 <p style={{ marginBottom: 2, fontWeight: 500 }}>
                   {selectedEvent.title}
                 </p>
+                <p style={{ marginBottom: 2, fontWeight: 500 }}>
+                  {selectedEvent.priority}
+                </p>
+                <p style={{ marginBottom: 2, fontWeight: 500 }}>
+                  {selectedEvent.description}
+                </p>
+                <p style={{ marginBottom: 2, fontWeight: 500 }}>
+                  {selectedEvent.completed}
+                </p>
+                <p style={{ marginBottom: 2, fontWeight: 500 }}>
+                  {selectedEvent.category}
+                </p>
                 <div style={{ display: "flex", alignItems: "center" }}>
                   <DateIcon style={{ fontSize: 20, marginRight: 5 }} />
                   <p style={{ fontSize: 14, marginTop: 2 }}>
@@ -78,6 +100,7 @@ const EventDetailDialog = ({
                         )}`
                       : formatDate(selectedEvent.start)}
                   </p>
+                  {selectedEvent.details && <p>{selectedEvent.details}</p>}
                 </div>
               </>
             ) : (
