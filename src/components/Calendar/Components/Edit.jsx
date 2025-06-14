@@ -11,6 +11,8 @@ import {
   Drawer,
   Box,
 } from "@mui/material";
+import InboxIcon from "@mui/icons-material/Inbox";
+import FlagIcon from "@mui/icons-material/Flag";
 import CloseIcon from "@mui/icons-material/Close";
 import DateIcon from "@mui/icons-material/DateRangeOutlined";
 
@@ -47,15 +49,13 @@ const EventDetailDialog = ({
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-        }}
-      >
+        }}>
         <DialogTitle
           style={{
             padding: "12px 24px",
             fontSize: 17,
             marginTop: 5,
-          }}
-        >
+          }}>
           Detail Event
         </DialogTitle>
         <div
@@ -64,47 +64,136 @@ const EventDetailDialog = ({
             padding: "12px 19px",
             cursor: "pointer",
             marginTop: 5,
-          }}
-        >
+          }}>
           <CloseIcon />
         </div>
       </div>
       <Divider />
-      <DialogContent>
+      <DialogContent style={{ padding: 0 }}>
         {selectedEvent && (
           <>
             {isHoliday ? (
-              <>
-                <p style={{ marginBottom: 2, fontWeight: 500 }}>
-                  {selectedEvent.title}
-                </p>
-                <p style={{ marginBottom: 2, fontWeight: 500 }}>
-                  {selectedEvent.priority}
-                </p>
-                <p style={{ marginBottom: 2, fontWeight: 500 }}>
-                  {selectedEvent.description}
-                </p>
-                <p style={{ marginBottom: 2, fontWeight: 500 }}>
-                  {selectedEvent.completed}
-                </p>
-                <p style={{ marginBottom: 2, fontWeight: 500 }}>
-                  {selectedEvent.category}
-                </p>
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <DateIcon style={{ fontSize: 20, marginRight: 5 }} />
-                  <p style={{ fontSize: 14, marginTop: 2 }}>
-                    {selectedEvent.end &&
-                    selectedEvent.start !== selectedEvent.end
-                      ? `${formatDate(selectedEvent.start)} - ${formatDate(
-                          selectedEvent.end
-                        )}`
-                      : formatDate(selectedEvent.start)}
+              <div style={{ display: "flex", width: "100%" }}>
+                <div style={{ width: "100%", padding: "20px 24px" }}>
+                  <p
+                    style={{
+                      marginBottom: 2,
+                      fontWeight: 500,
+                      lineHeight: "normal",
+                    }}>
+                    {selectedEvent.title}
                   </p>
-                  {selectedEvent.details && <p>{selectedEvent.details}</p>}
+
+                  <div
+                    style={{ fontSize: 15 }}
+                    dangerouslySetInnerHTML={{
+                      __html: selectedEvent.description || "",
+                    }}
+                  />
                 </div>
-              </>
+                {/* <p style={{ marginBottom: 2, fontWeight: 500 }}>
+                  {selectedEvent.description}
+                </p> */}
+                {/* <p style={{ marginBottom: 2, fontWeight: 500 }}>
+                  {selectedEvent.completed}
+                </p> */}
+                <div
+                  style={{
+                    maxWidth: "230px",
+                    width: "100%",
+                    padding: "20px 24px",
+                    backgroundColor: "#fcfaf8",
+                  }}>
+                  {selectedEvent.category && (
+                    <>
+                      <p
+                        style={{
+                          fontSize: 12,
+                          fontWeight: 500,
+                          color: "grey",
+                          marginBottom: 2,
+                        }}>
+                        Category
+                      </p>
+                      <div
+                        style={{
+                          display: "flex",
+                          fontSize: 13,
+                          alignItems: "center",
+                        }}>
+                        <InboxIcon style={{ marginRight: 5, fontSize: 20 }} />
+                        <p
+                          style={{
+                            marginBottom: 2,
+                            fontWeight: 500,
+                            fontSize: 13,
+                          }}>
+                          {selectedEvent.category}
+                        </p>
+                      </div>
+                      <Divider style={{ marginBottom: 10, marginTop: 10 }} />
+                    </>
+                  )}
+                  {selectedEvent.priority && (
+                    <>
+                      <p
+                        style={{
+                          fontSize: 12,
+                          fontWeight: 500,
+                          color: "grey",
+                          marginBottom: 2,
+                        }}>
+                        Priority
+                      </p>
+                      <div
+                        style={{
+                          display: "flex",
+                          fontSize: 13,
+                          alignItems: "center",
+                        }}>
+                        <FlagIcon style={{ marginRight: 5, fontSize: 20 }} />
+                        <p style={{ marginBottom: 2, fontWeight: 500 }}>
+                          {selectedEvent.priority}
+                        </p>
+                      </div>
+                      <Divider style={{ marginBottom: 10, marginTop: 10 }} />
+                    </>
+                  )}
+
+                  {selectedEvent.priority && (
+                    <p
+                      style={{
+                        fontSize: 12,
+                        fontWeight: 500,
+                        color: "grey",
+                        marginBottom: 2,
+                      }}>
+                      Date
+                    </p>
+                  )}
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <DateIcon style={{ fontSize: 20, marginRight: 5 }} />
+                    <p
+                      style={{
+                        fontSize: 13,
+                        marginTop: 2,
+                        lineHeight: "normal",
+                      }}>
+                      {selectedEvent.end &&
+                      selectedEvent.start !== selectedEvent.end
+                        ? `${formatDate(selectedEvent.start)} - ${formatDate(
+                            selectedEvent.end
+                          )}`
+                        : formatDate(selectedEvent.start)}
+                    </p>
+                  </div>
+                  {selectedEvent.priority && (
+                    <Divider style={{ marginBottom: 10, marginTop: 10 }} />
+                  )}
+                </div>
+              </div>
             ) : (
-              <>
+              <div style={{ padding: "20px 24px" }}>
                 <TextField
                   label="Event"
                   fullWidth
@@ -168,7 +257,7 @@ const EventDetailDialog = ({
                   onChange={(e) => setEditEnd(e.target.value)}
                   InputLabelProps={{ shrink: true }}
                 />
-              </>
+              </div>
             )}
           </>
         )}
@@ -183,8 +272,7 @@ const EventDetailDialog = ({
               fontWeight: "bold",
               fontSize: "12px",
               color: "#4f4f4f",
-            }}
-          >
+            }}>
             Hapus
           </Button>
           <Button
@@ -199,8 +287,7 @@ const EventDetailDialog = ({
               "&:hover": {
                 backgroundColor: "#4f4f4f",
               },
-            }}
-          >
+            }}>
             Simpan
           </Button>
         </DialogActions>

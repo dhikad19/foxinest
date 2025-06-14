@@ -22,6 +22,22 @@ import RunningWithErrorsOutlinedIcon from "@mui/icons-material/RunningWithErrors
 import TimerOutlinedIcon from "@mui/icons-material/TimerOutlined";
 import { toast } from "react-toastify";
 
+const showNotification = (titleOrCount, optionalBody) => {
+  if ("Notification" in window && Notification.permission === "granted") {
+    const options = {
+      icon: "/fox.png",
+      body:
+        typeof titleOrCount === "number"
+          ? `You have ${titleOrCount} tasks with deadline today or tomorrow!`
+          : optionalBody,
+    };
+    const title =
+      typeof titleOrCount === "number" ? "Task Reminder" : titleOrCount;
+
+    new Notification(title, options);
+  }
+};
+
 function TodayTasksButton() {
   const [todayTasks, setTodayTasks] = useState([]);
   const [open, setOpen] = useState(false);
@@ -37,6 +53,14 @@ function TodayTasksButton() {
     tomorrow.setDate(tomorrow.getDate() + 1);
     return tomorrow.toISOString().split("T")[0];
   };
+
+  useEffect(() => {
+    if ("Notification" in window) {
+      Notification.requestPermission().then((permission) => {
+        console.log("Notification permission:", permission);
+      });
+    }
+  }, []);
 
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
@@ -82,6 +106,7 @@ function TodayTasksButton() {
 
     if (filteredTasks.length > 0) {
       if (!lastToastTime || currentTime - lastToastTime > 3600000) {
+        // Show toast
         toast.info(
           `You have ${filteredTasks.length} tasks with deadline today or tomorrow!`,
           {
@@ -97,17 +122,76 @@ function TodayTasksButton() {
             ),
           }
         );
-        setTimeout(() => {
-          localStorage.setItem("lastToastTime", currentTime.toString());
-        }, 100);
+
+        // Show system notification
+        showNotification(filteredTasks.length);
+
+        localStorage.setItem("lastToastTime", currentTime.toString());
       }
     }
   };
 
   useEffect(() => {
-    // Load tasks from localStorage and check for toast on mount
-    loadTasksFromLocalStorage();
-  }, []); // Empty dependency array ensures this only runs once on mount
+    loadTasksFromLocalStorage(); // run once
+
+    const interval = setInterval(() => {
+      loadTasksFromLocalStorage(); // keep refreshing
+    }, 10000); // every minute
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date().toISOString().split("T")[0]; // Only date
+      const homeDataRaw = localStorage.getItem("home_projects_data");
+      const projectsDataRaw = localStorage.getItem("projects_data");
+
+      let allTasks = [];
+
+      if (homeDataRaw) {
+        try {
+          const homeData = JSON.parse(homeDataRaw);
+          if (Array.isArray(homeData.tasks)) {
+            allTasks.push(...homeData.tasks);
+          }
+        } catch (e) {
+          console.error("Invalid home_projects_data:", e);
+        }
+      }
+
+      if (projectsDataRaw) {
+        try {
+          const projectsData = JSON.parse(projectsDataRaw);
+          Object.values(projectsData).forEach((project) => {
+            if (Array.isArray(project.tasks)) {
+              allTasks.push(...project.tasks);
+            }
+          });
+        } catch (e) {
+          console.error("Invalid projects_data:", e);
+        }
+      }
+
+      const notifiedTasks = JSON.parse(
+        localStorage.getItem("notified_tasks") || "[]"
+      );
+
+      allTasks.forEach((task) => {
+        if (task.dueDate === now && !notifiedTasks.includes(task.id)) {
+          showNotification("Task Due Today", `"${task.title}" is due today!`);
+
+          // Mark this task as notified so we don't alert again
+          localStorage.setItem(
+            "notified_tasks",
+            JSON.stringify([...notifiedTasks, task.id])
+          );
+        }
+      });
+    }, 60000); // every 60 seconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -139,8 +223,7 @@ function TodayTasksButton() {
           borderRadius: 2,
           cursor: "pointer",
           userSelect: "none",
-        }}
-      >
+        }}>
         <RunningWithErrorsOutlinedIcon style={{ fontSize: 15 }} />
         <p style={{ fontSize: 14, fontWeight: 500 }}>{todayTasks.length}</p>
       </div>
@@ -150,24 +233,20 @@ function TodayTasksButton() {
         open={open}
         onClose={handleClose}
         fullWidth
-        maxWidth="sm"
-      >
+        maxWidth="sm">
         <div
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-          }}
-        >
+          }}>
           <DialogTitle
-            style={{ padding: "12px 24px", fontSize: 17, marginTop: 5 }}
-          >
+            style={{ padding: "12px 24px", fontSize: 17, marginTop: 5 }}>
             Today's Tasks
           </DialogTitle>
           <div
             style={{ padding: "12px 19px", marginTop: 5 }}
-            onClick={handleClose}
-          >
+            onClick={handleClose}>
             <CloseIcon />
           </div>
         </div>
@@ -178,8 +257,7 @@ function TodayTasksButton() {
               <ListItem
                 key={task.id}
                 divider
-                style={{ paddingLeft: 0, paddingRight: 0 }}
-              >
+                style={{ paddingLeft: 0, paddingRight: 0 }}>
                 <div style={{ width: "100%" }}>
                   <div
                     style={{
@@ -188,16 +266,13 @@ function TodayTasksButton() {
                       justifyContent: "space-between",
                       width: "100%",
                       marginBottom: 10,
-                      marginTop: 10,
-                    }}
-                  >
+                    }}>
                     <div
                       style={{
                         display: "flex",
                         alignItems: "center",
                         width: "100%",
-                      }}
-                    >
+                      }}>
                       <DateIcon
                         style={{
                           fontSize: 19,
@@ -232,8 +307,7 @@ function TodayTasksButton() {
                         width: "180px",
                         overflow: "hidden",
                         textAlign: "right",
-                      }}
-                    >
+                      }}>
                       {task.category}
                     </p>
                   </div>
@@ -244,8 +318,7 @@ function TodayTasksButton() {
                       lineHeight: "normal",
                       marginBottom: 10,
                       marginTop: 0,
-                    }}
-                  >
+                    }}>
                     {task.title}
                   </p>
                   <div

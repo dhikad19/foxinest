@@ -139,7 +139,7 @@ const Section = () => {
       setPrevTasksState(tasks);
       setTaskToUndo(updatedTask);
 
-      toast.info("Task marked as completed. Click to undo.", {
+      toast.info("Task marked as completed", {
         className: "custom-toast",
         progressClassName: "custom-toast-progress",
         icon: (
@@ -148,7 +148,6 @@ const Section = () => {
           </div>
         ),
         position: "bottom-left",
-        onClick: handleUndoComplete,
         closeOnClick: true,
         pauseOnHover: true,
         autoClose: 6000,
@@ -242,8 +241,7 @@ const Section = () => {
         margin: "0 auto",
         overflow: "visible",
         position: "relative",
-      }}
-    >
+      }}>
       <div style={{ paddingLeft: "3px", paddingRight: "3px" }}>
         <h2 style={{ marginBottom: "0px", marginTop: "10px" }}>Home</h2>
         <SearchBar query={searchQuery} setQuery={setSearchQuery} />
@@ -261,12 +259,10 @@ const Section = () => {
             padding: 4,
             marginTop: 16,
           }}
-          onClick={() => setShowForm(true)}
-        >
+          onClick={() => setShowForm(true)}>
           <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
           <span
-            style={{ fontWeight: "bold", color: "#ff7800", fontSize: "15px" }}
-          >
+            style={{ fontWeight: "bold", color: "#ff7800", fontSize: "15px" }}>
             Add Section
           </span>
           <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
@@ -274,8 +270,7 @@ const Section = () => {
       ) : (
         <form
           onSubmit={handleSubmit}
-          style={{ gap: 8, marginTop: 10, marginBottom: 30, padding: 3 }}
-        >
+          style={{ gap: 8, marginTop: 10, marginBottom: 30, padding: 3 }}>
           <div
             style={{
               display: "flex",
@@ -284,16 +279,14 @@ const Section = () => {
               userSelect: "none",
               marginBottom: 16,
               marginTop: 7,
-            }}
-          >
+            }}>
             <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
             <span
               style={{
                 fontWeight: "bold",
                 color: "#ff7800",
                 fontSize: "15px",
-              }}
-            >
+              }}>
               Add new section
             </span>
             <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
@@ -338,8 +331,7 @@ const Section = () => {
                 fontSize: "12px",
                 marginRight: "6px",
               }}
-              disabled={!inputValue.trim()}
-            >
+              disabled={!inputValue.trim()}>
               Add Section
             </Button>
             <Button
@@ -357,8 +349,7 @@ const Section = () => {
               onClick={() => {
                 setShowForm(false);
                 setInputValue("");
-              }}
-            >
+              }}>
               Cancel
             </Button>
           </div>

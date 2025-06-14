@@ -21,6 +21,10 @@ div p {
   transition: background-color 0.2s ease;
 }
 
+.fc .fc-daygrid-day-events {
+  cursor: pointer;
+}
+
 .sidebar-link:hover {
   background-color: #ffe0c2;
 }
