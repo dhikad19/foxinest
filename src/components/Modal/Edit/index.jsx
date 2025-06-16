@@ -352,8 +352,8 @@ const EditModal = ({ task, onSave, onClose, onCancel }) => {
                 marginRight: "6px",
               }}
               onClick={() => {
-                onCancel(); // Opsional, jika ingin menangani penghapusan atau perubahan task sebelum keluar
-                onClose(); // Pastikan onClose dipanggil untuk keluar dari mode edit
+                onCancel();
+                onClose();
               }}
               sx={{
                 color: "#000000",

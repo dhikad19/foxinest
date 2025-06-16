@@ -7,56 +7,78 @@ import {
   ListItem,
   Divider,
   useTheme,
+  Alert,
 } from "@mui/material";
 import DateIcon from "@mui/icons-material/DateRangeOutlined";
 import CloseIcon from "@mui/icons-material/Close";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import { toast } from "react-toastify";
 import RunningWithErrorsOutlinedIcon from "@mui/icons-material/RunningWithErrorsOutlined";
+import { toast } from "react-toastify";
 
-const showNotification = (titleOrCount, optionalBody) => {
+const showNotification = (taskCount) => {
+  const todayDate = new Date().toISOString().split("T")[0];
+  const lastNotificationDate = localStorage.getItem(
+    "lastSystemNotificationDate"
+  );
+
+  // Prevent duplicate system notifications on the same day
+  if (lastNotificationDate === todayDate) {
+    return;
+  }
   if ("Notification" in window && Notification.permission === "granted") {
     const options = {
       icon: "/fox.png",
-      body:
-        typeof titleOrCount === "number"
-          ? `You have ${titleOrCount} tasks with deadline today or tomorrow!`
-          : optionalBody,
+      body: `You have ${taskCount} tasks with deadline today or tomorrow!`,
     };
-    const title =
-      typeof titleOrCount === "number" ? "Task Reminder" : titleOrCount;
 
-    new Notification(title, options);
+    new Notification("Task Reminder", options);
+
+    localStorage.setItem("lastSystemNotificationDate", todayDate);
   }
 };
 
 function TodayTasksButton() {
   const [todayTasks, setTodayTasks] = useState([]);
   const [open, setOpen] = useState(false);
+  const [toastOpen, setToastOpen] = useState(false);
 
   const getTodayDateString = () => {
     const today = new Date();
-    return today.toISOString().split("T")[0]; // Returns today's date in YYYY-MM-DD format
+    return today.toISOString().split("T")[0];
   };
 
   const getTomorrowDateString = () => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    return tomorrow.toISOString().split("T")[0]; // Returns tomorrow's date in YYYY-MM-DD format
+    return tomorrow.toISOString().split("T")[0];
   };
 
-  const fetchTasks = () => {
-    const tasks = [];
+  useEffect(() => {
+    if ("Notification" in window) {
+      Notification.requestPermission().then((permission) => {
+        console.log("Notification permission:", permission);
+      });
+    }
+  }, []);
+
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const loadTasksFromLocalStorage = () => {
+    const todayDates = getTodayDateString();
+    const tomorrowDate = getTomorrowDateString();
+    let allTasks = [];
+
     const homeDataRaw = localStorage.getItem("home_projects_data");
     if (homeDataRaw) {
       try {
         const homeData = JSON.parse(homeDataRaw);
         if (Array.isArray(homeData.tasks)) {
-          tasks.push(...homeData.tasks);
+          allTasks.push(...homeData.tasks);
         }
-      } catch (error) {
-        console.error("Error parsing home_projects_data:", error);
+      } catch (e) {
+        console.error("Invalid home_projects_data:", e);
       }
     }
 
@@ -66,55 +88,117 @@ function TodayTasksButton() {
         const projectsData = JSON.parse(projectsDataRaw);
         Object.values(projectsData).forEach((project) => {
           if (Array.isArray(project.tasks)) {
-            tasks.push(...project.tasks);
+            allTasks.push(...project.tasks);
           }
         });
-      } catch (error) {
-        console.error("Error parsing projects_data:", error);
+      } catch (e) {
+        console.error("Invalid projects_data:", e);
       }
     }
 
-    return tasks;
-  };
+    const filteredTasks = allTasks.filter(
+      (task) => task.dueDate === todayDates || task.dueDate === tomorrowDate
+    );
 
-  useEffect(() => {
+    setTodayTasks(filteredTasks);
     const todayDate = getTodayDateString();
-    const tomorrowDate = getTomorrowDateString();
+    const lastToastDate = localStorage.getItem("lastToastDate");
 
-    const updateTasks = () => {
-      const tasks = fetchTasks();
-      const filteredTasks = tasks.filter(
-        (task) => task.dueDate === todayDate || task.dueDate === tomorrowDate
-      );
-      setTodayTasks(filteredTasks);
-
-      const currentDate = todayDate;
-      const last_notified_date = localStorage.getItem("last_notified_date");
-
-      if (filteredTasks.length > 0 && last_notified_date !== currentDate) {
-        showNotification(filteredTasks.length);
+    if (filteredTasks.length > 0) {
+      if (lastToastDate !== todayDate) {
         toast.info(
           `You have ${filteredTasks.length} tasks with deadline today or tomorrow!`,
           {
             className: "custom-toast",
             progressClassName: "custom-toast-progress",
-            icon: <InfoOutlinedIcon color="inherit" />,
+            icon: (
+              <div>
+                <InfoOutlinedIcon
+                  color="#ff7800"
+                  style={{ color: "#ff7800" }}
+                />
+              </div>
+            ),
           }
         );
-        localStorage.setItem("last_notified_date", currentDate);
-      }
-    };
 
-    updateTasks();
-    const interval = setInterval(updateTasks, 10000); // Update every 10 seconds
+        showNotification(filteredTasks.length);
+        localStorage.setItem("lastToastDate", todayDate);
+      }
+    }
+  };
+
+  useEffect(() => {
+    loadTasksFromLocalStorage();
+
+    const interval = setInterval(() => {
+      loadTasksFromLocalStorage();
+    }, 10000);
+
     return () => clearInterval(interval);
   }, []);
 
-  const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date().toISOString().split("T")[0]; // Only date
+      const homeDataRaw = localStorage.getItem("home_projects_data");
+      const projectsDataRaw = localStorage.getItem("projects_data");
+
+      let allTasks = [];
+
+      if (homeDataRaw) {
+        try {
+          const homeData = JSON.parse(homeDataRaw);
+          if (Array.isArray(homeData.tasks)) {
+            allTasks.push(...homeData.tasks);
+          }
+        } catch (e) {
+          console.error("Invalid home_projects_data:", e);
+        }
+      }
+
+      if (projectsDataRaw) {
+        try {
+          const projectsData = JSON.parse(projectsDataRaw);
+          Object.values(projectsData).forEach((project) => {
+            if (Array.isArray(project.tasks)) {
+              allTasks.push(...project.tasks);
+            }
+          });
+        } catch (e) {
+          console.error("Invalid projects_data:", e);
+        }
+      }
+
+      const notifiedTasks = JSON.parse(
+        localStorage.getItem("notified_tasks") || "[]"
+      );
+
+      allTasks.forEach((task) => {
+        if (task.dueDate === now && !notifiedTasks.includes(task.id)) {
+          showNotification("Task Due Today", `"${task.title}" is due today!`);
+
+          // Mark this task as notified so we don't alert again
+          localStorage.setItem(
+            "notified_tasks",
+            JSON.stringify([...notifiedTasks, task.id])
+          );
+        }
+      });
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  const handleToastClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setToastOpen(false);
+  };
 
   if (todayTasks.length === 0) {
     return null;
@@ -124,18 +208,14 @@ function TodayTasksButton() {
     <>
       <div
         onClick={handleOpen}
-        role="button"
-        tabIndex={0}
-        aria-label={`Open today's tasks. ${todayTasks.length} tasks due.`}
-        onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && handleOpen()}
         style={{
           marginRight: 5,
           display: "flex",
           gap: 5,
-          padding: "2px 8px",
+          padding: "2px 8px 2px 8px",
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: "rgb(241, 241, 241)",
+          backgroundColor: "rgb(241 241 241)",
           borderRadius: 2,
           cursor: "pointer",
           userSelect: "none",
