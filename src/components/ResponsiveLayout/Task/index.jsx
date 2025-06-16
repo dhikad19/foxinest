@@ -1,26 +1,19 @@
 import React, { useEffect, useState } from "react";
-import PendingActionsOutlinedIcon from "@mui/icons-material/PendingActionsOutlined";
 import {
   Dialog,
   DialogTitle,
   DialogContent,
   List,
   ListItem,
-  ListItemText,
-  Typography,
-  Snackbar,
   Divider,
   useTheme,
-  Alert,
 } from "@mui/material";
 import DateIcon from "@mui/icons-material/DateRangeOutlined";
 import CloseIcon from "@mui/icons-material/Close";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import NotificationImportantIcon from "@mui/icons-material/NotificationImportant";
-import RunningWithErrorsOutlinedIcon from "@mui/icons-material/RunningWithErrorsOutlined";
-import TimerOutlinedIcon from "@mui/icons-material/TimerOutlined";
 import { toast } from "react-toastify";
+import RunningWithErrorsOutlinedIcon from "@mui/icons-material/RunningWithErrorsOutlined";
 
 const showNotification = (titleOrCount, optionalBody) => {
   if ("Notification" in window && Notification.permission === "granted") {
@@ -41,44 +34,29 @@ const showNotification = (titleOrCount, optionalBody) => {
 function TodayTasksButton() {
   const [todayTasks, setTodayTasks] = useState([]);
   const [open, setOpen] = useState(false);
-  const [toastOpen, setToastOpen] = useState(false);
 
   const getTodayDateString = () => {
     const today = new Date();
-    return today.toISOString().split("T")[0];
+    return today.toISOString().split("T")[0]; // Returns today's date in YYYY-MM-DD format
   };
 
   const getTomorrowDateString = () => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    return tomorrow.toISOString().split("T")[0];
+    return tomorrow.toISOString().split("T")[0]; // Returns tomorrow's date in YYYY-MM-DD format
   };
 
-  useEffect(() => {
-    if ("Notification" in window) {
-      Notification.requestPermission().then((permission) => {
-        console.log("Notification permission:", permission);
-      });
-    }
-  }, []);
-
-  const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
-
-  const loadTasksFromLocalStorage = () => {
-    const todayDate = getTodayDateString();
-    const tomorrowDate = getTomorrowDateString();
-    let allTasks = [];
-
+  const fetchTasks = () => {
+    const tasks = [];
     const homeDataRaw = localStorage.getItem("home_projects_data");
     if (homeDataRaw) {
       try {
         const homeData = JSON.parse(homeDataRaw);
         if (Array.isArray(homeData.tasks)) {
-          allTasks.push(...homeData.tasks);
+          tasks.push(...homeData.tasks);
         }
-      } catch (e) {
-        console.error("Invalid home_projects_data:", e);
+      } catch (error) {
+        console.error("Error parsing home_projects_data:", error);
       }
     }
 
@@ -88,122 +66,56 @@ function TodayTasksButton() {
         const projectsData = JSON.parse(projectsDataRaw);
         Object.values(projectsData).forEach((project) => {
           if (Array.isArray(project.tasks)) {
-            allTasks.push(...project.tasks);
+            tasks.push(...project.tasks);
           }
         });
-      } catch (e) {
-        console.error("Invalid projects_data:", e);
+      } catch (error) {
+        console.error("Error parsing projects_data:", error);
       }
     }
 
-    const filteredTasks = allTasks.filter(
-      (task) => task.dueDate === todayDate || task.dueDate === tomorrowDate
-    );
+    return tasks;
+  };
 
-    setTodayTasks(filteredTasks);
-    const lastToastTime = localStorage.getItem("lastToastTime");
-    const currentTime = Date.now();
+  useEffect(() => {
+    const todayDate = getTodayDateString();
+    const tomorrowDate = getTomorrowDateString();
 
-    if (filteredTasks.length > 0) {
-      if (!lastToastTime || currentTime - lastToastTime > 3600000) {
-        // Show toast
+    const updateTasks = () => {
+      const tasks = fetchTasks();
+      const filteredTasks = tasks.filter(
+        (task) => task.dueDate === todayDate || task.dueDate === tomorrowDate
+      );
+      setTodayTasks(filteredTasks);
+
+      const currentDate = todayDate;
+      const last_notified_date = localStorage.getItem("last_notified_date");
+
+      if (filteredTasks.length > 0 && last_notified_date !== currentDate) {
+        showNotification(filteredTasks.length);
         toast.info(
           `You have ${filteredTasks.length} tasks with deadline today or tomorrow!`,
           {
             className: "custom-toast",
             progressClassName: "custom-toast-progress",
-            icon: (
-              <div>
-                <InfoOutlinedIcon
-                  color="#ff7800"
-                  style={{ color: "#ff7800" }}
-                />
-              </div>
-            ),
+            icon: <InfoOutlinedIcon color="inherit" />,
           }
         );
-
-        // Show system notification
-        showNotification(filteredTasks.length);
-
-        localStorage.setItem("lastToastTime", currentTime.toString());
+        localStorage.setItem("last_notified_date", currentDate);
       }
-    }
-  };
+    };
 
-  useEffect(() => {
-    loadTasksFromLocalStorage(); // run once
-
-    const interval = setInterval(() => {
-      loadTasksFromLocalStorage(); // keep refreshing
-    }, 10000); // every minute
-
+    updateTasks();
+    const interval = setInterval(updateTasks, 10000); // Update every 10 seconds
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const now = new Date().toISOString().split("T")[0]; // Only date
-      const homeDataRaw = localStorage.getItem("home_projects_data");
-      const projectsDataRaw = localStorage.getItem("projects_data");
-
-      let allTasks = [];
-
-      if (homeDataRaw) {
-        try {
-          const homeData = JSON.parse(homeDataRaw);
-          if (Array.isArray(homeData.tasks)) {
-            allTasks.push(...homeData.tasks);
-          }
-        } catch (e) {
-          console.error("Invalid home_projects_data:", e);
-        }
-      }
-
-      if (projectsDataRaw) {
-        try {
-          const projectsData = JSON.parse(projectsDataRaw);
-          Object.values(projectsData).forEach((project) => {
-            if (Array.isArray(project.tasks)) {
-              allTasks.push(...project.tasks);
-            }
-          });
-        } catch (e) {
-          console.error("Invalid projects_data:", e);
-        }
-      }
-
-      const notifiedTasks = JSON.parse(
-        localStorage.getItem("notified_tasks") || "[]"
-      );
-
-      allTasks.forEach((task) => {
-        if (task.dueDate === now && !notifiedTasks.includes(task.id)) {
-          showNotification("Task Due Today", `"${task.title}" is due today!`);
-
-          // Mark this task as notified so we don't alert again
-          localStorage.setItem(
-            "notified_tasks",
-            JSON.stringify([...notifiedTasks, task.id])
-          );
-        }
-      });
-    }, 60000); // every 60 seconds
-
-    return () => clearInterval(interval);
-  }, []);
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const handleToastClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setToastOpen(false);
-  };
-
-  // Tidak render tombol jika tidak ada tugas
   if (todayTasks.length === 0) {
     return null;
   }
@@ -212,18 +124,23 @@ function TodayTasksButton() {
     <>
       <div
         onClick={handleOpen}
+        role="button"
+        tabIndex={0}
+        aria-label={`Open today's tasks. ${todayTasks.length} tasks due.`}
+        onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && handleOpen()}
         style={{
           marginRight: 5,
           display: "flex",
           gap: 5,
-          padding: "2px 8px 2px 8px",
+          padding: "2px 8px",
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: "rgb(241 241 241)",
+          backgroundColor: "rgb(241, 241, 241)",
           borderRadius: 2,
           cursor: "pointer",
           userSelect: "none",
-        }}>
+        }}
+      >
         <RunningWithErrorsOutlinedIcon style={{ fontSize: 15 }} />
         <p style={{ fontSize: 14, fontWeight: 500 }}>{todayTasks.length}</p>
       </div>
@@ -233,20 +150,24 @@ function TodayTasksButton() {
         open={open}
         onClose={handleClose}
         fullWidth
-        maxWidth="sm">
+        maxWidth="sm"
+      >
         <div
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-          }}>
+          }}
+        >
           <DialogTitle
-            style={{ padding: "12px 24px", fontSize: 17, marginTop: 5 }}>
+            style={{ padding: "12px 24px", fontSize: 17, marginTop: 5 }}
+          >
             Today's Tasks
           </DialogTitle>
           <div
             style={{ padding: "12px 19px", marginTop: 5 }}
-            onClick={handleClose}>
+            onClick={handleClose}
+          >
             <CloseIcon />
           </div>
         </div>
@@ -257,7 +178,8 @@ function TodayTasksButton() {
               <ListItem
                 key={task.id}
                 divider
-                style={{ paddingLeft: 0, paddingRight: 0 }}>
+                style={{ paddingLeft: 0, paddingRight: 0 }}
+              >
                 <div style={{ width: "100%" }}>
                   <div
                     style={{
@@ -266,13 +188,15 @@ function TodayTasksButton() {
                       justifyContent: "space-between",
                       width: "100%",
                       marginBottom: 10,
-                    }}>
+                    }}
+                  >
                     <div
                       style={{
                         display: "flex",
                         alignItems: "center",
                         width: "100%",
-                      }}>
+                      }}
+                    >
                       <DateIcon
                         style={{
                           fontSize: 19,
@@ -307,7 +231,8 @@ function TodayTasksButton() {
                         width: "180px",
                         overflow: "hidden",
                         textAlign: "right",
-                      }}>
+                      }}
+                    >
                       {task.category}
                     </p>
                   </div>
@@ -318,7 +243,8 @@ function TodayTasksButton() {
                       lineHeight: "normal",
                       marginBottom: 10,
                       marginTop: 0,
-                    }}>
+                    }}
+                  >
                     {task.title}
                   </p>
                   <div
@@ -326,21 +252,6 @@ function TodayTasksButton() {
                     dangerouslySetInnerHTML={{ __html: task.description }}
                   />
                 </div>
-                {/* <ListItemText
-                  primary={task.title}
-                  secondary={
-                    <>
-                      <div
-                        dangerouslySetInnerHTML={{
-                          __html: task.description || "",
-                        }}
-                      />
-                      <Typography variant="caption">
-                        Category: {task.category}
-                      </Typography>
-                    </>
-                  }
-                /> */}
               </ListItem>
             ))}
           </List>
