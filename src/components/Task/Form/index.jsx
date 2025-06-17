@@ -12,6 +12,8 @@ import {
   ListItem,
   ListItemButton,
   Divider,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -21,7 +23,8 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import dayjs from "dayjs";
-
+import { MobileTimePicker } from "@mui/x-date-pickers/MobileTimePicker";
+import { DesktopTimePicker } from "@mui/x-date-pickers/DesktopTimePicker";
 import FlagIcon from "@mui/icons-material/Flag";
 import EventIcon from "@mui/icons-material/Event";
 import TodayIcon from "@mui/icons-material/Today";
@@ -86,6 +89,9 @@ const TaskForm = ({ onAdd, defaultCategory = "", onCancel }) => {
   const [dueAnchor, setDueAnchor] = useState(null);
   const [priorityAnchor, setPriorityAnchor] = useState(null);
   const [categoryAnchor, setCategoryAnchor] = useState(null);
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const randomPlaceholder = useMemo(() => {
     const items = [
@@ -192,37 +198,78 @@ const TaskForm = ({ onAdd, defaultCategory = "", onCancel }) => {
             anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
           >
             <Box>
-              <List dense sx={{ mt: 1 }}>
-                {quickDates.map((item) => (
-                  <ListItem disablePadding key={item.label}>
-                    <ListItemButton
-                      onClick={() => {
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <div
+                  style={{
+                    padding: 20,
+                  }}
+                >
+                  {isMobile ? (
+                    <MobileTimePicker
+                      label="Pick a time"
+                      value={form.dueTime ? dayjs(form.dueTime, "HH:mm") : null}
+                      onChange={(newValue) => {
                         setForm((prev) => ({
                           ...prev,
-                          dueDate: item.date.format("YYYY-MM-DD"),
+                          dueTime: newValue ? newValue.format("HH:mm") : null,
                         }));
-                        setDueAnchor(null);
                       }}
-                    >
-                      <ListItemIcon sx={{ minWidth: 30 }}>
-                        {item.icon}
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={
-                          <Typography sx={{ fontSize: 13 }}>
-                            {item.label}
-                          </Typography>
-                        }
-                      />
-                      <Typography sx={{ fontSize: 13, mr: 1 }}>
-                        {item.display(item.date)}
-                      </Typography>
-                    </ListItemButton>
-                  </ListItem>
-                ))}
-              </List>
-
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      slotProps={{
+                        textField: {
+                          size: "small",
+                          sx: { width: "100%" },
+                        },
+                      }}
+                    />
+                  ) : (
+                    <DesktopTimePicker
+                      label="Pick a time"
+                      value={form.dueTime ? dayjs(form.dueTime, "HH:mm") : null}
+                      onChange={(newValue) => {
+                        setForm((prev) => ({
+                          ...prev,
+                          dueTime: newValue ? newValue.format("HH:mm") : null,
+                        }));
+                      }}
+                      slotProps={{
+                        textField: {
+                          size: "small",
+                          sx: { width: "100%", mt: 2 },
+                        },
+                      }}
+                    />
+                  )}
+                </div>
+                <Divider />
+                <List dense>
+                  {quickDates.map((item) => (
+                    <ListItem disablePadding key={item.label}>
+                      <ListItemButton
+                        onClick={() => {
+                          setForm((prev) => ({
+                            ...prev,
+                            dueDate: item.date.format("YYYY-MM-DD"),
+                          }));
+                          setDueAnchor(null);
+                        }}
+                      >
+                        <ListItemIcon sx={{ minWidth: 30 }}>
+                          {item.icon}
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={
+                            <Typography sx={{ fontSize: 13 }}>
+                              {item.label}
+                            </Typography>
+                          }
+                        />
+                        <Typography sx={{ fontSize: 13, mr: 1 }}>
+                          {item.display(item.date)}
+                        </Typography>
+                      </ListItemButton>
+                    </ListItem>
+                  ))}
+                </List>
                 <DateCalendar
                   disablePast
                   value={form.dueDate ? dayjs(form.dueDate) : null}

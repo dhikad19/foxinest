@@ -10,10 +10,14 @@ import {
   List,
   ListItem,
   ListItemIcon,
+  useTheme,
+  useMediaQuery,
   Divider,
   Stack,
   ListItemButton,
 } from "@mui/material";
+import { MobileTimePicker } from "@mui/x-date-pickers/MobileTimePicker";
+import { DesktopTimePicker } from "@mui/x-date-pickers/DesktopTimePicker";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckIcon from "@mui/icons-material/Check";
 import { useEditor, EditorContent } from "@tiptap/react";
@@ -84,6 +88,9 @@ const buttonMenu = {
 const EditModal = ({ task, onSave, onClose, onCancel }) => {
   const [form, setForm] = useState(task);
   const [sections, setSections] = useState([]);
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   // Popover controls
   const [dueAnchor, setDueAnchor] = useState(null);
@@ -188,44 +195,92 @@ const EditModal = ({ task, onSave, onClose, onCancel }) => {
               anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
             >
               <Box>
-                <List dense style={{ marginTop: 10 }}>
-                  {quickDates.map((item) => (
-                    <ListItem disablePadding key={item.label}>
-                      <ListItemButton
-                        onClick={() => {
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <div
+                    style={{
+                      padding: 20,
+                    }}
+                  >
+                    {isMobile ? (
+                      <MobileTimePicker
+                        label="Pick a time"
+                        value={
+                          form.dueTime ? dayjs(form.dueTime, "HH:mm") : null
+                        }
+                        onChange={(newValue) => {
                           setForm((prev) => ({
                             ...prev,
-                            dueDate: item.date.format("YYYY-MM-DD"),
+                            dueTime: newValue ? newValue.format("HH:mm") : null,
                           }));
-                          setDueAnchor(null);
                         }}
-                        sx={{ justifyContent: "space-between" }}
-                      >
-                        <ListItemIcon
-                          sx={{ minWidth: 30 }}
-                          style={{ marginLeft: "7px" }}
+                        slotProps={{
+                          textField: {
+                            size: "small",
+                            sx: { width: "100%" },
+                          },
+                        }}
+                      />
+                    ) : (
+                      <DesktopTimePicker
+                        label="Pick a time"
+                        value={
+                          form.dueTime ? dayjs(form.dueTime, "HH:mm") : null
+                        }
+                        onChange={(newValue) => {
+                          setForm((prev) => ({
+                            ...prev,
+                            dueTime: newValue ? newValue.format("HH:mm") : null,
+                          }));
+                        }}
+                        slotProps={{
+                          textField: {
+                            size: "small",
+                            sx: { width: "100%", mt: 2 },
+                          },
+                        }}
+                      />
+                    )}
+                  </div>
+                  <Divider />
+                  <List dense>
+                    {quickDates.map((item) => (
+                      <ListItem disablePadding key={item.label}>
+                        <ListItemButton
+                          onClick={() => {
+                            setForm((prev) => ({
+                              ...prev,
+                              dueDate: item.date.format("YYYY-MM-DD"),
+                            }));
+                            setDueAnchor(null);
+                          }}
+                          sx={{ justifyContent: "space-between" }}
                         >
-                          {item.icon}
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={
-                            <Typography sx={{ fontSize: 13, fontWeight: 500 }}>
-                              {item.label}
-                            </Typography>
-                          }
-                        />
-                        <Typography
-                          style={{ marginRight: "7px" }}
-                          sx={{ fontSize: 13, color: "#666" }}
-                        >
-                          {item.display(item.date)}
-                        </Typography>
-                      </ListItemButton>
-                    </ListItem>
-                  ))}
-                </List>
+                          <ListItemIcon
+                            sx={{ minWidth: 30 }}
+                            style={{ marginLeft: "7px" }}
+                          >
+                            {item.icon}
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={
+                              <Typography
+                                sx={{ fontSize: 13, fontWeight: 500 }}
+                              >
+                                {item.label}
+                              </Typography>
+                            }
+                          />
+                          <Typography
+                            style={{ marginRight: "7px" }}
+                            sx={{ fontSize: 13, color: "#666" }}
+                          >
+                            {item.display(item.date)}
+                          </Typography>
+                        </ListItemButton>
+                      </ListItem>
+                    ))}
+                  </List>
 
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DateCalendar
                     disablePast
                     value={form.dueDate ? dayjs(form.dueDate) : null}

@@ -11,10 +11,21 @@ import {
   Drawer,
   Box,
 } from "@mui/material";
+
+import {
+  LocalizationProvider,
+  DateTimePicker,
+  DatePicker,
+} from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import InboxIcon from "@mui/icons-material/Inbox";
 import FlagIcon from "@mui/icons-material/Flag";
 import CloseIcon from "@mui/icons-material/Close";
 import DateIcon from "@mui/icons-material/DateRangeOutlined";
+
+const hasTime = (dateStr) =>
+  typeof dateStr === "string" && dateStr.includes("T");
+const parseDate = (value) => (value ? new Date(value) : null);
 
 const EventDetailDialog = ({
   open,
@@ -49,13 +60,15 @@ const EventDetailDialog = ({
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-        }}>
+        }}
+      >
         <DialogTitle
           style={{
             padding: "12px 24px",
             fontSize: 17,
             marginTop: 5,
-          }}>
+          }}
+        >
           Detail Event
         </DialogTitle>
         <div
@@ -64,7 +77,8 @@ const EventDetailDialog = ({
             padding: "12px 19px",
             cursor: "pointer",
             marginTop: 5,
-          }}>
+          }}
+        >
           <CloseIcon />
         </div>
       </div>
@@ -80,7 +94,8 @@ const EventDetailDialog = ({
                       marginBottom: 2,
                       fontWeight: 500,
                       lineHeight: "normal",
-                    }}>
+                    }}
+                  >
                     {selectedEvent.title}
                   </p>
 
@@ -103,7 +118,8 @@ const EventDetailDialog = ({
                     width: "100%",
                     padding: "20px 24px",
                     backgroundColor: "#fcfaf8",
-                  }}>
+                  }}
+                >
                   {selectedEvent.category && (
                     <>
                       <p
@@ -112,7 +128,8 @@ const EventDetailDialog = ({
                           fontWeight: 500,
                           color: "grey",
                           marginBottom: 2,
-                        }}>
+                        }}
+                      >
                         Category
                       </p>
                       <div
@@ -120,14 +137,16 @@ const EventDetailDialog = ({
                           display: "flex",
                           fontSize: 13,
                           alignItems: "center",
-                        }}>
+                        }}
+                      >
                         <InboxIcon style={{ marginRight: 5, fontSize: 20 }} />
                         <p
                           style={{
                             marginBottom: 2,
                             fontWeight: 500,
                             fontSize: 13,
-                          }}>
+                          }}
+                        >
                           {selectedEvent.category}
                         </p>
                       </div>
@@ -142,7 +161,8 @@ const EventDetailDialog = ({
                           fontWeight: 500,
                           color: "grey",
                           marginBottom: 2,
-                        }}>
+                        }}
+                      >
                         Priority
                       </p>
                       <div
@@ -150,7 +170,8 @@ const EventDetailDialog = ({
                           display: "flex",
                           fontSize: 13,
                           alignItems: "center",
-                        }}>
+                        }}
+                      >
                         <FlagIcon style={{ marginRight: 5, fontSize: 20 }} />
                         <p style={{ marginBottom: 2, fontWeight: 500 }}>
                           {selectedEvent.priority}
@@ -167,7 +188,8 @@ const EventDetailDialog = ({
                         fontWeight: 500,
                         color: "grey",
                         marginBottom: 2,
-                      }}>
+                      }}
+                    >
                       Date
                     </p>
                   )}
@@ -178,7 +200,8 @@ const EventDetailDialog = ({
                         fontSize: 13,
                         marginTop: 2,
                         lineHeight: "normal",
-                      }}>
+                      }}
+                    >
                       {selectedEvent.end &&
                       selectedEvent.start !== selectedEvent.end
                         ? `${formatDate(selectedEvent.start)} - ${formatDate(
@@ -214,49 +237,106 @@ const EventDetailDialog = ({
                   }}
                   style={{ marginBottom: 12 }}
                 />
-                <TextField
-                  label="Start Date"
-                  type="date"
-                  fullWidth
-                  margin="dense"
-                  style={{ marginBottom: 12 }}
-                  size="small"
-                  sx={{
-                    "& label.Mui-focused": { color: "#4f4f4f" },
-                    "& .MuiOutlinedInput-root.Mui-focused": {
-                      "& fieldset": {
-                        borderColor: "#4f4f4f",
-                      },
-                      "& input": {
-                        color: "#4f4f4f",
-                      },
-                    },
-                  }}
-                  value={editStart}
-                  onChange={(e) => setEditStart(e.target.value)}
-                  InputLabelProps={{ shrink: true }}
-                />
-                <TextField
-                  label="End Date"
-                  type="date"
-                  size="small"
-                  sx={{
-                    "& label.Mui-focused": { color: "#4f4f4f" },
-                    "& .MuiOutlinedInput-root.Mui-focused": {
-                      "& fieldset": {
-                        borderColor: "#4f4f4f",
-                      },
-                      "& input": {
-                        color: "#4f4f4f",
-                      },
-                    },
-                  }}
-                  fullWidth
-                  margin="dense"
-                  value={editEnd}
-                  onChange={(e) => setEditEnd(e.target.value)}
-                  InputLabelProps={{ shrink: true }}
-                />
+                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                  {hasTime(editStart) ? (
+                    <DateTimePicker
+                      label="Start Date & Time"
+                      value={parseDate(editStart)}
+                      slotProps={{
+                        textField: {
+                          size: "small",
+                          margin: "dense",
+                          style: { marginBottom: 10 },
+                          fullWidth: true,
+                        },
+                      }}
+                      onChange={(newValue) =>
+                        setEditStart(newValue.toISOString())
+                      }
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          fullWidth
+                          size="small"
+                          style={{ marginBottom: 12 }}
+                        />
+                      )}
+                    />
+                  ) : (
+                    <DatePicker
+                      label="Start Date"
+                      value={parseDate(editStart)}
+                      fullWidth
+                      slotProps={{
+                        textField: {
+                          size: "small",
+                          margin: "dense",
+                          style: { marginBottom: 10 },
+                          fullWidth: true,
+                        },
+                      }}
+                      onChange={(newValue) =>
+                        setEditStart(newValue.toISOString().split("T")[0])
+                      }
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          fullWidth
+                          size="small"
+                          style={{ marginBottom: 12 }}
+                        />
+                      )}
+                    />
+                  )}
+
+                  {hasTime(editEnd) ? (
+                    <DateTimePicker
+                      label="End Date & Time"
+                      value={parseDate(editEnd)}
+                      slotProps={{
+                        textField: {
+                          size: "small",
+                          margin: "dense",
+                          fullWidth: true,
+                        },
+                      }}
+                      onChange={(newValue) =>
+                        setEditEnd(newValue.toISOString())
+                      }
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          fullWidth
+                          size="small"
+                          margin="dense"
+                        />
+                      )}
+                    />
+                  ) : (
+                    <DatePicker
+                      label="End Date"
+                      value={parseDate(editEnd)}
+                      slotProps={{
+                        textField: {
+                          size: "small",
+                          margin: "dense",
+                          fullWidth: true,
+                        },
+                      }}
+                      onChange={(newValue) =>
+                        setEditEnd(newValue.toISOString().split("T")[0])
+                      }
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          fullWidth
+                          size="small"
+                          margin="dense"
+                        />
+                      )}
+                    />
+                  )}
+                </LocalizationProvider>
               </div>
             )}
           </>
@@ -272,7 +352,8 @@ const EventDetailDialog = ({
               fontWeight: "bold",
               fontSize: "12px",
               color: "#4f4f4f",
-            }}>
+            }}
+          >
             Hapus
           </Button>
           <Button
@@ -287,7 +368,8 @@ const EventDetailDialog = ({
               "&:hover": {
                 backgroundColor: "#4f4f4f",
               },
-            }}>
+            }}
+          >
             Simpan
           </Button>
         </DialogActions>
