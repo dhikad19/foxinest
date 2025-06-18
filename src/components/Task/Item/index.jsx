@@ -17,6 +17,7 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
+import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 import FlagIcon from "@mui/icons-material/Flag";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import CloseIcon from "@mui/icons-material/Close";
@@ -692,6 +693,30 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                         );
                       })()}
                     </p>
+                  </div>
+                </div>
+              </>
+            )}
+            {task.dueTime && (
+              <>
+                <Divider />
+                <div style={{ marginBottom: 12, marginTop: 12 }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      marginTop: 5,
+                    }}
+                  >
+                    <AccessTimeOutlinedIcon
+                      style={{
+                        fontSize: 19,
+                        marginRight: 16,
+                        marginLeft: "-2px",
+                        color: "#4f4f4f",
+                      }}
+                    />
+                    <p style={{ fontSize: 14 }}>{task.dueTime}</p>
                   </div>
                 </div>
               </>

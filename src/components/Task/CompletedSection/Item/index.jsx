@@ -18,6 +18,7 @@ import {
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import FlagIcon from "@mui/icons-material/Flag";
+import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 import { useEditor, EditorContent } from "@tiptap/react";
 import DateIcon from "@mui/icons-material/DateRangeOutlined";
 import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
@@ -424,6 +425,30 @@ const CompletedTaskItem = ({ task, onDelete, onComplete }) => {
                         );
                       })()}
                     </p>
+                  </div>
+                </div>
+              </>
+            )}
+            {task.dueTime && (
+              <>
+                <Divider />
+                <div style={{ marginBottom: 12, marginTop: 12 }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      marginTop: 5,
+                    }}
+                  >
+                    <AccessTimeOutlinedIcon
+                      style={{
+                        fontSize: 19,
+                        marginRight: 16,
+                        marginLeft: "-2px",
+                        color: "#4f4f4f",
+                      }}
+                    />
+                    <p style={{ fontSize: 14 }}>{task.dueTime}</p>
                   </div>
                 </div>
               </>
