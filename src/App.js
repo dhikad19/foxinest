@@ -20,13 +20,13 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const routeTitles = {
-  "/": "Home - Todo",
-  "/about": "About Us - Todo",
-  "/calendar": "Calendar - Todo",
-  "/completed": "Completed Tasks - Todo",
-  "/project": "Projects - Todo",
-  "/project/:projectId": "Project Details - Todo",
-  "/welcome": "Welcome - Todo",
+  "/": "Home - Foxinest",
+  "/about": "About Us - Foxinest",
+  "/calendar": "Calendar - Foxinest",
+  "/completed": "Completed Tasks - Foxinest",
+  "/project": "Projects - Foxinest",
+  "/project/:projectId": "Project Details - Foxinest",
+  "/welcome": "Welcome - Foxinest",
   "*": "404 - Page Not Found",
 };
 

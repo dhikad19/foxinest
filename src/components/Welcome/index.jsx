@@ -34,7 +34,7 @@ const WelcomePage = ({ onSubmit }) => {
         src="/foxinest.png"
         style={{
           objectFit: "contain",
-          maxWidth: 40,
+          maxWidth: 30,
           marginTop: "20px",
           marginLeft: "20px",
         }}
