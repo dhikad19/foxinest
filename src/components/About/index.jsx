@@ -26,12 +26,12 @@ const AboutPage = () => {
         <p style={{ fontSize: 15 }}>
           Welcome to{" "}
           <strong>
-            <span style={{ color: "#ff7800" }}>Foxi</span>Todo
+            <span style={{ color: "#ff7800" }}>Foxinest</span>
           </strong>
           !
         </p>
         <p style={{ fontSize: 15 }}>
-          Foxi Todo App is a simple yet powerful task management application
+          Foxinest App is a simple yet powerful task management application
           designed to help you stay organized and boost your productivity.
           Created by Dika as part of a personal portfolio project, this app
           demonstrates the seamless integration of modern web technologies and
@@ -121,10 +121,10 @@ const AboutPage = () => {
         <div>
           <p style={{ fontSize: 15 }}>
             Hi, I’m Dika! I am a passionate web developer with a keen interest
-            in crafting intuitive and functional applications. Foxi Todo App is
+            in crafting intuitive and functional applications. Foxinest App is
             one of my personal projects, showcasing my skills in React and web
             development. It reflects my dedication to delivering high-quality
-            user experiences. The primary goal of Foxi Todo App is to serve as a
+            user experiences. The primary goal of Foxinest App is to serve as a
             portfolio piece that highlights my technical skills and creativity
             in solving everyday problems through code. It’s also a tool I’ve
             personally enjoyed using to organize my day-to-day tasks.

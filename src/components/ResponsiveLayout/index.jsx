@@ -210,7 +210,8 @@ const ResponsiveLayout = ({ children }) => {
           alignItems: "center",
           marginTop: isMobile ? "-45px" : "-48px",
           marginBottom: isMobile ? "15px" : "10px",
-        }}>
+        }}
+      >
         <div
           style={{
             display: "flex",
@@ -223,7 +224,8 @@ const ResponsiveLayout = ({ children }) => {
             color: "#ffffff",
             marginRight: "10px",
             marginLeft: "10px",
-          }}>
+          }}
+        >
           {userData.firstName.charAt(0)}
         </div>
         <div>
@@ -232,7 +234,8 @@ const ResponsiveLayout = ({ children }) => {
               marginBottom: "0px",
               lineHeight: "normal",
               fontWeight: "500",
-            }}>
+            }}
+          >
             {userData.firstName} {userData.lastName}
           </p>
         </div>
@@ -247,7 +250,8 @@ const ResponsiveLayout = ({ children }) => {
           scrollbarWidth: "thin",
           scrollbarColor: "#c0c0c0 transparent",
           WebkitScrollbarWidth: "thin",
-        }}>
+        }}
+      >
         <style>
           {`
             ::-webkit-scrollbar {
@@ -299,7 +303,8 @@ const ResponsiveLayout = ({ children }) => {
                   },
                 },
               }}
-              style={{ padding: "0px 8px 0px 8px" }}>
+              style={{ padding: "0px 8px 0px 8px" }}
+            >
               <NavLink
                 to={path}
                 className={({ isActive }) =>
@@ -312,7 +317,8 @@ const ResponsiveLayout = ({ children }) => {
                   color: "inherit",
                   display: "flex",
                   alignItems: "center",
-                }}>
+                }}
+              >
                 <ListItemIcon sx={{ minWidth: "36px", color: "inherit" }}>
                   {icon}
                 </ListItemIcon>
@@ -320,7 +326,8 @@ const ResponsiveLayout = ({ children }) => {
                   variant="body1"
                   sx={{
                     fontSize: "14px",
-                  }}>
+                  }}
+                >
                   {label}
                 </Typography>
               </NavLink>
@@ -343,14 +350,16 @@ const ResponsiveLayout = ({ children }) => {
                       borderRadius: "4px",
                     },
                   },
-                }}>
+                }}
+              >
                 <ListItemText
                   primary={
                     <span
                       style={{
                         fontSize: "15px",
                         fontWeight: "bold",
-                      }}>
+                      }}
+                    >
                       Favorites
                     </span>
                   }
@@ -369,7 +378,8 @@ const ResponsiveLayout = ({ children }) => {
                         borderRadius: "4px",
                       },
                     },
-                  }}>
+                  }}
+                >
                   <NavLink
                     to={`/project/${normalizeName(project.name)}`}
                     className={({ isActive }) =>
@@ -382,7 +392,8 @@ const ResponsiveLayout = ({ children }) => {
                       color: "inherit",
                       display: "flex",
                       alignItems: "center",
-                    }}>
+                    }}
+                  >
                     <ListItemIcon sx={{ minWidth: "36px", color: "inherit" }}>
                       <TagIcon
                         style={{ fontSize: "22px", color: project.color }}
@@ -397,7 +408,8 @@ const ResponsiveLayout = ({ children }) => {
                         whiteSpace: "nowrap",
                         textOverflow: "ellipsis",
                         fontWeight: "400",
-                      }}>
+                      }}
+                    >
                       {project.name
                         .replaceAll("-", " ")
                         .split(" ")
@@ -428,7 +440,8 @@ const ResponsiveLayout = ({ children }) => {
                 onClick={handleModalOpen}
                 style={{ color: "#000000", marginTop: "7px" }}
               />
-            }>
+            }
+          >
             <NavLink
               to="/project"
               className={({ isActive }) =>
@@ -442,13 +455,15 @@ const ResponsiveLayout = ({ children }) => {
                 alignItems: "center",
                 padding: "8px 10px 8px 10px",
               }}
-              end>
+              end
+            >
               <Typography
                 variant="body1"
                 sx={{
                   fontSize: "14px",
                   fontWeight: "bold",
-                }}>
+                }}
+              >
                 My Projects
               </Typography>
             </NavLink>
@@ -467,7 +482,8 @@ const ResponsiveLayout = ({ children }) => {
                     borderRadius: "4px",
                   },
                 },
-              }}>
+              }}
+            >
               <NavLink
                 to={`/project/${normalizeName(project.name)}`}
                 className={({ isActive }) =>
@@ -481,7 +497,8 @@ const ResponsiveLayout = ({ children }) => {
                   alignItems: "center",
                   justifyContent: "space-between",
                   padding: "8px 10px 8px 10px",
-                }}>
+                }}
+              >
                 <div style={{ display: "flex" }}>
                   <ListItemIcon sx={{ minWidth: "36px", color: "inherit" }}>
                     <TagIcon
@@ -498,7 +515,8 @@ const ResponsiveLayout = ({ children }) => {
                       whiteSpace: "nowrap",
                       textOverflow: "ellipsis",
                       fontWeight: "400",
-                    }}>
+                    }}
+                  >
                     {project.name
                       .replaceAll("-", " ")
                       .split(" ")
@@ -523,7 +541,8 @@ const ResponsiveLayout = ({ children }) => {
       <Box
         component="nav"
         sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
-        aria-label="sidebar">
+        aria-label="sidebar"
+      >
         <Drawer
           variant="temporary"
           open={mobileOpen}
@@ -538,7 +557,8 @@ const ResponsiveLayout = ({ children }) => {
               scrollbarWidth: "thin",
               overflowX: "hidden",
             },
-          }}>
+          }}
+        >
           {drawer}
         </Drawer>
 
@@ -559,7 +579,8 @@ const ResponsiveLayout = ({ children }) => {
               left: 0,
             },
           }}
-          open>
+          open
+        >
           {drawer}
         </Drawer>
       </Box>
@@ -572,14 +593,16 @@ const ResponsiveLayout = ({ children }) => {
             backgroundColor: "#fff",
             color: "#000",
             borderBottom: showBorder ? "1px solid rgba(0, 0, 0, 0.12)" : "none",
-          }}>
+          }}
+        >
           <Toolbar sx={{ position: "relative", alignItems: "center" }}>
             {isMobile && (
               <IconButton
                 color="inherit"
                 edge="start"
                 style={{ marginRight: 3 }}
-                onClick={handleDrawerToggle}>
+                onClick={handleDrawerToggle}
+              >
                 <MenuIcon />
               </IconButton>
             )}
@@ -589,26 +612,9 @@ const ResponsiveLayout = ({ children }) => {
                 alignItems: "center",
                 justifyContent: "space-between",
                 width: "100%",
-              }}>
-              <NavLink to={"/"}>
-                {isMobile ? (
-                  <img
-                    src="/logo.png"
-                    style={{
-                      objectFit: "contain",
-                      maxWidth: 60,
-                      marginTop: 6,
-                    }}
-                    alt="Logo"
-                  />
-                ) : (
-                  <img
-                    src="/logo-todo.png"
-                    style={{ objectFit: "contain", maxWidth: 120 }}
-                    alt="Logo"
-                  />
-                )}
-              </NavLink>
+              }}
+            >
+              <div></div>
 
               {location.pathname.split("/")[1] === "project" ? (
                 <div style={{ display: "flex", alignItems: "center" }}>
@@ -627,7 +633,8 @@ const ResponsiveLayout = ({ children }) => {
                       whiteSpace: "nowrap",
                       opacity: showTitle ? 1 : 0,
                       transition: "opacity 0.2s ease",
-                    }}>
+                    }}
+                  >
                     {capitalizeEachWord(
                       location.pathname.split("/")[2]?.replaceAll("-", " ") ||
                         ""
@@ -650,7 +657,8 @@ const ResponsiveLayout = ({ children }) => {
                     whiteSpace: "nowrap",
                     opacity: showTitle ? 1 : 0,
                     transition: "opacity 0.2s ease",
-                  }}>
+                  }}
+                >
                   {getTitle()}
                 </Typography>
               )}
@@ -658,7 +666,8 @@ const ResponsiveLayout = ({ children }) => {
                 <TaskActive />
                 <NavLink
                   to={"/calendar"}
-                  style={{ textDecoration: "none", color: "#000000" }}>
+                  style={{ textDecoration: "none", color: "#000000" }}
+                >
                   <div
                     style={{
                       display: "flex",
@@ -669,7 +678,8 @@ const ResponsiveLayout = ({ children }) => {
                       backgroundColor: "rgb(241 241 241)",
                       marginRight: -2,
                       borderRadius: 2,
-                    }}>
+                    }}
+                  >
                     <CalendarTodayIcon style={{ fontSize: 15 }} />
                     <p style={{ fontSize: 14, fontWeight: 500 }}>
                       {isMobile ? getCurrentDateMobile() : getCurrentDate()}

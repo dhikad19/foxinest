@@ -31,10 +31,10 @@ const WelcomePage = ({ onSubmit }) => {
   return (
     <>
       <img
-        src="/logo-todo.png"
+        src="/foxinest.png"
         style={{
           objectFit: "contain",
-          maxWidth: 110,
+          maxWidth: 40,
           marginTop: "20px",
           marginLeft: "20px",
         }}
