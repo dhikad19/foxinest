@@ -1,17 +1,9 @@
-import React from "react";
-import {
-  Container,
-  Typography,
-  Box,
-  Card,
-  CardContent,
-  Button,
-} from "@mui/material";
 import {
   CheckCircleOutline,
   DesignServices,
   Devices,
 } from "@mui/icons-material";
+import { Box, Card, Container, Typography } from "@mui/material";
 const AboutPage = () => {
   return (
     <Container

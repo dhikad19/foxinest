@@ -1,10 +1,10 @@
 import {
+  Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Button,
 } from "@mui/material";
 
 const DeleteProjectDialog = ({ open, onClose, onDelete }) => {

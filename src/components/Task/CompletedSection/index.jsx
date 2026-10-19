@@ -1,18 +1,10 @@
-import React, { useEffect, useState } from "react";
-import CompletedTaskList from "./List";
-import {
-  Button,
-  Menu,
-  MenuItem,
-  TextField,
-  useTheme,
-  useMediaQuery,
-} from "@mui/material";
+import { DateRange, NewReleases, SortByAlpha } from "@mui/icons-material";
 import CheckIcon from "@mui/icons-material/Check";
 import ChecklistRtlOutlinedIcon from "@mui/icons-material/ChecklistRtlOutlined";
 import SortOutlinedIcon from "@mui/icons-material/SortOutlined";
-import { FaChevronDown } from "react-icons/fa";
-import { SortByAlpha, DateRange, NewReleases } from "@mui/icons-material";
+import { Menu, TextField, useMediaQuery, useTheme } from "@mui/material";
+import { useEffect, useState } from "react";
+import CompletedTaskList from "./List";
 
 const CompletedSection = () => {
   const [completedTasks, setCompletedTasks] = useState([]);
@@ -230,7 +222,6 @@ const CompletedSection = () => {
       localStorage.setItem("user_events", JSON.stringify(updatedEvents));
     }
 
-    // Update completedTasks state
     setCompletedTasks((prev) => prev.filter((t) => t.id !== taskIdToDelete));
   };
 

@@ -1,27 +1,26 @@
 // components/ProjectDialog.jsx
-import React from "react";
+import CloseIcon from "@mui/icons-material/Close";
 import {
+  Box,
+  Button,
   Dialog,
-  DialogTitle,
-  DialogContent,
   DialogActions,
-  TextField,
-  Select,
-  MenuItem,
-  OutlinedInput,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  Drawer,
   FormControl,
   FormControlLabel,
-  Switch,
-  Button,
   IconButton,
-  useTheme,
-  useMediaQuery,
-  Drawer,
-  Box,
-  Divider,
+  MenuItem,
+  OutlinedInput,
+  Select,
+  Switch,
+  TextField,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
 const colorOptions = [
   { value: "default", label: "Default", color: "#ccc" },
   { value: "blue", label: "Blue", color: "#2196f3" },

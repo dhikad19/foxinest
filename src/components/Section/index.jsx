@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { loadFromStorage, saveToStorage } from "../../utils/storage";
-import TaskList from "../../components/Task/List";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import { Button, Divider, TextField } from "@mui/material";
+import { useEffect, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
 import EditModal from "../../components/Modal/Edit";
 import SearchBar from "../../components/Search";
-import { ToastContainer, toast } from "react-toastify";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import { Button, TextField, Divider, Typography } from "@mui/material";
+import TaskList from "../../components/Task/List";
+import { loadFromStorage, saveToStorage } from "../../utils/storage";
 
 const Section = () => {
   const [tasks, setTasks] = useState([]);

@@ -1,35 +1,35 @@
-import React, { useState, useEffect, useMemo } from "react";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import EventIcon from "@mui/icons-material/Event";
+import FlagIcon from "@mui/icons-material/Flag";
+import TodayIcon from "@mui/icons-material/Today";
+import WeekendIcon from "@mui/icons-material/Weekend";
 import {
   Box,
   Button,
-  Typography,
-  Popover,
-  Menu,
-  MenuItem,
-  ListItemIcon,
-  ListItemText,
+  Divider,
   List,
   ListItem,
   ListItemButton,
-  Divider,
-  useTheme,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Popover,
+  Typography,
   useMediaQuery,
+  useTheme,
 } from "@mui/material";
-import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Placeholder from "@tiptap/extension-placeholder";
-import Bold from "@tiptap/extension-bold";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
-import dayjs from "dayjs";
-import { MobileTimePicker } from "@mui/x-date-pickers/MobileTimePicker";
 import { DesktopTimePicker } from "@mui/x-date-pickers/DesktopTimePicker";
-import FlagIcon from "@mui/icons-material/Flag";
-import EventIcon from "@mui/icons-material/Event";
-import TodayIcon from "@mui/icons-material/Today";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import WeekendIcon from "@mui/icons-material/Weekend";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { MobileTimePicker } from "@mui/x-date-pickers/MobileTimePicker";
+import Bold from "@tiptap/extension-bold";
+import Placeholder from "@tiptap/extension-placeholder";
+import { EditorContent, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import dayjs from "dayjs";
+import { useEffect, useMemo, useState } from "react";
 
 const priorities = [
   { label: "High", value: "High", color: "#ff77009d" },

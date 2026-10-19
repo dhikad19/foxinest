@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { loadFromStorage, saveToStorage } from "../../../utils/storage";
-import TaskList from "../../../components/Task/List";
+import { useEffect, useState } from "react";
 import EditModal from "../../../components/Modal/Edit";
-import SearchBar from "../../../components/Search";
-import CompletedTaskList from "../../../components/Task/Completed"; // Import CompletedTaskList
 import Snackbar from "../../../components/Snackbar"; // Import Snackbar component
+import CompletedTaskList from "../../../components/Task/Completed"; // Import CompletedTaskList
+import { loadFromStorage, saveToStorage } from "../../../utils/storage";
 
 const CompletedSection = () => {
   const [tasks, setTasks] = useState([]);
@@ -49,7 +47,7 @@ const CompletedSection = () => {
   // Save edited task
   const handleSaveEdit = (updated) => {
     setTasks((prev) =>
-      prev.map((task) => (task.id === updated.id ? updated : task))
+      prev.map((task) => (task.id === updated.id ? updated : task)),
     );
     setEditTask(null);
   };
@@ -65,8 +63,8 @@ const CompletedSection = () => {
     setSections((prev) => prev.map((sec) => (sec === oldName ? newName : sec)));
     setTasks((prev) =>
       prev.map((task) =>
-        task.category === oldName ? { ...task, category: newName } : task
-      )
+        task.category === oldName ? { ...task, category: newName } : task,
+      ),
     );
     setEditingSection(null);
     setNewSectionName("");
@@ -115,7 +113,7 @@ const CompletedSection = () => {
 
   // Filter tasks based on search query
   const filteredTasks = tasks.filter((task) =>
-    task.title.toLowerCase().includes(searchQuery.toLowerCase())
+    task.title.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   // Separate completed and non-completed tasks

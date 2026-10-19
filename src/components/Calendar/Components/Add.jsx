@@ -1,17 +1,14 @@
-import React from "react";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-  Drawer,
-  IconButton,
-  Divider,
-  Box,
-} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  Drawer,
+  TextField,
+} from "@mui/material";
 const AddEventDialog = ({
   isMobile,
   dialogOpen,

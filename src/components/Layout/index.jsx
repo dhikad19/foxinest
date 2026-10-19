@@ -1,6 +1,6 @@
 // src/components/Layout.jsx
-import ResponsiveLayout from "../ResponsiveLayout";
 import { Outlet } from "react-router-dom";
+import ResponsiveLayout from "../ResponsiveLayout";
 
 const Layout = () => {
   return (

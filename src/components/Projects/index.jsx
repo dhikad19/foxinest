@@ -1,22 +1,14 @@
-import React, { useState } from "react";
-import {
-  Box,
-  List,
-  ListItem,
-  Typography,
-  IconButton,
-  Button,
-} from "@mui/material";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
+import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
+import TagIcon from "@mui/icons-material/TagOutlined";
+import { Box, List, ListItem, Typography } from "@mui/material";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import ProjectModal from "../Modal/Project/Add";
-import AddIcon from "@mui/icons-material/Add";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import TagIcon from "@mui/icons-material/TagOutlined";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
+import ProjectModal from "../Modal/Project/Add";
 const Projects = () => {
   const navigate = useNavigate();
 
@@ -75,7 +67,7 @@ const Projects = () => {
     const projectExists = projects.some(
       (project) =>
         normalizeName(project.name) === normalizedName &&
-        project.id !== editProject?.id
+        project.id !== editProject?.id,
     );
 
     if (projectExists) {
@@ -93,7 +85,7 @@ const Projects = () => {
     let updatedProjects;
     if (editProject) {
       updatedProjects = projects.map((project) =>
-        project.id === editProject.id ? newProject : project
+        project.id === editProject.id ? newProject : project,
       );
     } else {
       updatedProjects = [...projects, newProject];
@@ -137,7 +129,7 @@ const Projects = () => {
     project.name
       .replaceAll("-", " ")
       .toLowerCase()
-      .includes(searchQuery.toLowerCase())
+      .includes(searchQuery.toLowerCase()),
   );
 
   return (

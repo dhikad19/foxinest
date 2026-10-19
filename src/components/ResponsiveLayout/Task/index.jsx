@@ -1,19 +1,18 @@
-import React, { useEffect, useState } from "react";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  List,
-  ListItem,
-  Divider,
-  useTheme,
-  Alert,
-} from "@mui/material";
-import DateIcon from "@mui/icons-material/DateRangeOutlined";
 import CloseIcon from "@mui/icons-material/Close";
-import useMediaQuery from "@mui/material/useMediaQuery";
+import DateIcon from "@mui/icons-material/DateRangeOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import RunningWithErrorsOutlinedIcon from "@mui/icons-material/RunningWithErrorsOutlined";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  List,
+  ListItem,
+  useTheme,
+} from "@mui/material";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 const showNotification = (taskCount) => {
@@ -41,7 +40,6 @@ const showNotification = (taskCount) => {
 function TodayTasksButton() {
   const [todayTasks, setTodayTasks] = useState([]);
   const [open, setOpen] = useState(false);
-  const [toastOpen, setToastOpen] = useState(false);
 
   const getTodayDateString = () => {
     const today = new Date();
@@ -192,13 +190,6 @@ function TodayTasksButton() {
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-
-  const handleToastClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setToastOpen(false);
-  };
 
   if (todayTasks.length === 0) {
     return null;

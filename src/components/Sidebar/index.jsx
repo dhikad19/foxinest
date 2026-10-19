@@ -1,5 +1,5 @@
-import { NavLink } from "react-router-dom";
 import { useEffect, useRef } from "react";
+import { NavLink } from "react-router-dom";
 
 const Sidebar = ({ isMobile, isOpen, onClose }) => {
   const sidebarRef = useRef();

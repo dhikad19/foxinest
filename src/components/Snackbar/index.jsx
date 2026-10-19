@@ -1,7 +1,7 @@
-import React, { useEffect } from "react";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import { useEffect } from "react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 const Snackbar = ({ message, onUndo }) => {
   useEffect(() => {

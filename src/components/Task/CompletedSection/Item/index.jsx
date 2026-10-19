@@ -1,36 +1,35 @@
-import React, { useState, useMemo, useEffect } from "react";
-import dayjs from "dayjs";
+import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
+import AttachFileIcon from "@mui/icons-material/AttachFile";
+import CommentsIcon from "@mui/icons-material/ChatBubbleOutline";
+import CloseIcon from "@mui/icons-material/Close";
+import DateIcon from "@mui/icons-material/DateRangeOutlined";
+import DeleteIcon from "@mui/icons-material/DeleteOutlined";
+import FlagIcon from "@mui/icons-material/Flag";
+import InsertEmoticonIcon from "@mui/icons-material/InsertEmoticon";
+import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
 import {
+  Button,
+  Checkbox,
   Dialog,
+  DialogContent,
+  DialogTitle,
   Divider,
   IconButton,
-  Menu,
-  DialogContent,
-  MenuItem,
-  useTheme,
-  DialogTitle,
-  Checkbox,
+  List,
   ListItem,
   ListItemText,
-  List,
-  Button,
+  Menu,
+  MenuItem,
   Tooltip,
+  useTheme,
 } from "@mui/material";
-import { Link } from "react-router-dom";
-import FlagIcon from "@mui/icons-material/Flag";
-import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
-import { useEditor, EditorContent } from "@tiptap/react";
-import DateIcon from "@mui/icons-material/DateRangeOutlined";
-import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-import CloseIcon from "@mui/icons-material/Close";
-import CommentsIcon from "@mui/icons-material/ChatBubbleOutline";
-import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
-import InsertEmoticonIcon from "@mui/icons-material/InsertEmoticon";
-import AttachFileIcon from "@mui/icons-material/AttachFile";
+import { EditorContent, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 import EmojiPicker from "emoji-picker-react";
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 
 const CompletedTaskItem = ({ task, onDelete, onComplete }) => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -42,10 +41,10 @@ const CompletedTaskItem = ({ task, onDelete, onComplete }) => {
   const [commentMenuIndex, setCommentMenuIndex] = useState(null);
   const [editCommentEditor, setEditCommentEditor] = useState(null);
   const [commentToEdit, setCommentToEdit] = useState(null);
-  const [newComment, setNewComment] = useState("");
+  const [setNewComment] = useState("");
   const [addCommentEditor, setAddCommentEditor] = useState(null);
   const [anchorElEmoji, setAnchorElEmoji] = useState(null);
-  const [lastFocusedEditor, setLastFocusedEditor] = useState(null);
+  const [lastFocusedEditor] = useState(null);
   function formatDate(date) {
     const currentYear = new Date().getFullYear();
     const parsedDate = new Date(date);

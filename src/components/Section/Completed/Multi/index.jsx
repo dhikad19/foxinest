@@ -1,21 +1,11 @@
-import { useParams } from "react-router-dom";
+import { Box, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { Box, Typography, TextField, Button, Paper } from "@mui/material";
-import CompletedTaskList from "../../../../components/Task/Completed"; // ✅ Import this
+import { useParams } from "react-router-dom";
 import CustomSnackbar from "../../../../components/Snackbar";
+import CompletedTaskList from "../../../../components/Task/Completed"; // ✅ Import this
 
-import {
-  DndContext,
-  closestCenter,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
-import {
-  arrayMove,
-  SortableContext,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
+import { PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { arrayMove } from "@dnd-kit/sortable";
 
 const ProjectDetail = () => {
   const { projectId } = useParams();
@@ -81,7 +71,7 @@ const ProjectDetail = () => {
   const completeTask = (id) => {
     setData((prev) => {
       const updatedTasks = prev.tasks.map((t) =>
-        t.id === id ? { ...t, completed: !t.completed } : t
+        t.id === id ? { ...t, completed: !t.completed } : t,
       );
       return { ...prev, tasks: updatedTasks };
     });
@@ -96,7 +86,7 @@ const ProjectDetail = () => {
 
     setData((prev) => {
       const updatedTasks = prev.tasks.map((task) =>
-        task.id === completedTask.id ? { ...task, completed: false } : task
+        task.id === completedTask.id ? { ...task, completed: false } : task,
       );
       return { ...prev, tasks: updatedTasks };
     });
@@ -135,7 +125,7 @@ const ProjectDetail = () => {
 
   const tasksByCategory = data.sections.reduce((acc, section) => {
     acc[section] = data.tasks.filter(
-      (t) => t.category === section && !t.completed
+      (t) => t.category === section && !t.completed,
     );
     return acc;
   }, {});

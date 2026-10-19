@@ -1,39 +1,38 @@
-import React, { useState, useEffect, useRef } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
+import AttachFileIcon from "@mui/icons-material/AttachFile";
+import CommentsIcon from "@mui/icons-material/ChatBubbleOutline";
+import CloseIcon from "@mui/icons-material/Close";
+import DateIcon from "@mui/icons-material/DateRangeOutlined";
+import DeleteIcon from "@mui/icons-material/DeleteOutlined";
+import DragIcon from "@mui/icons-material/DragIndicator";
+import EditIcon from "@mui/icons-material/EditOutlined";
+import FlagIcon from "@mui/icons-material/Flag";
+import InsertEmoticonIcon from "@mui/icons-material/InsertEmoticon";
+import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
 import {
-  Divider,
-  Checkbox,
   Button,
+  Checkbox,
   Dialog,
-  DialogActions,
   DialogContent,
   DialogTitle,
+  Divider,
   List,
   ListItem,
   ListItemText,
-  Tooltip,
-  useTheme,
   Menu,
   MenuItem,
+  Tooltip,
+  useTheme,
 } from "@mui/material";
-import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
-import FlagIcon from "@mui/icons-material/Flag";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import CloseIcon from "@mui/icons-material/Close";
-import CommentsIcon from "@mui/icons-material/ChatBubbleOutline";
-import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-import EditIcon from "@mui/icons-material/EditOutlined";
-import DragIcon from "@mui/icons-material/DragIndicator";
-import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
-import DateIcon from "@mui/icons-material/DateRangeOutlined";
-import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Placeholder from "@tiptap/extension-placeholder";
-import EmojiPicker from "emoji-picker-react";
 import IconButton from "@mui/material/IconButton";
-import InsertEmoticonIcon from "@mui/icons-material/InsertEmoticon";
-import AttachFileIcon from "@mui/icons-material/AttachFile";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import Placeholder from "@tiptap/extension-placeholder";
+import { EditorContent, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import EmojiPicker from "emoji-picker-react";
+import { useEffect, useRef, useState } from "react";
 
 // Styles
 const containerStyle = (isDragging, transform, transition) => ({
@@ -63,12 +62,11 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
   } = useSortable({ id: task.id });
 
   const [openDialog, setOpenDialog] = useState(false);
-  const [newComment, setNewComment] = useState("");
+  const [setNewComment] = useState("");
   const [comments, setComments] = useState([]);
   const [commentToEdit, setCommentToEdit] = useState(null);
   const [editingContent, setEditingContent] = useState("");
   const [lastFocusedEditor, setLastFocusedEditor] = useState(null); // 'add' | 'edit'
-  const [showComments, setShowComments] = useState(true);
 
   const [anchorElEmoji, setAnchorElEmoji] = useState(null);
   const [anchorElCommentMenu, setAnchorElCommentMenu] = useState(null);
@@ -89,7 +87,6 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
 
     return new Intl.DateTimeFormat("en-GB", options).format(parsedDate);
   }
-  const toggleComments = () => setShowComments((prev) => !prev);
 
   const handleOpenCommentMenu = (event, index) => {
     setAnchorElCommentMenu(event.currentTarget);
@@ -256,22 +253,15 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
   const handleEditComment = (index) => {
     const commentText = comments[index]?.text || "";
 
-    // Tampilkan editor edit
     setCommentToEdit(index);
     setEditingContent(commentText);
 
-    // Masukkan konten ke editor dan fokuskan editor
     if (editCommentEditor) {
       editCommentEditor.commands.setContent(commentText);
       editCommentEditor.chain().focus().run();
     }
 
     handleCloseCommentMenu();
-  };
-
-  const cancelEdit = () => {
-    setCommentToEdit(null);
-    editCommentEditor?.commands.clearContent();
   };
 
   const saveEditedComment = () => {

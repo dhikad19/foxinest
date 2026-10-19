@@ -1,21 +1,21 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
-import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import listPlugin from "@fullcalendar/list";
-import timeGridPlugin from "@fullcalendar/timegrid";
-import interactionPlugin from "@fullcalendar/interaction";
+import "@fullcalendar/common/main.css";
 import idLocale from "@fullcalendar/core/locales/id";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import interactionPlugin from "@fullcalendar/interaction";
+import listPlugin from "@fullcalendar/list";
+import FullCalendar from "@fullcalendar/react";
+import timeGridPlugin from "@fullcalendar/timegrid";
 import {
   Box,
-  useTheme,
-  useMediaQuery,
-  Typography,
   CircularProgress,
+  Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
-import EventDetailDialog from "./Components/Edit";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { addDays, hasTime, toDate } from "../../utils/date";
 import AddEventDialog from "./Components/Add";
-import { hasTime, toDate, addDays } from "../../utils/date";
-import "@fullcalendar/common/main.css";
+import EventDetailDialog from "./Components/Edit";
 
 const HOLIDAY_URL =
   "https://raw.githubusercontent.com/guangrei/APIHariLibur_V2/main/calendar.json";

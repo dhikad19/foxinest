@@ -1,58 +1,6 @@
-import { useParams, useNavigate, useLocation, replace } from "react-router-dom";
-import { useEffect, useState, useMemo, useRef } from "react";
-import AddIcon from "@mui/icons-material/Add";
-import AddIconFilled from "@mui/icons-material/AddCircle";
 import {
-  Box,
-  Typography,
-  TextField,
-  Button,
-  Divider,
-  Stack,
-  Popover,
-  Menu,
-  MenuItem,
-  Dialog,
-  DialogActions,
-  useTheme,
-  useMediaQuery,
-  DialogContent,
-  DialogContentText,
-  ListItemButton,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  DialogTitle,
-} from "@mui/material";
-import {
-  Today as TodayIcon,
-  CalendarToday as CalendarTodayIcon,
-  Weekend as WeekendIcon,
-  Event as EventIcon,
-} from "@mui/icons-material";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import TaskForm from "../../Task/Form";
-import TaskItem from "../../Task/Item";
-import EditModal from "../../Modal/Edit";
-import DeleteProjectDialog from "../../Modal/Project/Delete";
-import EditProjectDialog from "../../Modal/Project/Edit";
-import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import { FaChevronDown, FaChevronRight } from "react-icons/fa";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
-import dayjs from "dayjs";
-import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
-import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-import EditIcon from "@mui/icons-material/EditOutlined";
-import { ToastContainer, toast } from "react-toastify";
-import { MobileTimePicker } from "@mui/x-date-pickers/MobileTimePicker";
-import { DesktopTimePicker } from "@mui/x-date-pickers/DesktopTimePicker";
-import {
-  DndContext,
   closestCenter,
+  DndContext,
   PointerSensor,
   useSensor,
   useSensors,
@@ -62,6 +10,55 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import {
+  CalendarToday as CalendarTodayIcon,
+  Event as EventIcon,
+  Today as TodayIcon,
+  Weekend as WeekendIcon,
+} from "@mui/icons-material";
+import AddIcon from "@mui/icons-material/Add";
+import AddIconFilled from "@mui/icons-material/AddCircle";
+import DeleteIcon from "@mui/icons-material/DeleteOutlined";
+import EditIcon from "@mui/icons-material/EditOutlined";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogTitle,
+  Divider,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Popover,
+  TextField,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
+import { DesktopTimePicker } from "@mui/x-date-pickers/DesktopTimePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { MobileTimePicker } from "@mui/x-date-pickers/MobileTimePicker";
+import { EditorContent, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import dayjs from "dayjs";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { FaChevronDown, FaChevronRight } from "react-icons/fa";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import EditModal from "../../Modal/Edit";
+import DeleteProjectDialog from "../../Modal/Project/Delete";
+import EditProjectDialog from "../../Modal/Project/Edit";
+import TaskForm from "../../Task/Form";
+import TaskItem from "../../Task/Item";
 
 const quickDates = [
   {

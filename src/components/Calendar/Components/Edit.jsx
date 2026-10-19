@@ -1,27 +1,25 @@
-import React, { useEffect, useState } from "react";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-  Divider,
-  IconButton,
-  Drawer,
-  Box,
-} from "@mui/material";
-import { hasTime, toDate, toYMD } from "../../../utils/date";
-import {
-  LocalizationProvider,
-  DateTimePicker,
-  DatePicker,
-} from "@mui/x-date-pickers";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import InboxIcon from "@mui/icons-material/Inbox";
-import FlagIcon from "@mui/icons-material/Flag";
 import CloseIcon from "@mui/icons-material/Close";
 import DateIcon from "@mui/icons-material/DateRangeOutlined";
+import FlagIcon from "@mui/icons-material/Flag";
+import InboxIcon from "@mui/icons-material/Inbox";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  Drawer,
+  TextField,
+} from "@mui/material";
+import {
+  DatePicker,
+  DateTimePicker,
+  LocalizationProvider,
+} from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { useState } from "react";
+import { hasTime, toDate, toYMD } from "../../../utils/date";
 
 const parseDate = (value) => (value ? toDate(value) : null);
 const EventDetailDialog = ({

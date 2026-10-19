@@ -1,35 +1,32 @@
-import React, { useState, useEffect } from "react";
+import {
+  CheckCircleOutlined as CompletedIcon,
+  AddHomeOutlined as HomeIcon,
+  InfoOutlined as InfoIcon,
+} from "@mui/icons-material";
+import AddIcon from "@mui/icons-material/Add";
+import CalendarIcon from "@mui/icons-material/CalendarMonthOutlined";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import MenuIcon from "@mui/icons-material/Menu";
+import TagIcon from "@mui/icons-material/TagOutlined";
 import {
   AppBar,
-  Toolbar,
-  IconButton,
-  Typography,
+  Box,
+  CssBaseline,
   Drawer,
+  IconButton,
   List,
   ListItem,
   ListItemText,
-  Box,
-  CssBaseline,
-  useTheme,
+  Toolbar,
+  Typography,
   useMediaQuery,
-  IconButton as MuiIconButton,
+  useTheme,
 } from "@mui/material";
-import TaskActive from "./Task";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import CommentsIcon from "@mui/icons-material/ChatBubbleOutline";
-import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
 import ListItemIcon from "@mui/material/ListItemIcon";
-import AddIcon from "@mui/icons-material/Add";
-import TagIcon from "@mui/icons-material/TagOutlined";
-import CalendarIcon from "@mui/icons-material/CalendarMonthOutlined";
-import { NavLink, useNavigate, useLocation } from "react-router-dom";
-import MenuIcon from "@mui/icons-material/Menu";
+import { useEffect, useState } from "react";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import ProjectModal from "../Modal/Project/Add";
-import {
-  AddHomeOutlined as HomeIcon,
-  InfoOutlined as InfoIcon,
-  CheckCircleOutlined as CompletedIcon,
-} from "@mui/icons-material";
+import TaskActive from "./Task";
 
 const drawerWidth = 240;
 

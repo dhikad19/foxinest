@@ -1,57 +1,58 @@
-import React, { useState, useEffect } from "react";
 import {
-  DndContext,
   closestCenter,
+  DndContext,
   DragOverlay,
   PointerSensor,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import {
-  Menu,
-  MenuItem,
-  IconButton,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemButton,
-  ListItemText,
-  Typography,
-} from "@mui/material";
-import { Dialog, DialogTitle, DialogActions } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
+import {
+  Dialog,
+  DialogActions,
+  DialogTitle,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Typography,
+} from "@mui/material";
+import { useEffect, useState } from "react";
 
-import { Divider, Popover, Button, Stack, Box } from "@mui/material";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import {
+  arrayMove,
   SortableContext,
   verticalListSortingStrategy,
-  arrayMove,
 } from "@dnd-kit/sortable";
 import AddIcon from "@mui/icons-material/Add";
 import AddIconFilled from "@mui/icons-material/AddCircle";
-import TaskItem from "../Item";
-import TaskForm from "../Form";
+import { Box, Button, Divider, Popover } from "@mui/material";
 import EditTask from "../../Modal/Edit";
+import TaskForm from "../Form";
+import TaskItem from "../Item";
 // import EditModal from "../../components/Modal/Edit";
 // Tiptap
-import { useEditor, EditorContent } from "@tiptap/react";
+import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 
 // Icons
 import {
-  Today as TodayIcon,
   CalendarToday as CalendarTodayIcon,
-  Weekend as WeekendIcon,
   Event as EventIcon,
+  Today as TodayIcon,
+  Weekend as WeekendIcon,
 } from "@mui/icons-material";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 
 // Date Picker
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 
 const quickDates = [
@@ -136,20 +137,16 @@ const TaskList = ({
 }) => {
   const [openForms, setOpenForms] = useState({});
   const [expandedSections, setExpandedSections] = useState({});
-  const [activeTask, setActiveTask] = useState(null);
+  const [setActiveTask] = useState(null);
   const [showOverdue, setShowOverdue] = useState(true);
   const sensors = useSensors(useSensor(PointerSensor));
   const [hoveredCategory, setHoveredCategory] = useState(null);
   const [editingTaskId, setEditingTaskId] = useState(null);
-  const [activeId, setActiveId] = useState(null);
-  const [draggedItem, setDraggedItem] = useState(null);
-  // 📅 Date picker state
+  const [draggedItem] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
   const today = dayjs();
-  const tomorrow = dayjs().add(1, "day");
-  const [isDragging, setIsDragging] = useState(false);
+  const [isDragging] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const [menuCategory, setMenuCategory] = useState(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -186,14 +183,6 @@ const TaskList = ({
   //   }
   //   setActiveId(null);
   // };
-
-  const handleOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
 
   const handleMenuOpen = (event, category) => {
     setMenuAnchorEl(event.currentTarget);
@@ -282,19 +271,6 @@ const TaskList = ({
       return [category, validTasks];
     }),
   );
-
-  const handleEdit = (updatedTask) => {
-    // Update tasksByCategory dengan task yang telah diubah
-    const updatedTasksByCategory = { ...tasksByCategory };
-    const category = updatedTask.category;
-    const taskIndex = updatedTasksByCategory[category].findIndex(
-      (task) => task.id === updatedTask.id,
-    );
-    if (taskIndex !== -1) {
-      updatedTasksByCategory[category][taskIndex] = updatedTask;
-    }
-    onReorderTasks(updatedTasksByCategory);
-  };
 
   const handleDateChange = (newDate) => {
     if (!newDate) return;
