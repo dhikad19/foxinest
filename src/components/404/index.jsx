@@ -16,7 +16,7 @@ const NotFoundPage = () => {
       padding="0px 15px 0px 15px"
       textAlign="center"
     >
-      <Typography variant="h2" color="#ff7800" gutterBottom>
+      <Typography variant="h2" color="#0066FF" gutterBottom>
         404
       </Typography>
       <Typography variant="h5" gutterBottom>
@@ -34,8 +34,8 @@ const NotFoundPage = () => {
           marginRight: "6px",
         }}
         sx={{
-          backgroundColor: "#ff7800",
-          "&:hover": { backgroundColor: "#ff871f" },
+          backgroundColor: "#0066FF",
+          "&:hover": { backgroundColor: "#004ec2" },
         }}
         disableElevation
         variant="contained"

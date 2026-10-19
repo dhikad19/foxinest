@@ -15,7 +15,12 @@ import {
 const AboutPage = () => {
   return (
     <Container
-      style={{ maxWidth: 700, paddingTop: "60px" }}
+      style={{
+        maxWidth: 700,
+        paddingTop: "60px",
+        paddingLeft: "48px",
+        paddingRight: "48px",
+      }}
       sx={{ mt: 2, mb: 6 }}
     >
       <Box sx={{ mb: 3 }}>
@@ -26,12 +31,12 @@ const AboutPage = () => {
         <p style={{ fontSize: 15 }}>
           Welcome to{" "}
           <strong>
-            <span style={{ color: "#ff7800" }}>Foxinest</span>
+            <span style={{ color: "#0066FF" }}>Trail</span>
           </strong>
           !
         </p>
         <p style={{ fontSize: 15 }}>
-          Foxinest App is a simple yet powerful task management application
+          Trail App is a simple yet powerful task management application
           designed to help you stay organized and boost your productivity.
           Created by Dika as part of a personal portfolio project, this app
           demonstrates the seamless integration of modern web technologies and
@@ -60,7 +65,7 @@ const AboutPage = () => {
             {
               icon: (
                 <CheckCircleOutline
-                  style={{ color: "#ff7800" }}
+                  style={{ color: "#0066FF" }}
                   fontSize="large"
                 />
               ),
@@ -69,13 +74,13 @@ const AboutPage = () => {
             },
             {
               icon: (
-                <DesignServices style={{ color: "#ff7800" }} fontSize="large" />
+                <DesignServices style={{ color: "#0066FF" }} fontSize="large" />
               ),
               title: "Intuitive Design",
               text: "A clean and straightforward interface for a smooth user experience.",
             },
             {
-              icon: <Devices style={{ color: "#ff7800" }} fontSize="large" />,
+              icon: <Devices style={{ color: "#0066FF" }} fontSize="large" />,
               title: "Cross-Platform Compatibility",
               text: "Works beautifully on desktop and mobile devices.",
             },
@@ -121,10 +126,10 @@ const AboutPage = () => {
         <div>
           <p style={{ fontSize: 15 }}>
             Hi, I’m Dika! I am a passionate web developer with a keen interest
-            in crafting intuitive and functional applications. Foxinest App is
-            one of my personal projects, showcasing my skills in React and web
+            in crafting intuitive and functional applications. Trail App is one
+            of my personal projects, showcasing my skills in React and web
             development. It reflects my dedication to delivering high-quality
-            user experiences. The primary goal of Foxinest App is to serve as a
+            user experiences. The primary goal of Trail App is to serve as a
             portfolio piece that highlights my technical skills and creativity
             in solving everyday problems through code. It’s also a tool I’ve
             personally enjoyed using to organize my day-to-day tasks.

@@ -118,7 +118,7 @@ const CompletedTaskItem = ({ task, onDelete, onComplete }) => {
       setComments(updatedComments);
       localStorage.setItem(
         `task_${task.id}_comments`,
-        JSON.stringify(updatedComments)
+        JSON.stringify(updatedComments),
       );
       addCommentEditor.commands.clearContent();
     }
@@ -167,7 +167,7 @@ const CompletedTaskItem = ({ task, onDelete, onComplete }) => {
     setComments(updatedComments);
     localStorage.setItem(
       `task_${task.id}_comments`,
-      JSON.stringify(updatedComments)
+      JSON.stringify(updatedComments),
     );
     handleCloseCommentMenu();
   };
@@ -176,12 +176,12 @@ const CompletedTaskItem = ({ task, onDelete, onComplete }) => {
       const updatedComments = comments.map((comment, index) =>
         index === commentToEdit
           ? { ...comment, text: editCommentEditor.getHTML() }
-          : comment
+          : comment,
       );
       setComments(updatedComments);
       localStorage.setItem(
         `task_${task.id}_comments`,
-        JSON.stringify(updatedComments)
+        JSON.stringify(updatedComments),
       );
       setCommentToEdit(null);
       editCommentEditor.commands.clearContent();
@@ -200,7 +200,7 @@ const CompletedTaskItem = ({ task, onDelete, onComplete }) => {
 
   useEffect(() => {
     const storedComments = JSON.parse(
-      localStorage.getItem(`task_${task.id}_comments`)
+      localStorage.getItem(`task_${task.id}_comments`),
     );
     if (storedComments) {
       setComments(storedComments);
@@ -350,20 +350,20 @@ const CompletedTaskItem = ({ task, onDelete, onComplete }) => {
                       task.priority === "High"
                         ? "#ff77009d"
                         : task.priority === "Medium"
-                        ? "#4f4f4f9f"
-                        : task.priority === "Low"
-                        ? "#1f50ff93"
-                        : "black",
+                          ? "#4f4f4f9f"
+                          : task.priority === "Low"
+                            ? "#1f50ff93"
+                            : "black",
                   },
                   "&.Mui-checked .MuiSvgIcon-root": {
                     color:
                       task.priority === "High"
                         ? "#ff77009d"
                         : task.priority === "Medium"
-                        ? "#4f4f4f9f"
-                        : task.priority === "Low"
-                        ? "#1f50ff93"
-                        : "black",
+                          ? "#4f4f4f9f"
+                          : task.priority === "Low"
+                            ? "#1f50ff93"
+                            : "black",
                   },
                   p: 0,
                 }}
@@ -421,7 +421,7 @@ const CompletedTaskItem = ({ task, onDelete, onComplete }) => {
                           }),
                         };
                         return new Intl.DateTimeFormat("en-GB", options).format(
-                          dueDate
+                          dueDate,
                         );
                       })()}
                     </p>
@@ -619,7 +619,7 @@ const CompletedTaskItem = ({ task, onDelete, onComplete }) => {
                                     size="small"
                                     variant="contained"
                                     sx={{
-                                      backgroundColor: "#ff7800",
+                                      backgroundColor: "#0066FF",
                                       textTransform: "capitalize",
                                       boxShadow: "none",
                                       fontWeight: "bold",

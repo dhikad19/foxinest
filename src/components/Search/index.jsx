@@ -17,10 +17,10 @@ const SearchBar = ({ query, setQuery }) => (
           borderColor: "#ccc", // Default border color
         },
         "&:hover fieldset": {
-          borderColor: "#ff7800", // Hover border color
+          borderColor: "#0066FF", // Hover border color
         },
         "&.Mui-focused fieldset": {
-          borderColor: "#ff7800", // Focus border color
+          borderColor: "#0066FF", // Focus border color
         },
       },
     }}

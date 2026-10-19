@@ -163,7 +163,7 @@ const ProjectDetail = () => {
   const normalize = (str) => str.trim().toLowerCase().replace(/\s+/g, "-");
 
   const isValidProjectId = projects.some(
-    (p) => normalize(p.name) === normalize(projectId)
+    (p) => normalize(p.name) === normalize(projectId),
   );
 
   const sensors = useSensors(useSensor(PointerSensor));
@@ -196,7 +196,7 @@ const ProjectDetail = () => {
       JSON.parse(localStorage.getItem("projects_data")) || {};
 
     const matchedProject = storedProjects.find(
-      (p) => normalize(p.name) === normalize(projectId)
+      (p) => normalize(p.name) === normalize(projectId),
     );
 
     if (!matchedProject) {
@@ -212,7 +212,7 @@ const ProjectDetail = () => {
 
     const hasProjectData = Object.prototype.hasOwnProperty.call(
       storedProjectsData,
-      matchedProject.name
+      matchedProject.name,
     );
     if (!hasProjectData) {
       navigate("/404", { replace: true });
@@ -264,7 +264,7 @@ const ProjectDetail = () => {
 
     if (editDialogOpen) {
       const currentProject = projects.find(
-        (p) => normalize(p.name) === normalize(projectId)
+        (p) => normalize(p.name) === normalize(projectId),
       );
       if (currentProject) {
         setEditProjectData({
@@ -278,7 +278,7 @@ const ProjectDetail = () => {
 
   const today = dayjs().format("YYYY-MM-DD");
   const overdueTasks = projectData.tasks.filter(
-    (task) => !task.completed && task.dueDate && task.dueDate < today
+    (task) => !task.completed && task.dueDate && task.dueDate < today,
   );
 
   const tasksByCategory = useMemo(() => {
@@ -287,7 +287,7 @@ const ProjectDetail = () => {
         (t) =>
           t.category === section &&
           !t.completed &&
-          (!t.dueDate || t.dueDate >= today)
+          (!t.dueDate || t.dueDate >= today),
       );
       return acc;
     }, {});
@@ -330,7 +330,7 @@ const ProjectDetail = () => {
             dueTime: selectedTime || null,
             dueDateTime: combinedDateTime,
           }
-        : task
+        : task,
     );
 
     setProjectData((prev) => ({
@@ -466,7 +466,7 @@ const ProjectDetail = () => {
         progressClassName: "custom-toast-progress",
         icon: (
           <div>
-            <InfoOutlinedIcon style={{ color: "#ff7800" }} />
+            <InfoOutlinedIcon style={{ color: "#0066FF" }} />
           </div>
         ),
         position: "bottom-left",
@@ -482,7 +482,7 @@ const ProjectDetail = () => {
         progressClassName: "custom-toast-progress",
         icon: (
           <div>
-            <InfoOutlinedIcon style={{ color: "#ff7800" }} />
+            <InfoOutlinedIcon style={{ color: "#0066FF" }} />
           </div>
         ),
         position: "bottom-left",
@@ -499,7 +499,7 @@ const ProjectDetail = () => {
     setProjectData((prev) => ({
       ...prev,
       tasks: prev.tasks.map((task) =>
-        task.id === completedTask.id ? { ...task, completed: false } : task
+        task.id === completedTask.id ? { ...task, completed: false } : task,
       ),
     }));
     setCompletedTask(null);
@@ -526,7 +526,7 @@ const ProjectDetail = () => {
     const updated = projects.map((project) =>
       normalize(project.name) === normalize(projectId)
         ? { ...project, ...editProjectData }
-        : project
+        : project,
     );
 
     localStorage.setItem("projects", JSON.stringify(updated));
@@ -534,7 +534,7 @@ const ProjectDetail = () => {
     setProjects(updated);
 
     const oldKey = projects.find(
-      (p) => normalize(p.name) === normalize(projectId)
+      (p) => normalize(p.name) === normalize(projectId),
     )?.name;
 
     const newKey = editProjectData.name;
@@ -556,7 +556,7 @@ const ProjectDetail = () => {
 
   const handleDeleteProject = () => {
     const updated = projects.filter(
-      (p) => normalize(p.name) !== normalize(projectId)
+      (p) => normalize(p.name) !== normalize(projectId),
     );
 
     localStorage.setItem("projects", JSON.stringify(updated));
@@ -564,7 +564,7 @@ const ProjectDetail = () => {
 
     const data = JSON.parse(localStorage.getItem("projects_data")) || {};
     const projectToDelete = projects.find(
-      (p) => normalize(p.name) === normalize(projectId)
+      (p) => normalize(p.name) === normalize(projectId),
     );
     if (projectToDelete && data[projectToDelete.name]) {
       delete data[projectToDelete.name];
@@ -579,11 +579,11 @@ const ProjectDetail = () => {
     if (oldName === newName || !newName.trim()) return;
 
     const updatedSections = projectData.sections.map((sec) =>
-      sec === oldName ? newName : sec
+      sec === oldName ? newName : sec,
     );
 
     const updatedTasks = projectData.tasks.map((task) =>
-      task.category === oldName ? { ...task, category: newName } : task
+      task.category === oldName ? { ...task, category: newName } : task,
     );
 
     setProjectData((prev) => ({
@@ -595,10 +595,10 @@ const ProjectDetail = () => {
 
   const handleDeleteSection = (sectionName) => {
     const updatedSections = projectData.sections.filter(
-      (sec) => sec !== sectionName
+      (sec) => sec !== sectionName,
     );
     const updatedTasks = projectData.tasks.filter(
-      (task) => task.category !== sectionName
+      (task) => task.category !== sectionName,
     );
 
     setProjectData((prev) => ({
@@ -662,7 +662,7 @@ const ProjectDetail = () => {
 
   const filteredSections = useMemo(() => {
     return projectData.sections.filter((section) =>
-      section.toLowerCase().includes(searchQuery.toLowerCase())
+      section.toLowerCase().includes(searchQuery.toLowerCase()),
     );
   }, [projectData.sections, searchQuery]);
 
@@ -730,7 +730,7 @@ const ProjectDetail = () => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                backgroundColor: "#ff7800",
+                backgroundColor: "#0066FF",
                 marginRight: 6,
                 color: "white",
                 borderRadius: 4,
@@ -768,10 +768,10 @@ const ProjectDetail = () => {
                 borderColor: "#ccc",
               },
               "&:hover fieldset": {
-                borderColor: "#ff7800",
+                borderColor: "#0066FF",
               },
               "&.Mui-focused fieldset": {
-                borderColor: "#ff7800",
+                borderColor: "#0066FF",
               },
             },
           }}
@@ -792,13 +792,13 @@ const ProjectDetail = () => {
           }}
           onClick={() => setShowForm(true)}
         >
-          <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
+          <Divider sx={{ flex: 1, borderColor: "#0066FF" }} />
           <span
-            style={{ fontWeight: "bold", color: "#ff7800", fontSize: "15px" }}
+            style={{ fontWeight: "bold", color: "#0066FF", fontSize: "15px" }}
           >
             Add Section
           </span>
-          <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
+          <Divider sx={{ flex: 1, borderColor: "#0066FF" }} />
         </div>
       ) : (
         <form
@@ -815,17 +815,17 @@ const ProjectDetail = () => {
               marginTop: 7,
             }}
           >
-            <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
+            <Divider sx={{ flex: 1, borderColor: "#0066FF" }} />
             <span
               style={{
                 fontWeight: "bold",
-                color: "#ff7800",
+                color: "#0066FF",
                 fontSize: "15px",
               }}
             >
               Add new section
             </span>
-            <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
+            <Divider sx={{ flex: 1, borderColor: "#0066FF" }} />
           </div>
           <TextField
             fullWidth
@@ -842,10 +842,10 @@ const ProjectDetail = () => {
                   borderColor: "#ccc",
                 },
                 "&:hover fieldset": {
-                  borderColor: "#ff7800",
+                  borderColor: "#0066FF",
                 },
                 "&.Mui-focused fieldset": {
-                  borderColor: "#ff7800",
+                  borderColor: "#0066FF",
                 },
               },
             }}
@@ -855,8 +855,8 @@ const ProjectDetail = () => {
               type="submit"
               variant="contained"
               sx={{
-                backgroundColor: "#ff7800",
-                "&:hover": { backgroundColor: "#ff871f" },
+                backgroundColor: "#0066FF",
+                "&:hover": { backgroundColor: "#004ec2" },
               }}
               disableElevation
               size="small"
@@ -934,7 +934,7 @@ const ProjectDetail = () => {
                 style={{
                   marginLeft: "auto",
                   cursor: "pointer",
-                  color: "#ff7800",
+                  color: "#0066FF",
                   fontWeight: 500,
                   fontSize: 15,
                 }}
@@ -964,7 +964,7 @@ const ProjectDetail = () => {
                         }
                         onChange={(newValue) => {
                           setSelectedTime(
-                            newValue ? newValue.format("HH:mm") : null
+                            newValue ? newValue.format("HH:mm") : null,
                           );
                         }}
                         slotProps={{
@@ -982,7 +982,7 @@ const ProjectDetail = () => {
                         }
                         onChange={(newValue) => {
                           setSelectedTime(
-                            newValue ? newValue.format("HH:mm") : null
+                            newValue ? newValue.format("HH:mm") : null,
                           );
                         }}
                         slotProps={{
@@ -1049,7 +1049,7 @@ const ProjectDetail = () => {
                       setProjectData((prev) => ({
                         ...prev,
                         tasks: prev.tasks.map((t) =>
-                          t.id === updatedTask.id ? updatedTask : t
+                          t.id === updatedTask.id ? updatedTask : t,
                         ),
                       }));
                       setEditingTaskId(null);
@@ -1065,7 +1065,7 @@ const ProjectDetail = () => {
                     onEdit={() => setEditingTaskId(task.id)}
                     onComplete={handleCompleteTask}
                   />
-                )
+                ),
               )}
             </div>
           )}
@@ -1160,13 +1160,13 @@ const ProjectDetail = () => {
                               tasks: prev.tasks.map((t) =>
                                 t.id === updatedTask.id
                                   ? { ...t, ...updatedTask }
-                                  : t
+                                  : t,
                               ),
                             }));
 
                             // Sync with localStorage for user_events
                             const storedEvents = JSON.parse(
-                              localStorage.getItem("user_events") || "[]"
+                              localStorage.getItem("user_events") || "[]",
                             );
 
                             const updatedEvents = storedEvents.map((event) =>
@@ -1178,12 +1178,12 @@ const ProjectDetail = () => {
                                     end: updatedTask.dueDate,
                                     details: updatedTask,
                                   }
-                                : event
+                                : event,
                             );
 
                             localStorage.setItem(
                               "user_events",
-                              JSON.stringify(updatedEvents)
+                              JSON.stringify(updatedEvents),
                             );
 
                             // Close the modal
@@ -1200,7 +1200,7 @@ const ProjectDetail = () => {
                           onEdit={() => setEditingTaskId(task.id)}
                           onComplete={handleCompleteTask}
                         />
-                      )
+                      ),
                     )}
                   </SortableContext>
 
@@ -1215,7 +1215,7 @@ const ProjectDetail = () => {
                         cursor: "pointer",
                         marginTop: 10,
                         color:
-                          hoveredSection === section ? "#ff7800" : "inherit",
+                          hoveredSection === section ? "#0066FF" : "inherit",
                       }}
                     >
                       {hoveredSection === section ? (
@@ -1254,7 +1254,7 @@ const ProjectDetail = () => {
             setProjectData((prev) => ({
               ...prev,
               tasks: prev.tasks.map((task) =>
-                task.id === editedTask.id ? editedTask : task
+                task.id === editedTask.id ? editedTask : task,
               ),
             }));
             setEditTask(null);

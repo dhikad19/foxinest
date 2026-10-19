@@ -373,7 +373,7 @@ const EditModal = ({ task, onSave, onClose, onCancel }) => {
               <Divider />
               {sections.map((section, index) => {
                 const isSelected = form.category === section;
-                const textColor = isSelected ? "#ff7800" : "#4f4f4f"; // Blue for selected, gray otherwise
+                const textColor = isSelected ? "#0066FF" : "#4f4f4f"; // Blue for selected, gray otherwise
 
                 return (
                   <MenuItem
@@ -422,7 +422,7 @@ const EditModal = ({ task, onSave, onClose, onCancel }) => {
               type="submit"
               variant="contained"
               sx={{
-                backgroundColor: "#ff7800",
+                backgroundColor: "#0066FF",
                 textTransform: "capitalize",
                 boxShadow: "none",
                 fontWeight: "bold",

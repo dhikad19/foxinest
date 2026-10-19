@@ -20,13 +20,13 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const routeTitles = {
-  "/": "Home - Foxinest",
-  "/about": "About Us - Foxinest",
-  "/calendar": "Calendar - Foxinest",
-  "/completed": "Completed Tasks - Foxinest",
-  "/project": "Projects - Foxinest",
-  "/project/:projectId": "Project Details - Foxinest",
-  "/welcome": "Welcome - Foxinest",
+  "/": "Home - Trail",
+  "/about": "About Us - Trail",
+  "/calendar": "Calendar - Trail",
+  "/completed": "Completed Tasks - Trail",
+  "/project": "Projects - Trail",
+  "/project/:projectId": "Project Details - Trail",
+  "/welcome": "Welcome - Trail",
   "*": "404 - Page Not Found",
 };
 
@@ -62,7 +62,7 @@ const App = () => {
           height: "100vh",
         }}
       >
-        <CircularProgress sx={{ color: "#ff7800" }} />
+        <CircularProgress sx={{ color: "#0066FF" }} />
         <Typography variant="subtitle1" sx={{ marginTop: 2 }}>
           Please wait
         </Typography>

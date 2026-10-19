@@ -170,7 +170,7 @@ const ProjectDialog = ({
       <DialogActions style={{ paddingRight: "24px", paddingBottom: "24px" }}>
         {/* <Button
           onClick={onClose}
-          sx={{ textTransform: "capitalize", color: "#ff7800" }}
+          sx={{ textTransform: "capitalize", color: "#0066FF" }}
         >
           Cancel
         </Button> */}

@@ -160,7 +160,7 @@ const ResponsiveLayout = ({ children }) => {
     const normalizedName = normalizeName(trimmedName);
 
     const projectExists = projects.some(
-      (project) => normalizeName(project.name) === normalizedName
+      (project) => normalizeName(project.name) === normalizedName,
     );
 
     if (projectExists) {
@@ -218,7 +218,7 @@ const ResponsiveLayout = ({ children }) => {
             alignItems: "center",
             justifyContent: "center",
             borderRadius: "50%",
-            backgroundColor: "#ff7800",
+            backgroundColor: "#0066FF",
             minHeight: "35px",
             minWidth: "35px",
             color: "#ffffff",
@@ -414,7 +414,8 @@ const ResponsiveLayout = ({ children }) => {
                         .replaceAll("-", " ")
                         .split(" ")
                         .map(
-                          (word) => word.charAt(0).toUpperCase() + word.slice(1)
+                          (word) =>
+                            word.charAt(0).toUpperCase() + word.slice(1),
                         )
                         .join(" ")}
                     </Typography>
@@ -521,7 +522,7 @@ const ResponsiveLayout = ({ children }) => {
                       .replaceAll("-", " ")
                       .split(" ")
                       .map(
-                        (word) => word.charAt(0).toUpperCase() + word.slice(1)
+                        (word) => word.charAt(0).toUpperCase() + word.slice(1),
                       )
                       .join(" ")}
                   </Typography>
@@ -552,7 +553,7 @@ const ResponsiveLayout = ({ children }) => {
             display: { xs: "block", sm: "none" },
             "& .MuiDrawer-paper": {
               width: drawerWidth,
-              backgroundColor: "#FFF7E6",
+              backgroundColor: "#dceaff",
               color: "#000000",
               scrollbarWidth: "thin",
               overflowX: "hidden",
@@ -568,7 +569,7 @@ const ResponsiveLayout = ({ children }) => {
             display: { xs: "none", sm: "block" },
             "& .MuiDrawer-paper": {
               width: drawerWidth,
-              backgroundColor: "#FFF7E6",
+              backgroundColor: "#dceaff",
               color: "#000000",
               boxSizing: "border-box",
               height: "100vh",
@@ -637,7 +638,7 @@ const ResponsiveLayout = ({ children }) => {
                   >
                     {capitalizeEachWord(
                       location.pathname.split("/")[2]?.replaceAll("-", " ") ||
-                        ""
+                        "",
                     )}
                   </Typography>
                 </div>

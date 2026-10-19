@@ -179,7 +179,7 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
 
   useEffect(() => {
     const storedComments = JSON.parse(
-      localStorage.getItem(`task_${task.id}_comments`)
+      localStorage.getItem(`task_${task.id}_comments`),
     );
     if (storedComments) {
       setComments(storedComments);
@@ -247,7 +247,7 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
       setComments(updatedComments);
       localStorage.setItem(
         `task_${task.id}_comments`,
-        JSON.stringify(updatedComments)
+        JSON.stringify(updatedComments),
       );
       addCommentEditor.commands.clearContent();
     }
@@ -279,12 +279,12 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
       const updatedComments = comments.map((comment, index) =>
         index === commentToEdit
           ? { ...comment, text: editCommentEditor.getHTML() }
-          : comment
+          : comment,
       );
       setComments(updatedComments);
       localStorage.setItem(
         `task_${task.id}_comments`,
-        JSON.stringify(updatedComments)
+        JSON.stringify(updatedComments),
       );
       setCommentToEdit(null);
       editCommentEditor.commands.clearContent();
@@ -296,7 +296,7 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
     setComments(updatedComments);
     localStorage.setItem(
       `task_${task.id}_comments`,
-      JSON.stringify(updatedComments)
+      JSON.stringify(updatedComments),
     );
     handleCloseCommentMenu();
   };
@@ -338,20 +338,20 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                     task.priority === "High"
                       ? "#ff77009d"
                       : task.priority === "Medium"
-                      ? "#4f4f4f9f"
-                      : task.priority === "Low"
-                      ? "#1f50ff93"
-                      : "black",
+                        ? "#4f4f4f9f"
+                        : task.priority === "Low"
+                          ? "#1f50ff93"
+                          : "black",
                 },
                 "&.Mui-checked .MuiSvgIcon-root": {
                   color:
                     task.priority === "High"
                       ? "#ff77009d"
                       : task.priority === "Medium"
-                      ? "#4f4f4f9f"
-                      : task.priority === "Low"
-                      ? "#1f50ff93"
-                      : "black",
+                        ? "#4f4f4f9f"
+                        : task.priority === "Low"
+                          ? "#1f50ff93"
+                          : "black",
                 },
                 p: 0,
               }}
@@ -441,7 +441,7 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                           };
                           return new Intl.DateTimeFormat(
                             "en-GB",
-                            options
+                            options,
                           ).format(dueDate);
                         })()}
                       </p>
@@ -619,20 +619,20 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                       task.priority === "High"
                         ? "#ff77009d"
                         : task.priority === "Medium"
-                        ? "#4f4f4f9f"
-                        : task.priority === "Low"
-                        ? "#1f50ff93"
-                        : "black",
+                          ? "#4f4f4f9f"
+                          : task.priority === "Low"
+                            ? "#1f50ff93"
+                            : "black",
                   },
                   "&.Mui-checked .MuiSvgIcon-root": {
                     color:
                       task.priority === "High"
                         ? "#ff77009d"
                         : task.priority === "Medium"
-                        ? "#4f4f4f9f"
-                        : task.priority === "Low"
-                        ? "#1f50ff93"
-                        : "black",
+                          ? "#4f4f4f9f"
+                          : task.priority === "Low"
+                            ? "#1f50ff93"
+                            : "black",
                   },
                   p: 0,
                 }}
@@ -689,7 +689,7 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                           }),
                         };
                         return new Intl.DateTimeFormat("en-GB", options).format(
-                          dueDate
+                          dueDate,
                         );
                       })()}
                     </p>
@@ -887,7 +887,7 @@ const TaskItem = ({ task, onDelete, onEdit, onComplete }) => {
                                     size="small"
                                     variant="contained"
                                     sx={{
-                                      backgroundColor: "#ff7800",
+                                      backgroundColor: "#0066FF",
                                       textTransform: "capitalize",
                                       boxShadow: "none",
                                       fontWeight: "bold",

@@ -69,8 +69,8 @@ div p {
 }
 
 .active-link {
-  background-color: #ffe3cb;
-  color: #ff7800 !important;
+  background-color: #c3dbff;
+  color: #0066ff !important;
   border-radius: 4px;
   font-weight: bold !important;
 }
@@ -96,7 +96,7 @@ div p {
 }
 
 .fc-button {
-  background-color: #ff7800 !important;
+  background-color: #0066ff !important;
   text-transform: capitalize !important;
   border: none !important;
   color: #fff !important;
@@ -115,12 +115,12 @@ div p {
 /* In your CSS or Tailwind config */
 .custom-toast {
   line-height: normal !important;
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+  font-family:
+    source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 
 .custom-toast-progress {
-  background: #ff7800 !important;
+  background: #0066ff !important;
 }
 
 /* .ProseMirror p.is-editor-empty:first-child::before {

@@ -11,7 +11,7 @@ import {
   Drawer,
   Box,
 } from "@mui/material";
-
+import { hasTime, toDate, toYMD } from "../../../utils/date";
 import {
   LocalizationProvider,
   DateTimePicker,
@@ -23,10 +23,7 @@ import FlagIcon from "@mui/icons-material/Flag";
 import CloseIcon from "@mui/icons-material/Close";
 import DateIcon from "@mui/icons-material/DateRangeOutlined";
 
-const hasTime = (dateStr) =>
-  typeof dateStr === "string" && dateStr.includes("T");
-const parseDate = (value) => (value ? new Date(value) : null);
-
+const parseDate = (value) => (value ? toDate(value) : null);
 const EventDetailDialog = ({
   open,
   onClose,
@@ -87,7 +84,13 @@ const EventDetailDialog = ({
         {selectedEvent && (
           <>
             {isHoliday ? (
-              <div style={{ display: "flex", width: "100%" }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: isMobile ? "column" : "row",
+                  width: "100%",
+                }}
+              >
                 <div style={{ width: "100%", padding: "20px 24px" }}>
                   <p
                     style={{
@@ -99,12 +102,9 @@ const EventDetailDialog = ({
                     {selectedEvent.title}
                   </p>
 
-                  <div
-                    style={{ fontSize: 15 }}
-                    dangerouslySetInnerHTML={{
-                      __html: selectedEvent.description || "",
-                    }}
-                  />
+                  <div style={{ fontSize: 15 }}>
+                    {selectedEvent.description}
+                  </div>
                 </div>
                 {/* <p style={{ marginBottom: 2, fontWeight: 500 }}>
                   {selectedEvent.description}
@@ -114,7 +114,7 @@ const EventDetailDialog = ({
                 </p> */}
                 <div
                   style={{
-                    maxWidth: "230px",
+                    maxWidth: isMobile ? "none" : "230px",
                     width: "100%",
                     padding: "20px 24px",
                     backgroundColor: "#fcfaf8",
@@ -205,7 +205,7 @@ const EventDetailDialog = ({
                       {selectedEvent.end &&
                       selectedEvent.start !== selectedEvent.end
                         ? `${formatDate(selectedEvent.start)} - ${formatDate(
-                            selectedEvent.end
+                            selectedEvent.end,
                           )}`
                         : formatDate(selectedEvent.start)}
                     </p>
@@ -276,7 +276,7 @@ const EventDetailDialog = ({
                         },
                       }}
                       onChange={(newValue) =>
-                        setEditStart(newValue.toISOString().split("T")[0])
+                        newValue && setEditStart(toYMD(newValue))
                       }
                       renderInput={(params) => (
                         <TextField
@@ -324,7 +324,7 @@ const EventDetailDialog = ({
                         },
                       }}
                       onChange={(newValue) =>
-                        setEditEnd(newValue.toISOString().split("T")[0])
+                        newValue && setEditEnd(toYMD(newValue))
                       }
                       renderInput={(params) => (
                         <TextField

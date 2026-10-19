@@ -26,13 +26,13 @@ const Snackbar = ({ message, onUndo }) => {
         progressClassName: "custom-toast-progress",
         icon: (
           <div>
-            <InfoOutlinedIcon style={{ color: "#ff7800" }} />
+            <InfoOutlinedIcon style={{ color: "#0066FF" }} />
           </div>
         ),
         position: toast.POSITION.BOTTOM_LEFT,
         autoClose: 5000,
         closeOnClick: true,
-      }
+      },
     );
   }, [message, onUndo]);
 

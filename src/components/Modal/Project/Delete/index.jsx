@@ -20,7 +20,7 @@ const DeleteProjectDialog = ({ open, onClose, onDelete }) => {
       <DialogActions sx={{ px: 3, pb: 2 }}>
         <Button
           onClick={onClose}
-          sx={{ textTransform: "capitalize", color: "#ff7800" }}
+          sx={{ textTransform: "capitalize", color: "#0066FF" }}
         >
           Cancel
         </Button>
@@ -29,12 +29,12 @@ const DeleteProjectDialog = ({ open, onClose, onDelete }) => {
           onClick={onDelete}
           disableElevation
           sx={{
-            backgroundColor: "#ff7800",
+            backgroundColor: "#0066FF",
             textTransform: "capitalize",
             fontWeight: "bold",
             fontSize: "12px",
             "&:hover": {
-              backgroundColor: "#ff871f",
+              backgroundColor: "#004ec2",
             },
           }}
         >

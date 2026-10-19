@@ -387,7 +387,7 @@ const TaskForm = ({ onAdd, defaultCategory = "", onCancel }) => {
             variant="contained"
             disableElevation
             sx={{
-              backgroundColor: "#ff7800",
+              backgroundColor: "#0066FF",
               "&:hover": { backgroundColor: "#e06f00" },
               textTransform: "capitalize",
             }}

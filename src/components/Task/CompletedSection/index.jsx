@@ -34,7 +34,7 @@ const CompletedSection = () => {
         return tasks.sort((a, b) => a.title.localeCompare(b.title));
       case "dueDate":
         return tasks.sort(
-          (a, b) => new Date(b.dueDate || 0) - new Date(a.dueDate || 0)
+          (a, b) => new Date(b.dueDate || 0) - new Date(a.dueDate || 0),
         );
       case "newest":
       default:
@@ -60,7 +60,7 @@ const CompletedSection = () => {
                   ...task,
                   source: "projects_data",
                   projectId,
-                })
+                }),
               );
           }
         });
@@ -78,7 +78,7 @@ const CompletedSection = () => {
             combinedCompletedTasks.push({
               ...task,
               source: "home_projects_data",
-            })
+            }),
           );
       }
     }
@@ -131,7 +131,7 @@ const CompletedSection = () => {
 
     if (searchQuery.trim()) {
       sorted = sorted.filter((task) =>
-        task.title.toLowerCase().includes(searchQuery.toLowerCase())
+        task.title.toLowerCase().includes(searchQuery.toLowerCase()),
       );
     }
 
@@ -140,7 +140,7 @@ const CompletedSection = () => {
         (task) =>
           (task.source === "projects_data" &&
             task.projectId === selectedProject) ||
-          (task.source === "home_projects_data" && selectedProject === "home")
+          (task.source === "home_projects_data" && selectedProject === "home"),
       );
     }
 
@@ -186,7 +186,7 @@ const CompletedSection = () => {
 
   const handleDelete = (taskIdToDelete) => {
     const taskToRemove = completedTasks.find(
-      (task) => task.id === taskIdToDelete
+      (task) => task.id === taskIdToDelete,
     );
     if (!taskToRemove) return;
 
@@ -198,7 +198,7 @@ const CompletedSection = () => {
       const updatedProject = {
         ...projects[taskToRemove.projectId],
         tasks: projects[taskToRemove.projectId].tasks.filter(
-          (t) => t.id !== taskIdToDelete
+          (t) => t.id !== taskIdToDelete,
         ),
       };
       const updatedProjects = {
@@ -225,7 +225,7 @@ const CompletedSection = () => {
     if (rawEvents) {
       const userEvents = JSON.parse(rawEvents);
       const updatedEvents = userEvents.filter(
-        (event) => event.id !== taskIdToDelete
+        (event) => event.id !== taskIdToDelete,
       );
       localStorage.setItem("user_events", JSON.stringify(updatedEvents));
     }
@@ -316,7 +316,7 @@ const CompletedSection = () => {
                   ...task,
                   source: "projects_data",
                   projectId,
-                })
+                }),
               );
           }
         });
@@ -334,7 +334,7 @@ const CompletedSection = () => {
             combinedCompletedTasks.push({
               ...task,
               source: "home_projects_data",
-            })
+            }),
           );
       }
     }
@@ -354,7 +354,7 @@ const CompletedSection = () => {
 
     if (searchQuery.trim()) {
       sorted = sorted.filter((task) =>
-        task.title.toLowerCase().includes(searchQuery.toLowerCase())
+        task.title.toLowerCase().includes(searchQuery.toLowerCase()),
       );
     }
 
@@ -363,7 +363,7 @@ const CompletedSection = () => {
         (task) =>
           (task.source === "projects_data" &&
             task.projectId === selectedProject) ||
-          (task.source === "home_projects_data" && selectedProject === "home")
+          (task.source === "home_projects_data" && selectedProject === "home"),
       );
     }
 
@@ -381,7 +381,7 @@ const CompletedSection = () => {
 
       const updatedProjectTasks = projects[taskToUpdate.projectId].tasks.map(
         (task) =>
-          task.id === id ? { ...task, completed: !task.completed } : task
+          task.id === id ? { ...task, completed: !task.completed } : task,
       );
 
       projects[taskToUpdate.projectId].tasks = updatedProjectTasks;
@@ -395,7 +395,7 @@ const CompletedSection = () => {
       const todo = JSON.parse(raw);
 
       const updatedTasks = todo.tasks.map((task) =>
-        task.id === id ? { ...task, completed: !task.completed } : task
+        task.id === id ? { ...task, completed: !task.completed } : task,
       );
 
       todo.tasks = updatedTasks;
@@ -411,7 +411,7 @@ const CompletedSection = () => {
   }, [sortOption, searchQuery, selectedProject]);
 
   const filteredProjects = projectList.filter((name) =>
-    name.toLowerCase().includes(projectSearch.toLowerCase())
+    name.toLowerCase().includes(projectSearch.toLowerCase()),
   );
 
   const { text } = getButtonTextAndIcon();
@@ -448,10 +448,10 @@ const CompletedSection = () => {
                 borderColor: "#ccc",
               },
               "&:hover fieldset": {
-                borderColor: "#ff7800",
+                borderColor: "#0066FF",
               },
               "&.Mui-focused fieldset": {
-                borderColor: "#ff7800",
+                borderColor: "#0066FF",
               },
             },
           }}
@@ -520,7 +520,7 @@ const CompletedSection = () => {
               sx={{
                 "& .MuiOutlinedInput-root.Mui-focused": {
                   "& fieldset": {
-                    borderColor: "#ff7800",
+                    borderColor: "#0066FF",
                   },
                 },
               }}

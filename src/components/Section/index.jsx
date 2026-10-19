@@ -71,7 +71,7 @@ const Section = () => {
 
       // Retrieve existing events from localStorage
       const storedEvents = JSON.parse(
-        localStorage.getItem("user_events") || "[]"
+        localStorage.getItem("user_events") || "[]",
       );
 
       // Add the new event to the array and save to localStorage
@@ -99,7 +99,7 @@ const Section = () => {
 
   const handleSaveEdit = (updated) => {
     setTasks((prev) =>
-      prev.map((task) => (task.id === updated.id ? updated : task))
+      prev.map((task) => (task.id === updated.id ? updated : task)),
     );
     setEditTask(null);
   };
@@ -113,21 +113,21 @@ const Section = () => {
     setSections((prev) => prev.map((sec) => (sec === oldName ? newName : sec)));
     setTasks((prev) =>
       prev.map((task) =>
-        task.category === oldName ? { ...task, category: newName } : task
-      )
+        task.category === oldName ? { ...task, category: newName } : task,
+      ),
     );
     setEditingSection(null);
     setNewSectionName("");
   };
 
   const filteredSections = sections.filter((section) =>
-    section.toLowerCase().includes(searchQuery.toLowerCase())
+    section.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   // Kemudian, buat tasksByCategory hanya dari filteredSections:
   const filteredTasksByCategory = filteredSections.reduce((acc, section) => {
     acc[section] = tasks.filter(
-      (task) => task.category === section && !task.completed
+      (task) => task.category === section && !task.completed,
     );
     return acc;
   }, {});
@@ -167,7 +167,7 @@ const Section = () => {
         progressClassName: "custom-toast-progress",
         icon: (
           <div>
-            <InfoOutlinedIcon color="#ff7800" style={{ color: "#ff7800" }} />
+            <InfoOutlinedIcon color="#0066FF" style={{ color: "#0066FF" }} />
           </div>
         ),
         position: "bottom-left",
@@ -183,13 +183,13 @@ const Section = () => {
     // Update the tasks in the state
     setTasks((prevTasks) =>
       prevTasks.map((task) =>
-        task.id === updatedTask.id ? { ...task, ...updatedTask } : task
-      )
+        task.id === updatedTask.id ? { ...task, ...updatedTask } : task,
+      ),
     );
 
     // Update the corresponding event in localStorage
     const storedEvents = JSON.parse(
-      localStorage.getItem("user_events") || "[]"
+      localStorage.getItem("user_events") || "[]",
     );
 
     const updatedEvents = storedEvents.map((event) =>
@@ -201,7 +201,7 @@ const Section = () => {
             end: updatedTask.dueDate,
             details: updatedTask,
           }
-        : event
+        : event,
     );
 
     // Save updated events back to localStorage
@@ -217,7 +217,7 @@ const Section = () => {
   // };
 
   const filteredTasks = tasks.filter((task) =>
-    task.title.toLowerCase().includes(searchQuery.toLowerCase())
+    task.title.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const incompleteTasks = filteredTasks.filter((task) => !task.completed);
@@ -285,13 +285,13 @@ const Section = () => {
           }}
           onClick={() => setShowForm(true)}
         >
-          <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
+          <Divider sx={{ flex: 1, borderColor: "#0066FF" }} />
           <span
-            style={{ fontWeight: "bold", color: "#ff7800", fontSize: "15px" }}
+            style={{ fontWeight: "bold", color: "#0066FF", fontSize: "15px" }}
           >
             Add Section
           </span>
-          <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
+          <Divider sx={{ flex: 1, borderColor: "#0066FF" }} />
         </div>
       ) : (
         <form
@@ -308,17 +308,17 @@ const Section = () => {
               marginTop: 7,
             }}
           >
-            <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
+            <Divider sx={{ flex: 1, borderColor: "#0066FF" }} />
             <span
               style={{
                 fontWeight: "bold",
-                color: "#ff7800",
+                color: "#0066FF",
                 fontSize: "15px",
               }}
             >
               Add new section
             </span>
-            <Divider sx={{ flex: 1, borderColor: "#ff7800" }} />
+            <Divider sx={{ flex: 1, borderColor: "#0066FF" }} />
           </div>
           <TextField
             fullWidth
@@ -336,10 +336,10 @@ const Section = () => {
                   borderColor: "#ccc",
                 },
                 "&:hover fieldset": {
-                  borderColor: "#ff7800",
+                  borderColor: "#0066FF",
                 },
                 "&.Mui-focused fieldset": {
-                  borderColor: "#ff7800",
+                  borderColor: "#0066FF",
                 },
               },
             }}
@@ -349,8 +349,8 @@ const Section = () => {
               type="submit"
               variant="contained"
               sx={{
-                backgroundColor: "#ff7800",
-                "&:hover": { backgroundColor: "#ff871f" },
+                backgroundColor: "#0066FF",
+                "&:hover": { backgroundColor: "#004ec2" },
               }}
               disableElevation
               size="small"

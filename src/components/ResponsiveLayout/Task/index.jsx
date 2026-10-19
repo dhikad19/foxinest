@@ -19,7 +19,7 @@ import { toast } from "react-toastify";
 const showNotification = (taskCount) => {
   const todayDate = new Date().toISOString().split("T")[0];
   const lastNotificationDate = localStorage.getItem(
-    "lastSystemNotificationDate"
+    "lastSystemNotificationDate",
   );
 
   // Prevent duplicate system notifications on the same day
@@ -97,7 +97,7 @@ function TodayTasksButton() {
     }
 
     const filteredTasks = allTasks.filter(
-      (task) => task.dueDate === todayDates || task.dueDate === tomorrowDate
+      (task) => task.dueDate === todayDates || task.dueDate === tomorrowDate,
     );
 
     setTodayTasks(filteredTasks);
@@ -114,12 +114,12 @@ function TodayTasksButton() {
             icon: (
               <div>
                 <InfoOutlinedIcon
-                  color="#ff7800"
-                  style={{ color: "#ff7800" }}
+                  color="#0066FF"
+                  style={{ color: "#0066FF" }}
                 />
               </div>
             ),
-          }
+          },
         );
 
         showNotification(filteredTasks.length);
@@ -171,7 +171,7 @@ function TodayTasksButton() {
       }
 
       const notifiedTasks = JSON.parse(
-        localStorage.getItem("notified_tasks") || "[]"
+        localStorage.getItem("notified_tasks") || "[]",
       );
 
       allTasks.forEach((task) => {
@@ -181,7 +181,7 @@ function TodayTasksButton() {
           // Mark this task as notified so we don't alert again
           localStorage.setItem(
             "notified_tasks",
-            JSON.stringify([...notifiedTasks, task.id])
+            JSON.stringify([...notifiedTasks, task.id]),
           );
         }
       });
@@ -298,7 +298,7 @@ function TodayTasksButton() {
                           };
                           return new Intl.DateTimeFormat(
                             "en-GB",
-                            options
+                            options,
                           ).format(dueDate);
                         })()}
                       </p>

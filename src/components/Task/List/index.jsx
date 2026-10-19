@@ -244,7 +244,7 @@ const TaskList = ({
         const reordered = arrayMove(tasks, oldIndex, newIndex);
 
         const allTasks = Object.entries(tasksByCategory).flatMap(
-          ([cat, tList]) => (cat === section ? reordered : tList)
+          ([cat, tList]) => (cat === section ? reordered : tList),
         );
 
         onReorderTasks(allTasks);
@@ -280,7 +280,7 @@ const TaskList = ({
         return !isOverdue;
       });
       return [category, validTasks];
-    })
+    }),
   );
 
   const handleEdit = (updatedTask) => {
@@ -288,7 +288,7 @@ const TaskList = ({
     const updatedTasksByCategory = { ...tasksByCategory };
     const category = updatedTask.category;
     const taskIndex = updatedTasksByCategory[category].findIndex(
-      (task) => task.id === updatedTask.id
+      (task) => task.id === updatedTask.id,
     );
     if (taskIndex !== -1) {
       updatedTasksByCategory[category][taskIndex] = updatedTask;
@@ -305,7 +305,7 @@ const TaskList = ({
       .map((task) =>
         task.dueDate && task.dueDate < todayStr
           ? { ...task, dueDate: formatted }
-          : task
+          : task,
       );
 
     setSelectedDate(newDate);
@@ -388,7 +388,7 @@ const TaskList = ({
                     style={{
                       marginLeft: "auto",
                       cursor: "pointer",
-                      color: "#ff7800",
+                      color: "#0066FF",
                       fontWeight: 500,
                       fontSize: 15,
                     }}
@@ -468,7 +468,7 @@ const TaskList = ({
                         onEdit={() => setEditingTaskId(task.id)} // Masuk ke mode edit ketika tombol edit diklik
                         onComplete={onComplete} // Fungsi untuk menyelesaikan task
                       />
-                    )
+                    ),
                   )}
                 </div>
               )}
@@ -570,7 +570,7 @@ const TaskList = ({
                         onEdit={() => setEditingTaskId(task.id)}
                         onComplete={onComplete}
                       />
-                    )
+                    ),
                   )}
                 </SortableContext>
 
@@ -583,7 +583,7 @@ const TaskList = ({
                       display: "flex",
                       alignItems: "center",
                       color:
-                        hoveredCategory === category ? "#ff7800" : "inherit",
+                        hoveredCategory === category ? "#0066FF" : "inherit",
                       cursor: "pointer",
                       marginTop: 10,
                     }}
